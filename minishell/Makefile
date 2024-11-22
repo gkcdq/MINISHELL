@@ -1,4 +1,4 @@
-SRCS        = src/main.c
+SRCS        = src/main.c src/init.c src/builtins/exit.c
 OBJ_DIR     = obj
 OBJS        = $(addprefix $(OBJ_DIR)/, $(SRCS:.c=.o))
 NAME        = minishell
@@ -7,7 +7,7 @@ RM          = rm -f
 CFLAGS      = -Wall -Wextra -Werror
 CPPFLAGS    = -Iinc -Isrc
 LDFLAGS     = -Llibft
-LDLIBS      = -lft
+LDLIBS      = -lft -lreadline -lhistory
 
 all: $(NAME)
 
