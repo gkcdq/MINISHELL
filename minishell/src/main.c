@@ -20,8 +20,9 @@ int	ft_strcmp(char *s1, char *s2)
 char	*skip_isspace_for_fonctions(char *input)
 {
 	char *s;
-	int i = 0;
+	int i;
 
+	i = 0;
 	s = malloc(sizeof(char) * ft_strlen(input) + 1);
 	while (*input <= 32)
 	{
@@ -38,18 +39,22 @@ char	*skip_isspace_for_fonctions(char *input)
 	return (s);
 }
 ////////////////////////////////////////////////////////
+
 void	interprete_commande(char *input)
 {
 	input = skip_isspace_for_fonctions(input);
 	if (ft_strcmp(input, "exit") == 0)
 	{
-		ft_printf("🏃 exit\n");
+		free(input);
 		ft_exit();
 	}
-	else
+	else if (ft_strcmp(input, "pwd") == 0)
 	{
-		ft_printf("🍁_(`へ´*)_🍁: %s: command not found\n", input);
+	free(input);
+		ft_pwd();
 	}
+	else
+		ft_printf("🍁_(`へ´*)_🍁: %s: command not found\n", input);
 }
 
 int	main(int ac, char **av, char **envp)
@@ -69,8 +74,7 @@ int	main(int ac, char **av, char **envp)
 			interprete_commande(input);
 		}
 		free(input);
-
 	}
-
+	clear_history();
 	return (0);
 }

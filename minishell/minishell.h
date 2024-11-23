@@ -23,4 +23,12 @@ void	init_global(void);
 // exit.c
 void	ft_exit(void);
 
+// pwd.c
+void    ft_pwd(void);
+
+
+
+// utils.c
+int	ft_strcmp(char *s1, char *s2);
+
 #endif

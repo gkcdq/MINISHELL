@@ -1,4 +1,4 @@
-SRCS        = src/main.c src/init.c src/builtins/exit.c
+SRCS        = src/main.c src/init.c src/builtins/exit.c src/builtins/pwd.c src/builtins/cd.c
 OBJ_DIR     = obj
 OBJS        = $(addprefix $(OBJ_DIR)/, $(SRCS:.c=.o))
 NAME        = minishell
