@@ -13,17 +13,14 @@
 # include <sys/wait.h>          // wait, waitpid, etc.
 # include <termios.h>           // tcsetattr, tcgetattr
 
-typedef struct s_global
-{
-	int	minishell_check;
-}		t_global;
+extern int	g_minishell_check;
 
 // init_c
-void	init_global(t_global *global);
+void	init_global(void);
 
 // ---------- BUILTINS ----------- //
 
 // exit.c
-void	ft_exit(t_global *g);
+void	ft_exit(void);
 
 #endif

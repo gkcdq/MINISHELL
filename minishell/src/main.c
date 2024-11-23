@@ -1,5 +1,7 @@
 #include "../minishell.h"
 
+int g_minishell_check;
+
 int	ft_strcmp(char *s1, char *s2)
 {
 	int	i;
@@ -14,39 +16,57 @@ int	ft_strcmp(char *s1, char *s2)
 	}
 	return (0);
 }
-
-void	interprete_commande(char *input, t_global *global)
+//    utils.c    /////////////////////////////////////////
+char	*skip_isspace_for_fonctions(char *input)
 {
-	if (strcmp(input, "exit") == 0)
+	char *s;
+	int i = 0;
+
+	s = malloc(sizeof(char) * ft_strlen(input) + 1);
+	while (*input <= 32)
 	{
-		printf("Big alt f4..\n");
-		ft_exit(global);
+		input++;
+	}
+	//ft_printf("%c\n", *input);
+	while (*input > 32)
+	{
+		s[i] = *input;
+		i++;
+		input++;
+	}
+	s[i] = '\0';
+	return (s);
+}
+////////////////////////////////////////////////////////
+void	interprete_commande(char *input)
+{
+	input = skip_isspace_for_fonctions(input);
+	if (ft_strcmp(input, "exit") == 0)
+	{
+		ft_printf("🏃 exit\n");
+		ft_exit();
 	}
 	else
 	{
-		printf("You entered: %s\n", input);
+		ft_printf("🍁_(`へ´*)_🍁: %s: command not found\n", input);
 	}
 }
 
 int	main(int ac, char **av, char **envp)
 {
-
-
 	char *input;
 
     (void)ac;
     (void)av;
     (void)envp;
-    t_global *global = malloc(sizeof(t_global));
-    init_global(global);
-	while (global->minishell_check == 0)
+    init_global();
+	while (g_minishell_check == 0)
 	{
-        printf("%d", global->minishell_check);
-		input = readline("🍀_(^o^)_🍀 -> ");
+		input = readline("🍀_(^o^)_🍀  > ");
 		if (input && *input)
 		{
 			add_history(input);
-			interprete_commande(input, global);
+			interprete_commande(input);
 		}
 		free(input);
 

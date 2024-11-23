@@ -1,6 +1,6 @@
 #include "../minishell.h"
 
-void    init_global(t_global *global)
+void    init_global(void)
 {
-    global->minishell_check = 0;
+    g_minishell_check = 0;
 }

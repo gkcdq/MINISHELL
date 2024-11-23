@@ -1,6 +1,6 @@
 #include "../../minishell.h"
 
-void    ft_exit(t_global *global)
+void    ft_exit(void)
 {
-    global->minishell_check = 1;
+    g_minishell_check = 1;
 }
