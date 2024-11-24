@@ -16,19 +16,19 @@
 extern int	g_minishell_check;
 
 // init_c
-void	init_global(void);
+void		init_global(void);
 
 // ---------- BUILTINS ----------- //
 
 // exit.c
-void	ft_exit(void);
+void		ft_exit(char *input);
 
 // pwd.c
-void    ft_pwd(void);
-
-
+void		ft_pwd(void);
 
 // utils.c
-int	ft_strcmp(char *s1, char *s2);
+int			ft_strcmp(char *s1, char *s2);
+void		free_split(char **array);
+int			is_number(char *str);
 
 #endif

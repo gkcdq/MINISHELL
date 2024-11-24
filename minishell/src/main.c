@@ -1,6 +1,6 @@
 #include "../minishell.h"
 
-int g_minishell_check;
+int		g_minishell_check;
 
 int	ft_strcmp(char *s1, char *s2)
 {
@@ -17,18 +17,47 @@ int	ft_strcmp(char *s1, char *s2)
 	return (0);
 }
 //    utils.c    /////////////////////////////////////////
+
+int	is_number(char *str)
+{
+	int	i;
+
+	i = 0;
+	if (str[i] == '-' || str[i] == '+')
+		i++;
+	while (str[i])
+	{
+		if (!ft_isdigit(str[i]))
+			return (0);
+		i++;
+	}
+	return (1);
+}
+
+void	free_split(char **array)
+{
+	int	i;
+
+	if (!array)
+		return ;
+	i = 0;
+	while (array[i])
+	{
+		free(array[i]);
+		i++;
+	}
+	free(array);
+}
+
 char	*skip_isspace_for_fonctions(char *input)
 {
-	char *s;
-	int i;
+	char	*s;
+	int		i;
 
 	i = 0;
 	s = malloc(sizeof(char) * ft_strlen(input) + 1);
 	while (*input <= 32)
-	{
 		input++;
-	}
-	//ft_printf("%c\n", *input);
 	while (*input > 32)
 	{
 		s[i] = *input;
@@ -42,39 +71,52 @@ char	*skip_isspace_for_fonctions(char *input)
 
 void	interprete_commande(char *input)
 {
-	input = skip_isspace_for_fonctions(input);
-	if (ft_strcmp(input, "exit") == 0)
+	char	*trimmed_input;
+
+	trimmed_input = skip_isspace_for_fonctions(input);
+	if (ft_strncmp(trimmed_input, "exit", 4) == 0)
 	{
-		free(input);
-		ft_exit();
+		ft_exit(trimmed_input);
 	}
-	else if (ft_strcmp(input, "pwd") == 0)
+	else if (ft_strcmp(trimmed_input, "pwd") == 0)
 	{
-	free(input);
 		ft_pwd();
 	}
 	else
-		ft_printf("🍁_(`へ´*)_🍁: %s: command not found\n", input);
+	{
+		ft_printf("🍁_(`へ´*)_🍁: %s: command not found\n", trimmed_input);
+	}
+	free(trimmed_input);
+}
+
+void	loop(char *input)
+{
+	input = readline("🍀_(^o^)_🍀  > ");
+	if (input && *input)
+	{
+		add_history(input);
+		interprete_commande(input);
+	}
+	free(input);
 }
 
 int	main(int ac, char **av, char **envp)
 {
-	char *input;
+	char	*input;
 
-    (void)ac;
-    (void)av;
-    (void)envp;
-    init_global();
+	input = NULL;
+	(void)ac;
+	(void)av;
+	(void)envp;
+	init_global();
 	while (g_minishell_check == 0)
 	{
-		input = readline("🍀_(^o^)_🍀  > ");
-		if (input && *input)
-		{
-			add_history(input);
-			interprete_commande(input);
-		}
-		free(input);
+		loop(input);
 	}
 	clear_history();
 	return (0);
 }
+
+// if (input[i] == 'e' && input[i + 1] == 'x' && input[i + 2] == 'i'
+//		&& input[i	+ 3 == 't'] && input[i + 4 == 32])
+//	check_if_number_for_exit(input);
