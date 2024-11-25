@@ -74,9 +74,9 @@ void	interprete_commande(char *input)
 	char	*trimmed_input;
 
 	trimmed_input = skip_isspace_for_fonctions(input);
-	if (ft_strncmp(trimmed_input, "exit", 4) == 0)
+	if (ft_strcmp(trimmed_input, "exit") == 0)
 	{
-		ft_exit(trimmed_input);
+		ft_exit(input);
 	}
 	else if (ft_strcmp(trimmed_input, "pwd") == 0)
 	{
