@@ -75,17 +75,11 @@ void	interprete_commande(char *input)
 
 	trimmed_input = skip_isspace_for_fonctions(input);
 	if (ft_strcmp(trimmed_input, "exit") == 0)
-	{
 		ft_exit(input);
-	}
 	else if (ft_strcmp(trimmed_input, "pwd") == 0)
-	{
 		ft_pwd();
-	}
 	else
-	{
 		ft_printf("🍁_(`へ´*)_🍁: %s: command not found\n", trimmed_input);
-	}
 	free(trimmed_input);
 }
 
