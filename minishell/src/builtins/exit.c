@@ -30,7 +30,7 @@ void	ft_exit(char *input)
 		free_split(args);
 		g_minishell_check = 1;
 	}
-	else if (args[2] != NULL && args[1][0] != ';')
+	else if (args[2] != NULL && args[1][0] != ';' && args[2][0] != ';')
 	{
 		ft_printf("exit\n");
 		ft_printf("💥_(╬ಠ益ಠ)_💥: exit: too many arguments\n");
