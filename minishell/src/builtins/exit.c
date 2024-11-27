@@ -7,13 +7,12 @@ char	*parse_input_exit(char *input)
 	i = 0;
 	while (input[i])
 	{
-		if (input[i] == ';')
+		if (input[i] == ';' && (input[i - 1] != ' '))
 		{
 			input[i] = '\0';
 			break;
 		}
-		else
-			i++;
+		i++;
 	}
 	return (input);
 }
@@ -24,14 +23,14 @@ void	ft_exit(char *input)
 
 	input = parse_input_exit(input);
 	args = ft_split(input, ' ');
-	if ((args[1] && !is_number(args[1])) || (args[1][0] == '-' || args[1][0] == '+'))
+	if (args[1] && !is_number(args[1]) && args[1][0] != ';')
 	{
 		ft_printf("exit\n");
 		ft_printf("🚧_(⊙_⊙;)_🚧 : exit: %s: numeric argument required\n", args[1]);
 		free_split(args);
 		g_minishell_check = 1;
 	}
-	else if (args[2] != NULL)
+	else if (args[2] != NULL && args[1][0] != ';')
 	{
 		ft_printf("exit\n");
 		ft_printf("💥_(╬ಠ益ಠ)_💥: exit: too many arguments\n");

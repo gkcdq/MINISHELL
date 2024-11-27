@@ -23,8 +23,6 @@ int	is_number(char *str)
 	int	i;
 
 	i = 0;
-	if (str[i] == '-' || str[i] == '+')
-		i++;
 	while (str[i])
 	{
 		if (!ft_isdigit(str[i]))
@@ -74,6 +72,8 @@ void	interprete_commande(char *input)
 	char	*trimmed_input;
 
 	trimmed_input = skip_isspace_for_fonctions(input);
+	//ft_printf("input : %s\n", input);
+	//ft_printf("trimmed_input ; %s\n", trimmed_input);
 	if (ft_strcmp(trimmed_input, "exit") == 0)
 		ft_exit(input);
 	else if (ft_strcmp(trimmed_input, "pwd") == 0)
@@ -110,7 +110,3 @@ int	main(int ac, char **av, char **envp)
 	clear_history();
 	return (0);
 }
-
-// if (input[i] == 'e' && input[i + 1] == 'x' && input[i + 2] == 'i'
-//		&& input[i	+ 3 == 't'] && input[i + 4 == 32])
-//	check_if_number_for_exit(input);
