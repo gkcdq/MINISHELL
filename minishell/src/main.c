@@ -47,34 +47,71 @@ void	free_split(char **array)
 	free(array);
 }
 
-char	*skip_isspace_for_fonctions(char *input)
+char	*skip_isspace_for_fonctions(char *input, t_token *token)
 {
 	char	*s;
 	int		i;
 
 	i = 0;
-	s = malloc(sizeof(char) * ft_strlen(input) + 1);
-	while (*input <= 32)
-		input++;
-	while (*input > 32)
+	if (check_token(input, token) == 1)
+		return (token->symbol);
+	else
 	{
-		s[i] = *input;
-		i++;
-		input++;
+		s = malloc(sizeof(char) * ft_strlen(input) + 1);
+		while (*input <= 32)
+			input++;
+		while (*input > 32)
+		{
+			s[i] = *input;
+			i++;
+			input++;
+		}
+		s[i] = '\0';
 	}
-	s[i] = '\0';
 	return (s);
+}
+
+int	check_token(char *input, t_token *token)
+{
+	int	i;
+
+	i = 0;
+	while (input[i] <= 32)
+		i++;
+	if (input[i] == ';' && input[i + 1] != ';')
+	{
+		token->token = 1;
+		token->symbol = ";";
+		return (1);
+	}
+	while (input[i])
+	{
+		if (input[i] == ';' && input[i + 1] == ';')
+		{
+			token->token = 1;
+			token->symbol = ";;";
+			return (1);
+		}
+		i++;
+	}
+	return (0);
 }
 ////////////////////////////////////////////////////////
 
 void	interprete_commande(char *input)
 {
 	char	*trimmed_input;
+	t_token	*token;
 
-	trimmed_input = skip_isspace_for_fonctions(input);
-	// ft_printf("input : %s\n", input);
-	// ft_printf("trimmed_input ; %s\n", trimmed_input);
-	if (ft_strcmp(trimmed_input, "exit") == 0)
+	token = malloc(sizeof(t_token));
+	token->token = 0;
+	trimmed_input = skip_isspace_for_fonctions(input, token);
+	if (token->token == 1)
+	{
+		printf("🛠️_(>_<;)_🛠️   : syntax error near unexpected token `%s'\n", token->symbol);
+		return ;
+	}
+	else if (ft_strcmp(trimmed_input, "exit") == 0)
 	{
 		if (ft_strcmp(trimmed_input, "exit") == 0 && ft_strcmp(trimmed_input,
 				input) == 0)

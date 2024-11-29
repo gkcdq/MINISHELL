@@ -1,32 +1,67 @@
 #include "../../minishell.h"
 
-char	*parse_input_exit(char *input)
+char	*parse_input_exit(char *input, t_token *exit)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	while (input[i])
 	{
+		if (input[i] == ';' && input[i + 1] == ';')
+			exit->token = 1;
 		if (input[i] == ';' && (input[i - 1] != ' '))
 		{
 			input[i] = '\0';
-			break;
+			break ;
 		}
 		i++;
 	}
 	return (input);
 }
 
+int	check_simple_exit(char *input)
+{
+	int	i;
+
+	i = 0;
+	while (input[i] <= 32)
+		i++;
+	while (input[i] > 32)
+		i++;
+	while (input[i] <= 32)
+	{
+		if (input[i] > 32)
+			return (1);
+		i++;
+	}
+	return (0);
+}
+
 void	ft_exit(char *input)
 {
+	t_token	*exit;
 	char	**args;
 
-	input = parse_input_exit(input);
+	exit = malloc(sizeof(t_token));
+	exit->token = 0;
+	input = parse_input_exit(input, exit);
 	args = ft_split(input, ' ');
+	if (check_simple_exit(input) == 0 && args[1] == NULL)
+	{
+		ft_printf("🏃 exit\n");
+		g_minishell_check = 1;
+		return ;
+	}
+	if (exit->token == 1)
+	{
+		printf("🛠️_(>_<;)_🛠️   : syntax error near unexpected token `;;'\n");
+		return ;
+	}
 	if (args[1] && !is_number(args[1]) && args[1][0] != ';')
 	{
 		ft_printf("exit\n");
-		ft_printf("🚧_(⊙_⊙;)_🚧 : exit: %s: numeric argument required\n", args[1]);
+		ft_printf("🚧_(⊙_⊙;)_🚧 : exit: %s: numeric argument required\n",
+			args[1]);
 		free_split(args);
 		g_minishell_check = 1;
 	}
