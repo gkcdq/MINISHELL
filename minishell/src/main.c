@@ -72,12 +72,28 @@ void	interprete_commande(char *input)
 	char	*trimmed_input;
 
 	trimmed_input = skip_isspace_for_fonctions(input);
-	//ft_printf("input : %s\n", input);
-	//ft_printf("trimmed_input ; %s\n", trimmed_input);
+	// ft_printf("input : %s\n", input);
+	// ft_printf("trimmed_input ; %s\n", trimmed_input);
 	if (ft_strcmp(trimmed_input, "exit") == 0)
-		ft_exit(input);
+	{
+		if (ft_strcmp(trimmed_input, "exit") == 0 && ft_strcmp(trimmed_input,
+				input) == 0)
+		{
+			printf("🏃 exit\n");
+			g_minishell_check = 1;
+		}
+		else
+			ft_exit(input);
+	}
 	else if (ft_strcmp(trimmed_input, "pwd") == 0)
 		ft_pwd();
+	else if ((ft_strcmp(trimmed_input, "cd") == 0) || (ft_strcmp(trimmed_input,
+				"~") == 0))
+		ft_cd(input);
+	else if (ft_strcmp(trimmed_input, "ls") == 0)
+		ft_ls(input);
+	else if (ft_strcmp(trimmed_input, "clear") == 0)
+		ft_clear(input);
 	else
 		ft_printf("🍁_(`へ´*)_🍁: %s: command not found\n", trimmed_input);
 	free(trimmed_input);

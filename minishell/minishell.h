@@ -15,6 +15,11 @@
 
 extern int	g_minishell_check;
 
+typedef struct s_cd
+{
+	int		ewrgea;
+}			t_cd;
+
 // init_c
 void		init_global(void);
 
@@ -22,9 +27,14 @@ void		init_global(void);
 
 // exit.c
 void		ft_exit(char *input);
-
 // pwd.c
 void		ft_pwd(void);
+// cd.c
+void		ft_cd(char *path);
+// ls.c
+void		ft_ls(char *input);
+
+// ------------------------------ //
 
 // utils.c
 int			ft_strcmp(char *s1, char *s2);
