@@ -33,6 +33,8 @@ void		ft_pwd(void);
 void		ft_cd(char *path);
 // ls.c
 void		ft_ls(char *input);
+// clear.c
+void		ft_clear(char *input);
 
 // ------------------------------ //
 
