@@ -200,6 +200,7 @@ void cumulate_token(char *input)
 	else
 	{
 		i = 0;
+		//printf("%c\n", input[i]);
 	}
 	return ;
 }
