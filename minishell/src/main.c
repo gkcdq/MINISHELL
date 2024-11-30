@@ -71,6 +71,19 @@ char	*skip_isspace_for_fonctions(char *input, t_token *token)
 	return (s);
 }
 
+int	check_token_in_all_string(char *input)
+{
+	int i = 0;
+
+	while (input[i])
+	{
+		if (input[i] == ';' && input[i + 1] == ';')
+			return (1);
+		i++;
+	}
+	return (0);
+}
+
 int	check_token(char *input, t_token *token)
 {
 	int	i;
@@ -84,7 +97,7 @@ int	check_token(char *input, t_token *token)
 		token->symbol = ";";
 		return (1);
 	}
-	while (input[i])
+	/*while (input[i])
 	{
 		if (input[i] == ';' && input[i + 1] == ';')
 		{
@@ -93,9 +106,35 @@ int	check_token(char *input, t_token *token)
 			return (1);
 		}
 		i++;
+	}*/
+	return (0);
+}
+
+int	token_found(char *input, t_token *tok)
+{
+	int	i;
+
+	i = 0;
+	while (input[i])
+	{
+		if (input[i] <= 32)
+		{
+			if (input[i] == '\0')
+				return (0);
+			i++;
+		}
+		if (input[i] == ';' && input[i + 1] == '\0')
+			return (0) ;
+		if (input[i] == ';' && input[i + 1] != '\0')
+		{
+				tok->found = 1;
+				return (1) ;
+		}
+		i++;
 	}
 	return (0);
 }
+
 ////////////////////////////////////////////////////////
 
 void	interprete_commande(char *input)
@@ -136,13 +175,60 @@ void	interprete_commande(char *input)
 	free(trimmed_input);
 }
 
+void cumulate_token(char *input)
+{
+    static int i = 0;     
+    char copy[1024]; 
+    int j = 0;
+	//printf("Input: %s\n", input);
+    //printf("Copy: %s\n", copy);
+    if (!input || input[i] == '\0')
+        return;
+    while (input[i] != '\0' && input[i] != ';')
+        copy[j++] = input[i++];
+    copy[j] = '\0';
+    //printf("Input: %c\n", input[i]);
+    //printf("Copy: %s\n", copy);
+	interprete_commande(copy);
+	//printf("%c\n", input[i]);
+    if (input[i] == ';' && input[i + 1] != ';')
+	{
+        i++;
+	}
+	if (input[i] != '\0')
+		cumulate_token(input);
+	else
+	{
+		i = 0;
+	}
+	return ;
+}
+
 void	loop(char *input)
 {
+	//int i = 0;
+	t_token *tok;
+
+	tok = malloc(sizeof(t_token));
+	tok->found = 0;
+	tok->stop = 0;
 	input = readline("🍀_(^o^)_🍀  > ");
 	if (input && *input)
 	{
 		add_history(input);
-		interprete_commande(input);
+		if (token_found(input, tok) == 1)
+		{
+			//i = 1;
+			//printf("%d\n", i);
+			if (check_token_in_all_string(input) == 1)
+			{
+				printf("🛠️_(>_<;)_🛠️   : syntax error near unexpected token `;;'\n");
+				return ;
+			}
+			cumulate_token(input);
+		}
+		else
+			interprete_commande(input);
 	}
 	free(input);
 }

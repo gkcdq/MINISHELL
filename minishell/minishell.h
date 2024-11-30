@@ -18,6 +18,8 @@ extern int	g_minishell_check;
 typedef struct s_token
 {
 	int		token;
+	int		found;
+	int		stop;
 	char	*symbol;
 }			t_token;
 
