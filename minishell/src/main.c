@@ -187,8 +187,8 @@ void cumulate_token(char *input)
     while (input[i] != '\0' && input[i] != ';')
         copy[j++] = input[i++];
     copy[j] = '\0';
-	printf("Input: %c\n", input[i]);
-    printf("Copy: %s\n", copy);
+	//printf("Input: %c\n", input[i]);
+   // printf("Copy: %s\n", copy);
 	interprete_commande(copy);
 	//printf("%c\n", input[i]);
 	if (input[i] == ';')
