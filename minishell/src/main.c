@@ -1,6 +1,7 @@
 #include "../minishell.h"
 
 int		g_minishell_check;
+char	**g_envp;
 
 int	ft_strcmp(char *s1, char *s2)
 {
@@ -73,8 +74,9 @@ char	*skip_isspace_for_fonctions(char *input, t_token *token)
 
 int	check_token_in_all_string(char *input)
 {
-	int i = 0;
+	int	i;
 
+	i = 0;
 	while (input[i])
 	{
 		if (input[i] == ';' && input[i + 1] == ';')
@@ -124,11 +126,11 @@ int	token_found(char *input, t_token *tok)
 			i++;
 		}
 		if (input[i] == ';' && input[i + 1] == '\0')
-			return (0) ;
+			return (0);
 		if (input[i] == ';' && input[i + 1] != '\0')
 		{
-				tok->found = 1;
-				return (1) ;
+			tok->found = 1;
+			return (1);
 		}
 		i++;
 	}
@@ -137,7 +139,7 @@ int	token_found(char *input, t_token *tok)
 
 ////////////////////////////////////////////////////////
 
-void	interprete_commande(char *input)
+void	interprete_commande(char *input, char **envp)
 {
 	char	*trimmed_input;
 	t_token	*token;
@@ -147,7 +149,8 @@ void	interprete_commande(char *input)
 	trimmed_input = skip_isspace_for_fonctions(input, token);
 	if (token->token == 1)
 	{
-		printf("🛠️_(>_<;)_🛠️   : syntax error near unexpected token `%s'\n", token->symbol);
+		printf("🛠️_(>_<;)_🛠️   : syntax error near unexpected token `%s'\n",
+			token->symbol);
 		return ;
 	}
 	else if (ft_strcmp(trimmed_input, "exit") == 0)
@@ -170,47 +173,51 @@ void	interprete_commande(char *input)
 		ft_ls(input);
 	else if (ft_strcmp(trimmed_input, "clear") == 0)
 		ft_clear(input);
+	else if (ft_strcmp(trimmed_input, "env") == 0)
+		ft_env(envp);
 	else
 		ft_printf("🍁_(`へ´*)_🍁: %s: command not found\n", trimmed_input);
 	free(trimmed_input);
 }
 
-void cumulate_token(char *input)
+void	cumulate_token(char *input, char **envp)
 {
-    static int i = 0;     
-    char copy[1024]; 
-    int j = 0;
-	//printf("Input: %s\n", input);
-    //printf("Copy: %s\n", copy);
-    if (!input || input[i] == '\0')
-        return;
-    while (input[i] != '\0' && input[i] != ';')
-        copy[j++] = input[i++];
-    copy[j] = '\0';
-	//printf("Input: %c\n", input[i]);
-   // printf("Copy: %s\n", copy);
-	interprete_commande(copy);
-	//printf("%c\n", input[i]);
+	static int	i = 0;
+	char		copy[1024];
+	int			j;
+
+	j = 0;
+	// printf("Input: %s\n", input);
+	// printf("Copy: %s\n", copy);
+	if (!input || input[i] == '\0')
+		return ;
+	while (input[i] != '\0' && input[i] != ';')
+		copy[j++] = input[i++];
+	copy[j] = '\0';
+	// printf("Input: %c\n", input[i]);
+	// printf("Copy: %s\n", copy);
+	interprete_commande(copy, envp);
+	// printf("%c\n", input[i]);
 	if (input[i] == ';')
 		i++;
 	if (input[i] != '\0')
 	{
-		//printf("input de fin %c\n", input[i]);
-		cumulate_token(input);
+		// printf("input de fin %c\n", input[i]);
+		cumulate_token(input, envp);
 	}
 	else
 	{
 		i = 0;
-		//printf("input apres reset %c\n", input[i]);
+		// printf("input apres reset %c\n", input[i]);
 	}
 	return ;
 }
 
-void	loop(char *input)
+void	loop(char *input, char **envp)
 {
-	//int i = 0;
-	t_token *tok;
+	t_token	*tok;
 
+	// int i = 0;
 	tok = malloc(sizeof(t_token));
 	tok->found = 0;
 	tok->stop = 0;
@@ -220,17 +227,17 @@ void	loop(char *input)
 		add_history(input);
 		if (token_found(input, tok) == 1)
 		{
-			//i = 1;
-			//printf("%d\n", i);
+			// i = 1;
+			// printf("%d\n", i);
 			if (check_token_in_all_string(input) == 1)
 			{
 				printf("🛠️_(>_<;)_🛠️   : syntax error near unexpected token `;;'\n");
 				return ;
 			}
-			cumulate_token(input);
+			cumulate_token(input, envp);
 		}
 		else
-			interprete_commande(input);
+			interprete_commande(input, envp);
 	}
 	free(input);
 }
@@ -242,11 +249,10 @@ int	main(int ac, char **av, char **envp)
 	input = NULL;
 	(void)ac;
 	(void)av;
-	(void)envp;
-	init_global();
+	init_global(envp);
 	while (g_minishell_check == 0)
 	{
-		loop(input);
+		loop(input, envp);
 	}
 	clear_history();
 	return (0);

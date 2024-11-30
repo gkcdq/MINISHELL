@@ -14,6 +14,7 @@
 # include <termios.h>           // tcsetattr, tcgetattr
 
 extern int	g_minishell_check;
+extern char	**g_envp;
 
 typedef struct s_token
 {
@@ -23,8 +24,17 @@ typedef struct s_token
 	char	*symbol;
 }			t_token;
 
+typedef struct s_env_fonction
+{
+	char	*copy_pwd;
+	char	*copy_oldpwd;
+	int		found_difference;
+	int		print_the_same;
+}			t_env;
+
 // init_c
-void		init_global(void);
+int			ft_strlonglen(char **s);
+void		init_global(char **envp);
 
 // ---------- BUILTINS ----------- //
 
@@ -38,6 +48,9 @@ void		ft_cd(char *path);
 void		ft_ls(char *input);
 // clear.c
 void		ft_clear(char *input);
+// env.c
+void		ft_env(char **envp);
+void		copy_pwd(t_env *env);
 
 // ------------------------------ //
 

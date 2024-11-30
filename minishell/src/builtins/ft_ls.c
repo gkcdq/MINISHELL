@@ -32,7 +32,7 @@ void	ft_ls(char *input)
 	char **args;
 	char *path;
 	DIR *dir;
-	int	file_found;
+	int file_found;
 	struct dirent *entry;
 
 	file_found = 0;
@@ -47,7 +47,8 @@ void	ft_ls(char *input)
 		dir = opendir(args[1]);
 	if (!dir)
 	{
-		printf("💔_(ಥ﹏ಥ)_💔: cannot access '%s': No such file or directory\n", args[1]);
+		printf("💔_(ಥ﹏ಥ)_💔: cannot access '%s': No such file or directory\n",
+			args[1]);
 		return ;
 	}
 	while ((entry = readdir(dir)) != NULL)
