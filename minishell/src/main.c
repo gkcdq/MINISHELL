@@ -191,10 +191,6 @@ void cumulate_token(char *input)
     //printf("Copy: %s\n", copy);
 	interprete_commande(copy);
 	//printf("%c\n", input[i]);
-    if (input[i] == ';' && input[i + 1] != ';')
-	{
-        i++;
-	}
 	if (input[i] != '\0')
 		cumulate_token(input);
 	else
