@@ -28,8 +28,6 @@ typedef struct s_env_fonction
 {
 	char	*copy_pwd;
 	char	*copy_oldpwd;
-	int		found_difference;
-	int		print_the_same;
 }			t_env;
 
 // init_c

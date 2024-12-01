@@ -166,8 +166,7 @@ void	interprete_commande(char *input, char **envp)
 	}
 	else if (ft_strcmp(trimmed_input, "pwd") == 0)
 		ft_pwd();
-	else if ((ft_strcmp(trimmed_input, "cd") == 0) || (ft_strcmp(trimmed_input,
-				"~") == 0))
+	else if ((ft_strncmp(trimmed_input, "cd", 2) == 0) || (ft_strcmp(trimmed_input, "~") == 0))
 		ft_cd(input);
 	else if (ft_strcmp(trimmed_input, "ls") == 0)
 		ft_ls(input);
