@@ -114,6 +114,8 @@ void	copy_pwd(t_env *env)
 */
 
 
+//////////////////////////////////////////////////////////////
+
 void	ft_env(char **envp)
 {
 	t_env		*env;
@@ -156,4 +158,5 @@ void	ft_env(char **envp)
 	free(env->copy_pwd);
 	free(env);
 }
+/////////////////////////////////////////////////////
 
