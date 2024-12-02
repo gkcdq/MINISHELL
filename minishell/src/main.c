@@ -156,8 +156,7 @@ void	interprete_commande(char *input, char **envp)
 	}
 	if (token->token == 1)
 	{
-		printf("🛠️_(>_<;)_🛠️   : syntax error near unexpected token `%s'\n",
-			token->symbol);
+		printf("🛠️_(>_<;)_🛠️   : syntax error near unexpected token ';'\n");
 		free(token);
 		return ;
 	}
@@ -247,7 +246,9 @@ void	loop(char *input, char **envp)
 			// printf("%d\n", i);
 			if (check_token_in_all_string(input) == 1)
 			{
-				printf("🛠️_(>_<;)_🛠️   : syntax error near unexpected token `;;'\n");
+				printf("🛠️_(>_<;)_🛠️   : syntax error near unexpected token `;; KOKO'\n");
+				free(input);
+				free(tok);
 				return ;
 			}
 			cumulate_token(input, envp);
