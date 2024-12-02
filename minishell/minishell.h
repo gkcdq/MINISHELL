@@ -14,14 +14,12 @@
 # include <termios.h>           // tcsetattr, tcgetattr
 
 extern int	g_minishell_check;
-extern int	g_directory_change;
+extern int	g_directory_changed;
 
 typedef struct s_token
 {
 	int		token;
 	int		found;
-	int		stop;
-	char	*symbol;
 }			t_token;
 
 typedef struct s_env_fonction
@@ -63,5 +61,6 @@ int			ft_strcmp(char *s1, char *s2);
 void		free_split(char **array);
 int			is_number(char *str);
 int			check_token(char *input, t_token *token);
+int			check_string(char *input);
 
 #endif

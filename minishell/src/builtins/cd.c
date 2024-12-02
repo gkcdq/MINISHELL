@@ -57,3 +57,4 @@ void	ft_cd(char *input)
 	free_split(cd->args);
 	free(cd);
 }
+

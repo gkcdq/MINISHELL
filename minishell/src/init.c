@@ -13,5 +13,5 @@ int ft_strlonglen(char **s)
 void	init_global()
 {
 	g_minishell_check = 0;
-    g_directory_change = 0;
+    g_directory_changed = 0;
 }

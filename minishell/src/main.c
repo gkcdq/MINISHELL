@@ -1,7 +1,7 @@
 #include "../minishell.h"
 
 int		g_minishell_check;
-int		g_directory_change;
+int		g_directory_changed;
 
 int	ft_strcmp(char *s1, char *s2)
 {
@@ -55,7 +55,7 @@ char	*skip_isspace_for_fonctions(char *input, t_token *token)
 
 	i = 0;
 	if (check_token(input, token) == 1)
-		return (token->symbol);
+		return (";");
 	else
 	{
 		s = malloc(sizeof(char) * ft_strlen(input) + 1);
@@ -72,15 +72,30 @@ char	*skip_isspace_for_fonctions(char *input, t_token *token)
 	return (s);
 }
 
-int	check_token_in_all_string(char *input)
+int	check_token_in_all_string(char *input, t_token *tok)
 {
 	int	i;
+	int	token_found;
 
+	token_found = 0;
 	i = 0;
 	while (input[i])
 	{
-		if (input[i] == ';' && input[i + 1] == ';')
-			return (1);
+		if (input[i] == ';')
+		{
+			if (input[i + 1] == ';')
+				return (1);
+			//if (token_found)
+			//	return (1);
+			token_found = 1;
+			while (input[i + 1] <= 32)
+				i++;
+			if (input[i + 1] == ';')
+			{
+				tok->token = 2;
+				return (1);
+			}
+		}
 		i++;
 	}
 	return (0);
@@ -96,7 +111,6 @@ int	check_token(char *input, t_token *token)
 	if (input[i] == ';' && input[i + 1] != ';')
 	{
 		token->token = 1;
-		token->symbol = ";";
 		return (1);
 	}
 	/*while (input[i])
@@ -117,14 +131,12 @@ int	token_found(char *input, t_token *tok)
 	int	i;
 
 	i = 0;
+	while (input[i] <= 32)
+		i++;
+	if (input[i] == '\0')
+		return (0);
 	while (input[i])
 	{
-		if (input[i] <= 32)
-		{
-			if (input[i] == '\0')
-				return (0);
-			i++;
-		}
 		if (input[i] == ';' && input[i + 1] == '\0')
 			return (0);
 		if (input[i] == ';' && input[i + 1] != '\0')
@@ -166,7 +178,7 @@ void	interprete_commande(char *input, char **envp)
 				input) == 0)
 		{
 			printf("🏃 exit\n");
-			//free(token);
+			// free(token);
 			g_minishell_check = 1;
 		}
 		else
@@ -232,32 +244,52 @@ void	loop(char *input, char **envp)
 {
 	t_token	*tok;
 
-	// int i = 0;
 	tok = malloc(sizeof(t_token));
 	tok->found = 0;
-	tok->stop = 0;
 	input = readline("🍀_(^o^)_🍀  > ");
 	if (input && *input)
 	{
 		add_history(input);
-		if (token_found(input, tok) == 1)
+		if (check_string(input) == 0)
 		{
-			// i = 1;
-			// printf("%d\n", i);
-			if (check_token_in_all_string(input) == 1)
+			if (token_found(input, tok) == 1)
 			{
-				printf("🛠️_(>_<;)_🛠️   : syntax error near unexpected token `;; KOKO'\n");
-				free(input);
-				free(tok);
-				return ;
+				if (check_token_in_all_string(input, tok) == 1)
+				{
+					if (tok->token == 2)
+					{
+						printf("🛠️_(>_<;)_🛠️   : syntax error near unexpected token `;'\n");
+						tok->token = 0;
+					}
+					else
+						printf("🛠️_(>_<;)_🛠️   : syntax error near unexpected token `;;'\n");
+					free(input);
+					free(tok);
+					return ;
+				}
+				cumulate_token(input, envp);
 			}
-			cumulate_token(input, envp);
+			else
+				interprete_commande(input, envp);
 		}
-		else
-			interprete_commande(input, envp);
 	}
 	free(input);
 	free(tok);
+}
+
+int	check_string(char *input)
+{
+	int	i;
+
+	i = 0;
+
+	while (input[i])
+	{
+		if (input[i] > 32)
+			return (0);
+		i++;
+	}
+	return (1);
 }
 
 int	main(int ac, char **av, char **envp)
