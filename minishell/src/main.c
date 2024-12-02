@@ -85,7 +85,7 @@ int	check_token_in_all_string(char *input, t_token *tok)
 		{
 			if (input[i + 1] == ';')
 				return (1);
-			//if (token_found)
+			// if (token_found)
 			//	return (1);
 			token_found = 1;
 			while (input[i + 1] <= 32)
@@ -189,8 +189,8 @@ void	interprete_commande(char *input, char **envp)
 	}
 	else if (ft_strcmp(trimmed_input, "pwd") == 0)
 		ft_pwd();
-	else if ((ft_strcmp(trimmed_input, "cd") == 0)
-		|| (ft_strcmp(trimmed_input, "~") == 0))
+	else if ((ft_strcmp(trimmed_input, "cd") == 0) || (ft_strcmp(trimmed_input,
+				"~") == 0))
 		ft_cd(input);
 	else if (ft_strcmp(trimmed_input, "ls") == 0)
 		ft_ls(input);
@@ -198,6 +198,8 @@ void	interprete_commande(char *input, char **envp)
 		ft_clear(input);
 	else if (ft_strcmp(trimmed_input, "env") == 0)
 		ft_env(envp);
+	else if (ft_strcmp(trimmed_input, "wc") == 0)
+		ft_wc();
 	else
 	{
 		if (g_minishell_check == 0)
@@ -282,7 +284,6 @@ int	check_string(char *input)
 	int	i;
 
 	i = 0;
-
 	while (input[i])
 	{
 		if (input[i] > 32)
@@ -299,7 +300,7 @@ int	main(int ac, char **av, char **envp)
 	input = NULL;
 	(void)ac;
 	(void)av;
-	init_global(envp);
+	init_global();
 	while (g_minishell_check == 0)
 	{
 		loop(input, envp);

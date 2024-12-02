@@ -36,7 +36,7 @@ typedef struct s_cd_fonction
 
 // init_c
 int			ft_strlonglen(char **s);
-void		init_global(char **envp);
+void		init_global(void);
 
 // ---------- BUILTINS ----------- //
 
@@ -52,7 +52,10 @@ void		ft_ls(char *input);
 void		ft_clear(char *input);
 // env.c
 void		ft_env(char **envp);
-void		copy_pwd(t_env *env);
+// void		copy_pwd(t_env *env);
+
+// wc.c
+void		ft_wc(void);
 
 // ------------------------------ //
 
