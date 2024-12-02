@@ -14,7 +14,7 @@
 # include <termios.h>           // tcsetattr, tcgetattr
 
 extern int	g_minishell_check;
-extern char	**g_envp;
+extern int	g_directory_change;
 
 typedef struct s_token
 {
@@ -29,6 +29,12 @@ typedef struct s_env_fonction
 	char	*copy_pwd;
 	char	*copy_oldpwd;
 }			t_env;
+
+typedef struct s_cd_fonction
+{
+	char	**args;
+	char	*home;
+}			t_cd;
 
 // init_c
 int			ft_strlonglen(char **s);

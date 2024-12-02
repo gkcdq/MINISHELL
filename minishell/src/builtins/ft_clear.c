@@ -27,4 +27,5 @@ void	ft_clear(char *input)
 		printf("🦇 (¬‿¬) 🦇: Usage: clear\n");
 	else
 		system("clear");
+	free_split(args);
 }

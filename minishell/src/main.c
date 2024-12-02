@@ -1,7 +1,7 @@
 #include "../minishell.h"
 
 int		g_minishell_check;
-char	**g_envp;
+int		g_directory_change;
 
 int	ft_strcmp(char *s1, char *s2)
 {
@@ -145,12 +145,20 @@ void	interprete_commande(char *input, char **envp)
 	t_token	*token;
 
 	token = malloc(sizeof(t_token));
+	if (!token)
+		return ;
 	token->token = 0;
 	trimmed_input = skip_isspace_for_fonctions(input, token);
+	if (!trimmed_input)
+	{
+		free(token);
+		return ;
+	}
 	if (token->token == 1)
 	{
 		printf("🛠️_(>_<;)_🛠️   : syntax error near unexpected token `%s'\n",
 			token->symbol);
+		free(token);
 		return ;
 	}
 	else if (ft_strcmp(trimmed_input, "exit") == 0)
@@ -159,14 +167,19 @@ void	interprete_commande(char *input, char **envp)
 				input) == 0)
 		{
 			printf("🏃 exit\n");
+			//free(token);
 			g_minishell_check = 1;
 		}
 		else
+		{
 			ft_exit(input);
+			// free(token);
+		}
 	}
 	else if (ft_strcmp(trimmed_input, "pwd") == 0)
 		ft_pwd();
-	else if ((ft_strncmp(trimmed_input, "cd", 2) == 0) || (ft_strcmp(trimmed_input, "~") == 0))
+	else if ((ft_strncmp(trimmed_input, "cd", 2) == 0)
+		|| (ft_strcmp(trimmed_input, "~") == 0))
 		ft_cd(input);
 	else if (ft_strcmp(trimmed_input, "ls") == 0)
 		ft_ls(input);
@@ -175,7 +188,11 @@ void	interprete_commande(char *input, char **envp)
 	else if (ft_strcmp(trimmed_input, "env") == 0)
 		ft_env(envp);
 	else
-		ft_printf("🍁_(`へ´*)_🍁: %s: command not found\n", trimmed_input);
+	{
+		if (g_minishell_check == 0)
+			ft_printf("🍁_(`へ´*)_🍁: %s: command not found\n", trimmed_input);
+	}
+	free(token);
 	free(trimmed_input);
 }
 
@@ -239,6 +256,7 @@ void	loop(char *input, char **envp)
 			interprete_commande(input, envp);
 	}
 	free(input);
+	free(tok);
 }
 
 int	main(int ac, char **av, char **envp)

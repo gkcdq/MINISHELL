@@ -73,9 +73,9 @@
 
 void	copy_pwd(t_env *env)
 {
-	char	*pwd;
-	static char *save = NULL;
-	static char *last_save;
+	char		*pwd;
+	static char	*save = NULL;
+	static char	*last_save;
 
 	pwd = getcwd(NULL, 0);
 	if (!pwd)
@@ -113,13 +113,12 @@ void	copy_pwd(t_env *env)
 }
 */
 
-
 //////////////////////////////////////////////////////////////
 
 void	ft_env(char **envp)
 {
 	t_env		*env;
-	int 		i;
+	int			i;
 	static char	*save_oldpwd = NULL;
 	static char	*last_pwd = NULL;
 
@@ -159,4 +158,3 @@ void	ft_env(char **envp)
 	free(env);
 }
 /////////////////////////////////////////////////////
-

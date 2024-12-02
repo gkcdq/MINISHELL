@@ -61,5 +61,6 @@ void	ft_ls(char *input)
 	}
 	if (file_found)
 		printf("\n");
+	free_split(args);
 	closedir(dir);
 }

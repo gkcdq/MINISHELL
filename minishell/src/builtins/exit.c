@@ -49,6 +49,9 @@ void	ft_exit(char *input)
 	if (check_simple_exit(input) == 0 && args[1] == NULL)
 	{
 		ft_printf("🏃 exit\n");
+		if (args)
+			free_split(args);
+		free(exit);
 		g_minishell_check = 1;
 		return ;
 	}
@@ -63,6 +66,7 @@ void	ft_exit(char *input)
 		ft_printf("🚧_(⊙_⊙;)_🚧 : exit: %s: numeric argument required\n",
 			args[1]);
 		free_split(args);
+		free(exit);
 		g_minishell_check = 1;
 	}
 	else if (args[2] != NULL && args[1][0] != ';' && args[2][0] != ';')
@@ -74,6 +78,7 @@ void	ft_exit(char *input)
 	{
 		ft_printf("🏃 exit\n");
 		free_split(args);
+		free(exit);
 		g_minishell_check = 1;
 	}
 }

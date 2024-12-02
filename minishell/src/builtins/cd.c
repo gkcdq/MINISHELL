@@ -20,30 +20,30 @@ char	*parse_input_cd(char *input)
 
 void	ft_cd(char *input)
 {
-	char **args;
-	char *home;
+	t_cd *cd;
 	char *cwd;
 	int result;
 
+	cd = malloc(sizeof(t_cd));
 	input = parse_input_cd(input);
-	args = ft_split(input, ' ');
-	if (args[1] == NULL || ft_strcmp(args[0], "~") == 0)
+	cd->args = ft_split(input, ' ');
+	if (cd->args[1] == NULL || ft_strcmp(cd->args[0], "~") == 0)
 	{
-		home = getenv("HOME");
-		if (home == NULL)
+		cd->home = getenv("HOME");
+		if (cd->home == NULL)
 		{
 			printf("🍂_(´~`)_🍂: HOME not set\n");
-			free_split(args);
+			free_split(cd->args);
 			return ;
 		}
-		result = chdir(home);
+		result = chdir(cd->home);
 	}
 	else
-		result = chdir(args[1]);
+		result = chdir(cd->args[1]);
 	if (result != 0)
 	{
 		perror("🍂_(´~`)_🍂: cd");
-		free_split(args);
+		free_split(cd->args);
 		return ;
 	}
 	cwd = getcwd(NULL, 0);
@@ -54,5 +54,6 @@ void	ft_cd(char *input)
 	}
 	else
 		perror("getcwd");
-	free_split(args);
+	free_split(cd->args);
+	free(cd);
 }
