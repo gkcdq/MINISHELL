@@ -13,9 +13,6 @@
 # include <sys/wait.h>          // wait, waitpid, etc.
 # include <termios.h>           // tcsetattr, tcgetattr
 
-extern int	g_minishell_check;
-extern int	g_directory_changed;
-
 typedef struct s_token
 {
 	int		token;
@@ -34,9 +31,22 @@ typedef struct s_cd_fonction
 	char	*home;
 }			t_cd;
 
+typedef	struct s_envp_copy
+{
+	// signal exit
+	int		minishell_check;
+	// environnement
+	char 	**envp;
+	int		change_confirmed;
+	char	*copy_pwd;
+	char	*copy_oldpwd;
+	char	*save_oldpwd;
+	char 	*last_pwd;
+}			t_ee;
+
 // init_c
 int			ft_strlonglen(char **s);
-void		init_global(void);
+void		init_struct(t_ee *ee);
 
 // ---------- BUILTINS ----------- //
 
@@ -45,14 +55,15 @@ void		ft_exit(char *input);
 // pwd.c
 void		ft_pwd(void);
 // cd.c
-void		ft_cd(char *path);
+void		ft_cd(char *input, t_ee *ee);
 // ls.c
 void		ft_ls(char *input);
 // clear.c
 void		ft_clear(char *input);
 // env.c
-void		ft_env(char **envp);
-// void		copy_pwd(t_env *env);
+void		ft_env(t_ee *ee);
+// unset.c
+void 		ft_unset(char *input, t_ee *ee);
 
 // wc.c
 void		ft_wc(void);

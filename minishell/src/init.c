@@ -10,8 +10,10 @@ int	ft_strlonglen(char **s)
 	return (i);
 }
 
-void	init_global(void)
+void	init_struct(t_ee *ee)
 {
-	g_minishell_check = 0;
-	g_directory_changed = 0;
+	ee->minishell_check = 0;
+	ee->change_confirmed = 0;
+	ee->copy_pwd = NULL;
+	ee->copy_oldpwd = NULL;
 }

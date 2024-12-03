@@ -18,10 +18,9 @@ char	*parse_input_cd(char *input)
 	return (input);
 }
 
-void	ft_cd(char *input)
+void	ft_cd(char *input, t_ee *ee)
 {
 	t_cd *cd;
-	char *cwd;
 	int result;
 
 	cd = malloc(sizeof(t_cd));
@@ -36,24 +35,25 @@ void	ft_cd(char *input)
 			free_split(cd->args);
 			return ;
 		}
+		ee->change_confirmed = 1;
+		ee->copy_oldpwd = getcwd(NULL, 0); 
 		result = chdir(cd->home);
+		ee->copy_pwd = getcwd(NULL, 0);
 	}
 	else
+	{
+		ee->change_confirmed = 1;
+		ee->copy_oldpwd = getcwd(NULL, 0); 
 		result = chdir(cd->args[1]);
+		ee->copy_pwd = getcwd(NULL, 0);
+
+	}
 	if (result != 0)
 	{
 		perror("🍂_(´~`)_🍂: cd");
 		free_split(cd->args);
 		return ;
 	}
-	cwd = getcwd(NULL, 0);
-	if (cwd)
-	{
-		setenv("PWD", cwd, 1);
-		free(cwd);
-	}
-	else
-		perror("getcwd");
 	free_split(cd->args);
 	free(cd);
 }

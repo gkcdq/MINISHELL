@@ -115,46 +115,28 @@ void	copy_pwd(t_env *env)
 
 //////////////////////////////////////////////////////////////
 
-void	ft_env(char **envp)
+void	ft_env(t_ee *ee)
 {
-	t_env		*env;
 	int			i;
-	static char	*save_oldpwd = NULL;
-	static char	*last_pwd = NULL;
 
-	env = malloc(sizeof(t_env));
-	if (!env)
-		return ;
-	env->copy_pwd = getcwd(NULL, 0);
-	env->copy_oldpwd = NULL;
-	if (save_oldpwd == NULL)
-		save_oldpwd = ft_strdup(env->copy_pwd);
-	if (last_pwd != NULL && ft_strcmp(last_pwd, env->copy_pwd) != 0)
+	if (!ee->envp || !ee->envp[0])
 	{
-		free(save_oldpwd);
-		save_oldpwd = ft_strdup(last_pwd);
-	}
-	if (last_pwd)
-		free(last_pwd);
-	last_pwd = ft_strdup(env->copy_pwd);
-	if (!envp || !envp[0])
-	{
-		printf("PWD=%s\n", env->copy_pwd);
+		printf("PWD=%s\n", ee->copy_pwd);
 		printf("SHLVL=1\n");
 		printf("_=/usr/bin/env\n");
-		if (save_oldpwd && ft_strcmp(save_oldpwd, env->copy_pwd) != 0)
-			printf("OLDPWD=%s\n", save_oldpwd);
+		if (ee->copy_oldpwd && ft_strcmp(ee->copy_oldpwd, ee->copy_pwd) != 0)
+			printf("OLDPWD=%s\n", ee->copy_oldpwd);
 	}
 	else
 	{
 		i = 0;
-		while (envp[i])
+		while (ee->envp[i])
 		{
-			printf("%s\n", envp[i]);
+			if ((ee->copy_oldpwd) && (ee->envp[i + 1] == NULL && ft_strcmp(ee->copy_oldpwd, ee->copy_pwd) != 0))
+				printf("OLDPWD=%s\n", ee->copy_oldpwd);
+			printf("%s\n", ee->envp[i]);
 			i++;
 		}
 	}
-	free(env->copy_pwd);
-	free(env);
 }
 /////////////////////////////////////////////////////
