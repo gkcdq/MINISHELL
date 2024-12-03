@@ -51,7 +51,7 @@ void		init_struct(t_ee *ee);
 // ---------- BUILTINS ----------- //
 
 // exit.c
-void		ft_exit(char *input);
+void		ft_exit(char *input, t_ee *ee);
 // pwd.c
 void		ft_pwd(void);
 // cd.c

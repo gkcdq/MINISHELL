@@ -166,7 +166,7 @@ void	interprete_commande(char *input, t_ee *ee)
 			ee->minishell_check = 1;
 		}
 		else
-			ft_exit(input);
+			ft_exit(input, ee);
 	}
 	else if (ft_strcmp(trimmed_input, "pwd") == 0)
 		ft_pwd();

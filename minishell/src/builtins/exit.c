@@ -37,7 +37,7 @@ char	*parse_input_exit(char *input, t_token *exit)
 	return (0);
 }*/
 
-void	ft_exit(char *input)
+void	ft_exit(char *input, t_ee *ee)
 {
 	t_token	*exit;
 	char	**args;
@@ -67,7 +67,7 @@ void	ft_exit(char *input)
 			args[1]);
 		free_split(args);
 		free(exit);
-		g_minishell_check = 1;
+		ee->minishell_check = 1;
 	}
 	else if (args[2] != NULL && args[1][0] != ';' && args[2][0] != ';')
 	{
@@ -79,6 +79,6 @@ void	ft_exit(char *input)
 		ft_printf("🏃 exit\n");
 		free_split(args);
 		free(exit);
-		g_minishell_check = 1;
+		ee->minishell_check = 1;
 	}
 }

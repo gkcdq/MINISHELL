@@ -121,6 +121,8 @@ void	ft_env(t_ee *ee)
 
 	if (!ee->envp || !ee->envp[0])
 	{
+		if (ee->copy_pwd == NULL)
+			ee->copy_pwd = getcwd(NULL, 0);
 		printf("PWD=%s\n", ee->copy_pwd);
 		printf("SHLVL=1\n");
 		printf("_=/usr/bin/env\n");
