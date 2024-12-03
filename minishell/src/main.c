@@ -1,8 +1,5 @@
 #include "../minishell.h"
 
-int		g_minishell_check;
-int		g_directory_changed;
-
 int	ft_strcmp(char *s1, char *s2)
 {
 	int	i;
