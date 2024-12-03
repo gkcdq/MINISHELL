@@ -19,7 +19,7 @@ char	*parse_input_exit(char *input, t_token *exit)
 	return (input);
 }
 
-/*int	check_simple_exit(char *input)
+int	check_simple_exit(char *input)
 {
 	int	i;
 
@@ -28,14 +28,8 @@ char	*parse_input_exit(char *input, t_token *exit)
 		i++;
 	while (input[i] > 32)
 		i++;
-	while (input[i] <= 32)
-	{
-		if (input[i] > 32)
-			return (1);
-		i++;
-	}
 	return (0);
-}*/
+}
 
 void	ft_exit(char *input, t_ee *ee)
 {
@@ -46,15 +40,15 @@ void	ft_exit(char *input, t_ee *ee)
 	exit->token = 0;
 	input = parse_input_exit(input, exit);
 	args = ft_split(input, ' ');
-	//if (check_simple_exit(input) == 0 && args[1] == NULL)
-	//{
-	//	ft_printf("🏃 exit\n");
-	//	if (args)
-	///		free_split(args);
-	//	free(exit);
-	//	g_minishell_check = 1;
-	//	return ;
-	//}
+	if (check_simple_exit(input) == 0 && args[1] == NULL)
+	{
+		ft_printf("🏃 exit\n");
+		if (args)
+			free_split(args);
+		free(exit);
+		ee->minishell_check = 1;
+		return ;
+	}
 	if (exit->token == 1)
 	{
 		printf("🛠️_(>_<;)_🛠️   : syntax error near unexpected token `;;'\n");
