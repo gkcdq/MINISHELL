@@ -187,7 +187,7 @@ void	interprete_commande(char *input, t_ee *ee)
 		ft_unset(input, ee);
 	else
 	{
-		if (g_minishell_check == 0)
+		if (ee->minishell_check == 0)
 			ft_printf("🍁_(`へ´*)_🍁: %s: command not found\n", trimmed_input);
 	}
 	free(token);
