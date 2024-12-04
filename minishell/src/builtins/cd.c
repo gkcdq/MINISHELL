@@ -1,7 +1,7 @@
 #include "../../minishell.h"
 
 
-char	*parse_input_cd(char *input)
+/*char	*parse_input_cd(char *input)
 {
 	int i;
 
@@ -16,6 +16,24 @@ char	*parse_input_cd(char *input)
 		i++;
 	}
 	return (input);
+}*/
+
+char *parse_input_cd(char *input)
+{
+    int i = 0;
+
+    if (!input) return NULL;
+
+    while (input[i])
+    {
+        if (input[i] == ';' && i > 0 && input[i - 1] != ' ')  // Eviter l'accès à input[-1]
+        {
+            input[i] = '\0';
+            break;
+        }
+        i++;
+    }
+    return input;
 }
 
 void	ft_cd(char *input, t_ee *ee)
@@ -39,6 +57,7 @@ void	ft_cd(char *input, t_ee *ee)
 		ee->copy_oldpwd = getcwd(NULL, 0); 
 		result = chdir(cd->home);
 		ee->copy_pwd = getcwd(NULL, 0);
+		check_variable(ee);
 	}
 	else
 	{
@@ -46,7 +65,7 @@ void	ft_cd(char *input, t_ee *ee)
 		ee->copy_oldpwd = getcwd(NULL, 0); 
 		result = chdir(cd->args[1]);
 		ee->copy_pwd = getcwd(NULL, 0);
-
+		check_variable(ee);
 	}
 	if (result != 0)
 	{
@@ -57,3 +76,81 @@ void	ft_cd(char *input, t_ee *ee)
 	free_split(cd->args);
 	free(cd);
 }
+
+int	ft_strcmpchar(char a, char b)
+{
+	if (a != b)
+		return (1);
+	return (0); 
+}
+
+void check_variable(t_ee *ee)
+{
+    int i = 0;
+	int j;
+	int	yes = 0;
+
+	//ft_printf("%s\n", ee->envp[i]);
+    while (ee->envp[i])
+    {
+		j = 0;
+        while (ee->envp[i][j])
+		{
+			//ft_printf("%c", ee->envp[i][j]);
+			if ((ft_strcmpchar(ee->envp[i][j], 'P') == 0) && (ft_strcmpchar(ee->envp[i][j + 1], 'W') == 0) && (ft_strcmpchar(ee->envp[i][j + 2], 'D') == 0))
+			{
+				yes = 1;
+            	break;
+			}
+			j++;
+		}
+		if (yes == 1)
+			break;
+        i++;
+    }
+	//ft_printf("%s\n", ee->envp[i]);
+	char *copy = ft_strjoin_cd("PWD=", ee->copy_pwd);
+	if (!copy)
+	{
+		printf("MERDE");
+		return ;
+	}
+	//ft_printf("%s\n", copy);
+	if (ee->envp[i] && ft_strcmp(ee->envp[i], ee->copy_pwd) != 0)
+	{
+       	free(ee->envp[i]);
+    	ee->envp[i] = ft_strdup(copy);
+    }
+	free(copy);
+	//ft_printf("%s\n", ee->envp[i]);
+}
+
+
+char	*ft_strjoin_cd(char *s1, char *s2)
+{
+	char	*res;
+	int		i;
+	int		j;
+
+	i = 0;
+	j = 0;
+	if (!s1 || !s2)
+		return (NULL);
+	res = malloc(sizeof(char) * (ft_strlen(s1) + ft_strlen(s2) + 1));
+	if (!res)
+		return (NULL);
+	while (s1[i])
+	{
+		res[i] = s1[i];
+		i++;
+	}
+	while (s2[j])
+	{
+		res[i + j] = s2[j];
+		j++;
+	}
+	res[i + j] = '\0';
+	//free(s1);
+	return (res);
+}
+

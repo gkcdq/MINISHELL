@@ -18,7 +18,7 @@ void ft_unset(char *input, t_ee *ee)
     int i, j;
     int len;
 
-    /////////////////////////// split dans une autre fonction pour la norme /
+    /////////////////////////// split dans une autre fonction pour la norme //
     args = ft_split(input, ' ');
     if (args[1] == NULL)
     {
