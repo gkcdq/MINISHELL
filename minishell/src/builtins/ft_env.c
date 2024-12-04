@@ -135,7 +135,7 @@ void	ft_env(t_ee *ee)
 		while (ee->envp[i])
 		{
 			if ((ee->copy_oldpwd) && (ee->envp[i + 1] == NULL && ft_strcmp(ee->copy_oldpwd, ee->copy_pwd) != 0))
-				printf("👁️  0LDPWD=%s\n", ee->copy_oldpwd);
+				printf("👁️  OLDPWD=%s\n", ee->copy_oldpwd);
 			printf("%s\n", ee->envp[i]);
 			i++;
 		}

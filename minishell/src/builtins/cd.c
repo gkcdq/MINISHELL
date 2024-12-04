@@ -71,6 +71,7 @@ void	ft_cd(char *input, t_ee *ee)
 	{
 		perror("🍂_(´~`)_🍂: cd");
 		free_split(cd->args);
+		free(cd);
 		return ;
 	}
 	free_split(cd->args);
