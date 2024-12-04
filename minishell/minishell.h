@@ -64,6 +64,8 @@ void		ft_clear(char *input);
 void		ft_env(t_ee *ee);
 // unset.c
 void 		ft_unset(char *input, t_ee *ee);
+// export.c
+void		ft_export(char *input, t_ee *ee);
 
 // wc.c
 void		ft_wc(void);
