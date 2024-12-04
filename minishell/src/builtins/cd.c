@@ -151,4 +151,3 @@ char	*ft_strjoin_cd(char *s1, char *s2)
 	//free(s1);
 	return (res);
 }
-
