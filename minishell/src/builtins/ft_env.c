@@ -127,7 +127,7 @@ void	ft_env(t_ee *ee)
 		printf("SHLVL=1\n");
 		printf("_=/usr/bin/env\n");
 		if (ee->copy_oldpwd && ft_strcmp(ee->copy_oldpwd, ee->copy_pwd) != 0)
-			printf("OLDPWD=%s\n", ee->copy_oldpwd);
+			printf("👁️  OLDPWD=%s\n", ee->copy_oldpwd);
 	}
 	else
 	{
@@ -135,10 +135,46 @@ void	ft_env(t_ee *ee)
 		while (ee->envp[i])
 		{
 			if ((ee->copy_oldpwd) && (ee->envp[i + 1] == NULL && ft_strcmp(ee->copy_oldpwd, ee->copy_pwd) != 0))
-				printf("OLDPWD=%s\n", ee->copy_oldpwd);
+				printf("👁️  0LDPWD=%s\n", ee->copy_oldpwd);
 			printf("%s\n", ee->envp[i]);
 			i++;
 		}
 	}
 }
 /////////////////////////////////////////////////////
+
+void check_variable_oldpwd(char **envp)
+{
+    int i = 0;
+	int j;
+	int	yes = 0;
+
+	//ft_printf("%s\n", envp[i]);
+    while (envp[i])
+    {
+		j = 0;
+        while (envp[i][j])
+		{
+			//ft_printf("%c", envp[i][j]);
+			if ((ft_strcmpchar(envp[i][j], 'O') == 0) && (ft_strcmpchar(envp[i][j + 1], 'L') == 0) && (ft_strcmpchar(envp[i][j + 2], 'D') == 0))
+			{
+				yes = 1;
+            	break;
+			}
+			j++;
+		}
+		if (yes == 1)
+			break;
+        i++;
+    }
+	//ft_printf("%s\n", envp[i]);
+	if (envp[i])
+	{
+		while (envp[i])
+		{
+			envp[i] = envp[i + 1];
+			i++;
+		}
+	}
+	//ft_printf("%s\n", envp[i]);
+}

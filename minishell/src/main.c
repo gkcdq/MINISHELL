@@ -286,6 +286,7 @@ char **copy_envp(char **envp)
 
 	copy = malloc(sizeof(char *) * (ft_strlonglen(envp) + 1));
 	i = 0;
+	check_variable_oldpwd(envp);
     while (envp[i])
 	{
         copy[i] = ft_strdup(envp[i]);
@@ -302,11 +303,11 @@ int	main(int ac, char **av, char **envp)
 	char	*input;
 
 	ee = malloc(sizeof(t_ee));
-	ee->envp = copy_envp(envp);
 	input = NULL;
 	(void)ac;
 	(void)av;
 	init_struct(ee);
+	ee->envp = copy_envp(envp);
 	while (ee->minishell_check == 0)
 	{
 		loop(input, ee);

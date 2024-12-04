@@ -57,7 +57,7 @@ void	ft_cd(char *input, t_ee *ee)
 		ee->copy_oldpwd = getcwd(NULL, 0); 
 		result = chdir(cd->home);
 		ee->copy_pwd = getcwd(NULL, 0);
-		check_variable(ee);
+		check_variable_pwd(ee);
 	}
 	else
 	{
@@ -65,7 +65,7 @@ void	ft_cd(char *input, t_ee *ee)
 		ee->copy_oldpwd = getcwd(NULL, 0); 
 		result = chdir(cd->args[1]);
 		ee->copy_pwd = getcwd(NULL, 0);
-		check_variable(ee);
+		check_variable_pwd(ee);
 	}
 	if (result != 0)
 	{
@@ -84,7 +84,7 @@ int	ft_strcmpchar(char a, char b)
 	return (0); 
 }
 
-void check_variable(t_ee *ee)
+void check_variable_pwd(t_ee *ee)
 {
     int i = 0;
 	int j;
@@ -111,12 +111,9 @@ void check_variable(t_ee *ee)
 	//ft_printf("%s\n", ee->envp[i]);
 	char *copy = ft_strjoin_cd("PWD=", ee->copy_pwd);
 	if (!copy)
-	{
-		printf("MERDE");
 		return ;
-	}
 	//ft_printf("%s\n", copy);
-	if (ee->envp[i] && ft_strcmp(ee->envp[i], ee->copy_pwd) != 0)
+	if (ee->envp[i] && ((ft_strcmp(ee->envp[i], ee->copy_pwd) != 0) || (ft_strcmp(ee->envp[i], ee->copy_pwd) == 0)))
 	{
        	free(ee->envp[i]);
     	ee->envp[i] = ft_strdup(copy);

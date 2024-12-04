@@ -77,7 +77,9 @@ int			is_number(char *str);
 int			check_token(char *input, t_token *token);
 int			check_string(char *input);
 char 		**copy_envp(char **envp);
-void		check_variable(t_ee *ee);
+void		check_variable_pwd(t_ee *ee);
+void 		check_variable_oldpwd(char **envp);
 char		*ft_strjoin_cd(char *s1, char *s2);
+int			ft_strcmpchar(char a, char b);
 
 #endif
