@@ -42,6 +42,8 @@ typedef	struct s_envp_copy
 	char	*copy_oldpwd;
 	char	*save_oldpwd;
 	char 	*last_pwd;
+	int		if_unset__pwd;
+	int		if_unset__oldpwd;
 }			t_ee;
 
 // init_c

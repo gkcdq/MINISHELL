@@ -16,4 +16,7 @@ void	init_struct(t_ee *ee)
 	ee->change_confirmed = 0;
 	ee->copy_pwd = NULL;
 	ee->copy_oldpwd = NULL;
+	ee->if_unset__pwd = 0;
+	ee->if_unset__oldpwd = 0;
+
 }

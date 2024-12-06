@@ -56,7 +56,8 @@ void	ft_cd(char *input, t_ee *ee)
 		ee->change_confirmed = 1;
 		ee->copy_oldpwd = getcwd(NULL, 0); 
 		result = chdir(cd->home);
-		ee->copy_pwd = getcwd(NULL, 0);
+		if (ee->if_unset__pwd == 0)
+			ee->copy_pwd = getcwd(NULL, 0);
 		check_variable_pwd(ee);
 	}
 	else
@@ -64,8 +65,11 @@ void	ft_cd(char *input, t_ee *ee)
 		ee->change_confirmed = 1;
 		ee->copy_oldpwd = getcwd(NULL, 0); 
 		result = chdir(cd->args[1]);
-		ee->copy_pwd = getcwd(NULL, 0);
-		check_variable_pwd(ee);
+		if (ee->if_unset__pwd == 0)
+		{
+			ee->copy_pwd = getcwd(NULL, 0);
+			check_variable_pwd(ee);
+		}
 	}
 	if (result != 0)
 	{
@@ -94,33 +98,33 @@ void check_variable_pwd(t_ee *ee)
 	//ft_printf("%s\n", ee->envp[i]);
     while (ee->envp[i])
     {
-		j = 0;
-        while (ee->envp[i][j])
-		{
-			//ft_printf("%c", ee->envp[i][j]);
-			if ((ft_strcmpchar(ee->envp[i][j], 'P') == 0) && (ft_strcmpchar(ee->envp[i][j + 1], 'W') == 0) && (ft_strcmpchar(ee->envp[i][j + 2], 'D') == 0))
+			j = 0;
+        	while (ee->envp[i][j])
 			{
-				yes = 1;
-            	break;
+			//ft_printf("%c", ee->envp[i][j]);
+				if ((ft_strcmpchar(ee->envp[i][j], 'P') == 0) && (ft_strcmpchar(ee->envp[i][j + 1], 'W') == 0) && (ft_strcmpchar(ee->envp[i][j + 2], 'D') == 0))
+				{
+					yes = 1;
+            		break;
+				}
+				j++;
 			}
-			j++;
-		}
-		if (yes == 1)
-			break;
-        i++;
-    }
-	//ft_printf("%s\n", ee->envp[i]);
-	char *copy = ft_strjoin_cd("PWD=", ee->copy_pwd);
-	if (!copy)
-		return ;
-	//ft_printf("%s\n", copy);
-	if (ee->envp[i] && ((ft_strcmp(ee->envp[i], ee->copy_pwd) != 0) || (ft_strcmp(ee->envp[i], ee->copy_pwd) == 0)))
-	{
-       	free(ee->envp[i]);
-    	ee->envp[i] = ft_strdup(copy);
-    }
-	free(copy);
-	//ft_printf("%s\n", ee->envp[i]);
+			if (yes == 1)
+				break;
+        	i++;
+    	}
+		//ft_printf("%s\n", ee->envp[i]);
+		char *copy = ft_strjoin_cd("PWD=", ee->copy_pwd);
+		if (!copy)
+			return ;
+		//ft_printf("%s\n", copy);
+		if (ee->envp[i] && ((ft_strcmp(ee->envp[i], ee->copy_pwd) != 0) || (ft_strcmp(ee->envp[i], ee->copy_pwd) == 0)))
+		{
+       		free(ee->envp[i]);
+    		ee->envp[i] = ft_strdup(copy);
+    	}
+		free(copy);
+		//ft_printf("%s\n", ee->envp[i]);
 }
 
 

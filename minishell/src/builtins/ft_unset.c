@@ -50,5 +50,9 @@ void ft_unset(char *input, t_ee *ee)
     free_split(ee->envp);
     ee->envp = new_envp;
     unsetenv(args[1]);
+    if (ft_strcmp(args[1], "PWD") == 0)
+        ee->if_unset__pwd = 1;
+    if (ft_strcmp(args[1], "OLDPWD") == 0)
+        ee->if_unset__oldpwd = 1;
     free_split(args);
 }

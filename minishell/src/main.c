@@ -185,7 +185,7 @@ void	interprete_commande(char *input, t_ee *ee)
 		ft_wc();
 	else if (ft_strcmp(trimmed_input, "unset") == 0)
 		ft_unset(input, ee);
-	else if (ft_strcmp(trimmed_input, "export") == 0)
+	else if ((ft_strcmp(trimmed_input, "export") == 0) || (ft_strcmp(trimmed_input, "export=") == 0))
 		ft_export(input, ee);
 	else
 	{

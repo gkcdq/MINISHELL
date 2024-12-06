@@ -1,33 +1,33 @@
 #include "../../minishell.h"
 
-int find_env_variable(char **envp, const char *key) 
+/*int find_env_variable(char **envp, const char *key) 
 {
     int i = 0;
     size_t key_len = strlen(key);
 
     while (envp[i]) {
         if (strncmp(envp[i], key, key_len) == 0 && envp[i][key_len] == '=') {
-            return i; // Index de la variable trouvée
+            return i;
         }
         i++;
     }
-    return -1; // Non trouvé
+    return -1;
 }
 
 
 //a changer v
-void export_variable(t_ee *ee, const char *input) 
+void export_variable(t_ee *ee, const char *input, char **args) 
 {
-    char *key = strtok(strdup(input), "="); // Récupérer la clé (avant le "=")
+    char *key = strtok(strdup(input), "=");
     int index = find_env_variable(ee->envp, key);
 
     if (index != -1) 
     {
-        // Si la variable existe, mettez-la à jour
         free(ee->envp[index]);
         ee->envp[index] = strdup(input);
-    } else {
-        // Sinon, ajoutez une nouvelle variable
+    }
+    else 
+    {
         int len = 0;
         while (ee->envp[len]) len++;
 
@@ -44,7 +44,7 @@ void export_variable(t_ee *ee, const char *input)
         ee->envp = new_envp;
     }
 
-    free(key); // Libérez la clé temporaire
+    free(key);
 }
 
 // Fonction principale export
@@ -57,7 +57,7 @@ void ft_export(char *input, t_ee *ee)
     char *tmp;
 
     args = ft_split(input, ' ');
-    if (args[1] == NULL) 
+    if (input) 
     {
         int len = 0;
         while (ee->envp[len])
@@ -75,7 +75,8 @@ void ft_export(char *input, t_ee *ee)
         {
             i_inner = i_outer + 1;
             while (i_inner < len) {
-                if (ft_strcmp(sorted_env[i_outer], sorted_env[i_inner]) > 0) {
+                if (ft_strcmp(sorted_env[i_outer], sorted_env[i_inner]) > 0) 
+                {
                     tmp = sorted_env[i_outer];
                     sorted_env[i_outer] = sorted_env[i_inner];
                     sorted_env[i_inner] = tmp;
@@ -93,6 +94,101 @@ void ft_export(char *input, t_ee *ee)
         free(sorted_env);
     } 
     else 
-        export_variable(ee, input);
+        export_variable(ee, input, args);
     free_split(args);
+}*/
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+char *parse_input_simple_export(char *input)
+{
+    int i = 0;
+    int j = 0;
+    char *copy;
+
+    while (input[i] && input[i] <= 32)
+        i++;
+    int start = i;
+    while (input[i] && input[i] > 32)
+        i++;
+    copy = malloc(sizeof(char) * (i - start + 1));
+    if (!copy)
+        return (NULL);
+    while (start < i)
+    {
+        copy[j] = input[start];
+        start++;
+        j++;
+    }
+    copy[j] = '\0';
+    printf("%s\n", copy);
+    return (copy);
+}
+
+void    sort_export(t_ee *ee);
+
+void ft_export(char *input, t_ee *ee) 
+{
+    char **args;
+
+    args = ft_split(input, ' ');
+    if (ft_strcmp(args[0], "export=") == 0)
+    {
+        free_split(args);
+        return ;
+    }
+    if (args[1] == NULL)
+    {
+        printf("\n\n%s\n\n", input);
+        input = parse_input_simple_export(input);
+        printf("\n\n%s\n\n", input);
+        if (ft_strcmp(input, "export") == 0)
+            sort_export(ee);
+    }
+    //else 
+     //   export_variable(ee, input, args);
+    free_split(args);
+    free(input);
+}
+
+void    sort_export(t_ee *ee)
+{
+    char **sorted_env;
+    int i_outer;
+    int i_inner;
+    char *tmp;
+
+    int len = 0;
+    while (ee->envp[len])
+        len++;
+    sorted_env = malloc(sizeof(char *) * (len + 1));
+    int i = 0;
+    while (i < len)
+    {
+        sorted_env[i] = ee->envp[i];
+        i++;
+    }
+    sorted_env[len] = NULL;
+    i_outer = 0;
+    while (i_outer < len - 1) 
+    {
+        i_inner = i_outer + 1;
+        while (i_inner < len) {
+            if (ft_strcmp(sorted_env[i_outer], sorted_env[i_inner]) > 0) 
+            {
+                tmp = sorted_env[i_outer];
+                sorted_env[i_outer] = sorted_env[i_inner];
+                sorted_env[i_inner] = tmp;
+            }
+            i_inner++;
+        }
+        i_outer++;
+    }
+    int j = 0;
+    while (j < len) 
+    {
+        printf("⚙️_(o_o;)_⚙️  %s\n", sorted_env[j]);
+        j++;
+    }
+    free(sorted_env);
 }
