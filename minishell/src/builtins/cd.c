@@ -56,8 +56,7 @@ void	ft_cd(char *input, t_ee *ee)
 		ee->change_confirmed = 1;
 		ee->copy_oldpwd = getcwd(NULL, 0); 
 		result = chdir(cd->home);
-		if (ee->if_unset__pwd == 0)
-			ee->copy_pwd = getcwd(NULL, 0);
+		ee->copy_pwd = getcwd(NULL, 0);
 		check_variable_pwd(ee);
 	}
 	else
@@ -65,11 +64,8 @@ void	ft_cd(char *input, t_ee *ee)
 		ee->change_confirmed = 1;
 		ee->copy_oldpwd = getcwd(NULL, 0); 
 		result = chdir(cd->args[1]);
-		if (ee->if_unset__pwd == 0)
-		{
-			ee->copy_pwd = getcwd(NULL, 0);
-			check_variable_pwd(ee);
-		}
+		ee->copy_pwd = getcwd(NULL, 0);
+		check_variable_pwd(ee);
 	}
 	if (result != 0)
 	{

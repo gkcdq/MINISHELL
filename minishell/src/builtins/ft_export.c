@@ -100,6 +100,21 @@ void ft_export(char *input, t_ee *ee)
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 
+int	ft_strcmp_dif(char *s1, char *s2)
+{
+	int	i;
+
+	i = 0;
+	while (s1[i] || s2[i])
+	{
+		if (s1[i] != s2[i])
+			return (s1[i] - s2[i]);
+		else
+			i++;
+	}
+	return (0);
+}
+
 char *parse_input_simple_export(char *input)
 {
     int i = 0;
@@ -121,7 +136,7 @@ char *parse_input_simple_export(char *input)
         j++;
     }
     copy[j] = '\0';
-    printf("%s\n", copy);
+    //printf("%s\n", copy);
     return (copy);
 }
 
@@ -139,16 +154,17 @@ void ft_export(char *input, t_ee *ee)
     }
     if (args[1] == NULL)
     {
-        printf("\n\n%s\n\n", input);
+        //printf("\n\n%s\n\n", input);
         input = parse_input_simple_export(input);
-        printf("\n\n%s\n\n", input);
+        //printf("\n\n%s\n\n", input);
         if (ft_strcmp(input, "export") == 0)
             sort_export(ee);
+        free(input);
     }
-    //else 
+    else
+        printf("GROS ZIZI\n");
      //   export_variable(ee, input, args);
     free_split(args);
-    free(input);
 }
 
 void    sort_export(t_ee *ee)
@@ -168,13 +184,14 @@ void    sort_export(t_ee *ee)
         sorted_env[i] = ee->envp[i];
         i++;
     }
+    /////////////////// une sorte de copi de l'exo sort_in_tab ///////////////////
     sorted_env[len] = NULL;
     i_outer = 0;
     while (i_outer < len - 1) 
     {
         i_inner = i_outer + 1;
         while (i_inner < len) {
-            if (ft_strcmp(sorted_env[i_outer], sorted_env[i_inner]) > 0) 
+            if (ft_strcmp_dif(sorted_env[i_outer], sorted_env[i_inner]) > 0) 
             {
                 tmp = sorted_env[i_outer];
                 sorted_env[i_outer] = sorted_env[i_inner];
@@ -184,10 +201,11 @@ void    sort_export(t_ee *ee)
         }
         i_outer++;
     }
+    ///////////////////////////////////////////////////////////////////////////////
     int j = 0;
     while (j < len) 
     {
-        printf("⚙️_(o_o;)_⚙️  %s\n", sorted_env[j]);
+        ft_printf("⚙️_(o_o;)_⚙️  %s\n", sorted_env[j]);
         j++;
     }
     free(sorted_env);

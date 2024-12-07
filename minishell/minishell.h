@@ -31,6 +31,22 @@ typedef struct s_cd_fonction
 	char	*home;
 }			t_cd;
 
+typedef struct s_wc_fonction
+{
+    int	lines;
+    int	words;
+    int	chars;
+	int	longest_line;
+	int	current_line_length;
+	int	bytes_read;
+	int flag_l;
+	int flag_w;
+	int flag_c;
+	int flag_m;
+	int flag_L;
+	int	j;
+} 		t_wc;
+
 typedef	struct s_envp_copy
 {
 	// signal exit
@@ -44,6 +60,7 @@ typedef	struct s_envp_copy
 	char 	*last_pwd;
 	int		if_unset__pwd;
 	int		if_unset__oldpwd;
+	int		if_unset__shlvl;
 }			t_ee;
 
 // init_c
@@ -70,7 +87,7 @@ void 		ft_unset(char *input, t_ee *ee);
 void		ft_export(char *input, t_ee *ee);
 
 // wc.c
-void		ft_wc(void);
+void		ft_wc(char *input);
 
 // ------------------------------ //
 
