@@ -1,5 +1,7 @@
 #include "../minishell.h"
 
+int	g_omg_le_plus_beau_du_tieks_ca_dit_koi_le_sang_trkl_la_bess_j_ai_vu_tu_connais_ici_c_est_la_debrouille;
+
 int	ft_strcmp(char *s1, char *s2)
 {
 	int	i;
@@ -230,6 +232,23 @@ void	cumulate_token(char *input, t_ee *ee)
 	return ;
 }
 
+void	handle_sigint(int sig)
+{
+	if (sig == SIGINT)
+	{
+		ft_printf("\n");
+		rl_replace_line("", 0);  
+		rl_on_new_line();    
+		rl_redisplay();       
+	}
+}
+
+void	catch_signal(void)
+{
+	signal(SIGINT, handle_sigint);
+	signal(SIGQUIT, SIG_IGN);
+}
+
 void	loop(char *input, t_ee *ee)
 {
 	t_token	*tok;
@@ -237,6 +256,8 @@ void	loop(char *input, t_ee *ee)
 	tok = malloc(sizeof(t_token));
 	tok->found = 0;
 	input = readline("🍀_(^o^)_🍀  > ");
+	if (input == NULL || *input == '\0')
+		ee->minishell_check = 1;
 	if (input && *input)
 	{
 		add_history(input);
@@ -310,8 +331,10 @@ int	main(int ac, char **av, char **envp)
 	(void)av;
 	init_struct(ee);
 	ee->envp = copy_envp(envp);
+	g_omg_le_plus_beau_du_tieks_ca_dit_koi_le_sang_trkl_la_bess_j_ai_vu_tu_connais_ici_c_est_la_debrouille = 42;
 	while (ee->minishell_check == 0)
 	{
+		catch_signal();
 		loop(input, ee);
 	}
 	int i = 0;

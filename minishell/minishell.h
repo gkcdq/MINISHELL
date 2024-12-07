@@ -13,6 +13,8 @@
 # include <sys/wait.h>          // wait, waitpid, etc.
 # include <termios.h>           // tcsetattr, tcgetattr
 
+extern int	g_omg_le_plus_beau_du_tieks_ca_dit_koi_le_sang_trkl_la_bess_j_ai_vu_tu_connais_ici_c_est_la_debrouille;
+
 typedef struct s_token
 {
 	int		token;
