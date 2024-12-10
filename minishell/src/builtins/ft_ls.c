@@ -29,11 +29,11 @@ char	*parse_input_ls(char *input)
 
 void	ft_ls(char *input)
 {
-	char **args;
-	char *path;
-	DIR *dir;
-	int file_found;
-	struct dirent *entry;
+	char			**args;
+	char			*path;
+	DIR				*dir;
+	int				file_found;
+	struct dirent	*entry;
 
 	file_found = 0;
 	input = parse_input_ls(input);

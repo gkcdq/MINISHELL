@@ -117,7 +117,7 @@ void	copy_pwd(t_env *env)
 
 void	ft_env(t_ee *ee)
 {
-	int			i;
+	int	i;
 
 	if (!ee->envp || !ee->envp[0])
 	{
@@ -128,7 +128,8 @@ void	ft_env(t_ee *ee)
 		if (ee->if_unset__shlvl == 0)
 			printf("SHLVL=1\n");
 		printf("_=/usr/bin/env\n");
-		if (ee->copy_oldpwd && ft_strcmp(ee->copy_oldpwd, ee->copy_pwd) != 0 && (ee->if_unset__oldpwd == 0))
+		if (ee->copy_oldpwd && ft_strcmp(ee->copy_oldpwd, ee->copy_pwd) != 0
+			&& (ee->if_unset__oldpwd == 0))
 			printf("OLDPWD=%s\n", ee->copy_oldpwd);
 	}
 	else
@@ -136,8 +137,11 @@ void	ft_env(t_ee *ee)
 		i = 0;
 		while (ee->envp[i])
 		{
-			//if ((ee->if_unset__pwd == 0) && (ee->copy_oldpwd) && (ee->envp[i + 1] == NULL && ft_strcmp(ee->copy_oldpwd, ee->copy_pwd) != 0))
-			if (ee->copy_oldpwd && (ee->envp[i + 1] == NULL) && (ee->if_unset__oldpwd == 0))
+			// if ((ee->if_unset__pwd == 0) && (ee->copy_oldpwd) && (ee->envp[i
+			//+ 1] == NULL && ft_strcmp(ee->copy_oldpwd,
+			// ee->copy_pwd) != 0))
+			if (ee->copy_oldpwd && (ee->envp[i + 1] == NULL)
+				&& (ee->if_unset__oldpwd == 0))
 				printf("OLDPWD=%s\n", ee->copy_oldpwd);
 			printf("%s\n", ee->envp[i]);
 			i++;
@@ -149,31 +153,35 @@ void	ft_env(t_ee *ee)
 ///////👁️👁️👁️👁️👁️👁️👁️👁️👁️👁️👁️👁️👁️👁️👁️///////
 ///////////////////////////////////////////////////
 
-void check_variable_oldpwd(char **envp)
+void	check_variable_oldpwd(char **envp)
 {
-    int i = 0;
-	int j;
-	int	yes = 0;
+	int	i;
+	int	j;
+	int	yes;
 
-	//ft_printf("%s\n", envp[i]);
-    while (envp[i])
-    {
+	i = 0;
+	yes = 0;
+	// ft_printf("%s\n", envp[i]);
+	while (envp[i])
+	{
 		j = 0;
-        while (envp[i][j])
+		while (envp[i][j])
 		{
-			//ft_printf("%c", envp[i][j]);
-			if ((ft_strcmpchar(envp[i][j], 'O') == 0) && (ft_strcmpchar(envp[i][j + 1], 'L') == 0) && (ft_strcmpchar(envp[i][j + 2], 'D') == 0))
+			// ft_printf("%c", envp[i][j]);
+			if ((ft_strcmpchar(envp[i][j], 'O') == 0)
+				&& (ft_strcmpchar(envp[i][j + 1], 'L') == 0)
+				&& (ft_strcmpchar(envp[i][j + 2], 'D') == 0))
 			{
 				yes = 1;
-            	break;
+				break ;
 			}
 			j++;
 		}
 		if (yes == 1)
-			break;
-        i++;
-    }
-	//ft_printf("%s\n", envp[i]);
+			break ;
+		i++;
+	}
+	// ft_printf("%s\n", envp[i]);
 	if (envp[i])
 	{
 		while (envp[i])
@@ -182,5 +190,5 @@ void check_variable_oldpwd(char **envp)
 			i++;
 		}
 	}
-	//ft_printf("%s\n", envp[i]);
+	// ft_printf("%s\n", envp[i]);
 }

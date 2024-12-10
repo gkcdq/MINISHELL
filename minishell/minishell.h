@@ -35,31 +35,31 @@ typedef struct s_cd_fonction
 
 typedef struct s_wc_fonction
 {
-    int	lines;
-    int	words;
-    int	chars;
-	int	longest_line;
-	int	current_line_length;
-	int	bytes_read;
-	int flag_l;
-	int flag_w;
-	int flag_c;
-	int flag_m;
-	int flag_L;
-	int	j;
-} 		t_wc;
+	int		lines;
+	int		words;
+	int		chars;
+	int		longest_line;
+	int		current_line_length;
+	int		bytes_read;
+	int		flag_l;
+	int		flag_w;
+	int		flag_c;
+	int		flag_m;
+	int		flag_L;
+	int		j;
+}			t_wc;
 
-typedef	struct s_envp_copy
+typedef struct s_envp_copy
 {
 	// signal exit
 	int		minishell_check;
 	// environnement
-	char 	**envp;
+	char	**envp;
 	int		change_confirmed;
 	char	*copy_pwd;
 	char	*copy_oldpwd;
 	char	*save_oldpwd;
-	char 	*last_pwd;
+	char	*last_pwd;
 	int		if_unset__pwd;
 	int		if_unset__oldpwd;
 	int		if_unset__shlvl;
@@ -84,10 +84,11 @@ void		ft_clear(char *input);
 // env.c
 void		ft_env(t_ee *ee);
 // unset.c
-void 		ft_unset(char *input, t_ee *ee);
+void		ft_unset(char *input, t_ee *ee);
 // export.c
 void		ft_export(char *input, t_ee *ee);
-
+// echo.c
+void		ft_echo(char *input);
 // wc.c
 void		ft_wc(char *input);
 
@@ -99,9 +100,9 @@ void		free_split(char **array);
 int			is_number(char *str);
 int			check_token(char *input, t_token *token);
 int			check_string(char *input);
-char 		**copy_envp(char **envp);
+char		**copy_envp(char **envp);
 void		check_variable_pwd(t_ee *ee);
-void 		check_variable_oldpwd(char **envp);
+void		check_variable_oldpwd(char **envp);
 char		*ft_strjoin_cd(char *s1, char *s2);
 int			ft_strcmpchar(char a, char b);
 

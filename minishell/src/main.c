@@ -1,6 +1,6 @@
 #include "../minishell.h"
 
-int	g_omg_le_plus_beau_du_tieks_ca_dit_koi_le_sang_trkl_la_bess_j_ai_vu_tu_connais_ici_c_est_la_debrouille;
+int		g_omg_le_plus_beau_du_tieks_ca_dit_koi_le_sang_trkl_la_bess_j_ai_vu_tu_connais_ici_c_est_la_debrouille;
 
 int	ft_strcmp(char *s1, char *s2)
 {
@@ -135,6 +135,8 @@ int	token_found(char *input, t_token *tok)
 
 ////////////////////////////////////////////////////////
 
+void	execute_external_command(char *command);
+
 void	interprete_commande(char *input, t_ee *ee)
 {
 	char	*trimmed_input;
@@ -169,35 +171,148 @@ void	interprete_commande(char *input, t_ee *ee)
 	}
 	else if (ft_strcmp(trimmed_input, "pwd") == 0)
 		ft_pwd();
-	else if ((ft_strcmp(trimmed_input, "cd") == 0) || (ft_strcmp(trimmed_input, "~") == 0))
+	else if ((ft_strcmp(trimmed_input, "cd") == 0) || (ft_strcmp(trimmed_input,
+				"~") == 0))
 	{
 		if (ee->copy_oldpwd)
 			free(ee->copy_oldpwd);
-		if(ee->copy_pwd)
+		if (ee->copy_pwd)
 			free(ee->copy_pwd);
 		ft_cd(input, ee);
 	}
-	else if (ft_strcmp(trimmed_input, "ls") == 0)
-		ft_ls(input);
-	else if (ft_strcmp(trimmed_input, "clear") == 0)
-		ft_clear(input);
+	// else if (ft_strcmp(trimmed_input, "ls") == 0)
+	//	ft_ls(input);
+	// else if (ft_strcmp(trimmed_input, "clear") == 0)
+	//	ft_clear(input);
 	else if (ft_strcmp(trimmed_input, "env") == 0)
 		ft_env(ee);
 	else if (ft_strcmp(trimmed_input, "wc") == 0)
 		ft_wc(input);
 	else if (ft_strcmp(trimmed_input, "unset") == 0)
 		ft_unset(input, ee);
-	else if ((ft_strcmp(trimmed_input, "export") == 0) || (ft_strcmp(trimmed_input, "export=") == 0))
+	else if ((ft_strcmp(trimmed_input, "export") == 0)
+		|| (ft_strcmp(trimmed_input, "export=") == 0))
 		ft_export(input, ee);
+	else if (ft_strcmp(trimmed_input, "echo") == 0)
+		ft_echo(input);
 	else
 	{
 		if (ee->minishell_check == 0)
-			ft_printf("🍁_(`へ´*)_🍁: %s: command not found\n", trimmed_input);
+			execute_external_command(input);
 	}
 	free(token);
 	free(trimmed_input);
 }
+/*char *find_command_path(char *command)
+{
+	char	*path_env;
+	char	*path_dup;
+	char	*dir;
+		char full_path[1024];
+	int		i;
+	int		j;
 
+	path_env = getenv("PATH");
+	path_dup = ft_strdup(path_env);
+	dir = strtok(path_dup, ":");
+	while (dir)
+	{
+		snprintf(full_path, sizeof(full_path), "%s/%s", dir, command);
+		if (access(full_path, X_OK) == 0)
+		{
+			free(path_dup);
+			return (ft_strdup(full_path));
+		}
+		dir = strtok(NULL, ":");
+	}
+	free(path_dup);
+	return (NULL);
+}*/
+char	*ft_strcat(char *dest, const char *src)
+{
+	int i;
+	int j;
+	
+	i = 0;
+	while (dest[i])
+		i++;
+	j = 0;
+	while (src[j])
+	{
+		dest[i] = src[j];
+		i++;
+		j++;
+	}
+	dest[i] = '\0';
+	return (dest);
+}
+
+char	*find_command_path(char *command)
+{
+	char	*path_env;
+	char	**dirs;
+	char	*full_path;
+	int		i;
+	char	temp_path[2024];
+
+	path_env = getenv("PATH");
+	if (!path_env)
+		return (NULL);
+	dirs = ft_split(path_env, ':');
+	if (!dirs)
+		return (NULL);
+	full_path = NULL;
+	i = 0;
+	while (dirs[i])
+	{
+		temp_path[0] = '\0';
+		ft_strcat(temp_path, dirs[i]);
+		ft_strcat(temp_path, "/");
+		ft_strcat(temp_path, command);
+		if (access(temp_path, X_OK) == 0)
+		{
+			full_path = ft_strdup(temp_path);
+			break ;
+		}
+		i++;
+	}
+	free_split(dirs);
+	return (full_path);
+}
+
+void	execute_external_command(char *command)
+{
+	char	**args;
+	char	*path;
+	pid_t	pid;
+	int		status;
+
+	args = ft_split(command, ' ');
+	path = find_command_path(args[0]);
+	if (!path)
+	{
+		ft_printf("🍁_(`へ´*)_🍁: %s: command not found\n", args[0]);
+		free_split(args);
+		return ;
+	}
+	pid = fork();
+	if (pid == 0)
+	{
+		if (execv(path, args) == -1)
+		{
+			perror("execv");
+			exit(EXIT_FAILURE);
+		}
+	}
+	else if (pid > 0)
+	{
+		waitpid(pid, &status, 0);
+	}
+	else
+		perror("fork");
+	free(path);
+	free_split(args);
+}
 
 void	cumulate_token(char *input, t_ee *ee)
 {
@@ -237,9 +352,9 @@ void	handle_sigint(int sig)
 	if (sig == SIGINT)
 	{
 		ft_printf("\n");
-		rl_replace_line("", 0);  
-		rl_on_new_line();    
-		rl_redisplay();       
+		rl_replace_line("", 0);
+		rl_on_new_line();
+		rl_redisplay();
 	}
 }
 
@@ -302,28 +417,28 @@ int	check_string(char *input)
 	return (1);
 }
 
-char **copy_envp(char **envp)
+char	**copy_envp(char **envp)
 {
-    int i;
-    char **copy;
+	int		i;
+	char	**copy;
 
 	copy = malloc(sizeof(char *) * (ft_strlonglen(envp) + 1));
 	i = 0;
 	check_variable_oldpwd(envp);
-    while (envp[i])
+	while (envp[i])
 	{
-        copy[i] = ft_strdup(envp[i]);
+		copy[i] = ft_strdup(envp[i]);
 		i++;
 	}
-    copy[i] = NULL;
-    return (copy);
+	copy[i] = NULL;
+	return (copy);
 }
-
 
 int	main(int ac, char **av, char **envp)
 {
 	t_ee	*ee;
 	char	*input;
+	int		i;
 
 	ee = malloc(sizeof(t_ee));
 	input = NULL;
@@ -337,7 +452,7 @@ int	main(int ac, char **av, char **envp)
 		catch_signal();
 		loop(input, ee);
 	}
-	int i = 0;
+	i = 0;
 	while (ee->envp[i])
 	{
 		free(ee->envp[i]);
@@ -345,7 +460,7 @@ int	main(int ac, char **av, char **envp)
 	}
 	if (ee->copy_oldpwd)
 		free(ee->copy_oldpwd);
-	if(ee->copy_pwd)
+	if (ee->copy_pwd)
 		free(ee->copy_pwd);
 	free(ee->envp);
 	free(ee);

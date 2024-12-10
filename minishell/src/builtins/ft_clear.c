@@ -19,7 +19,7 @@ char	*parse_input_clear(char *input)
 
 void	ft_clear(char *input)
 {
-	char **args;
+	char	**args;
 
 	input = parse_input_clear(input);
 	args = ft_split(input, ' ');
