@@ -178,6 +178,16 @@ void	sort_export(t_ee *ee)
 	char *tmp;
 
 	int len = 0;
+    /////////////////
+	int bordel_de_merde = 0;
+	if (ee->copy_oldpwd)
+	{
+		while (ee->envp[bordel_de_merde])
+			bordel_de_merde++;
+        //printf("---------------------------------------------------------------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.%s\n", ee->envp[bordel_de_merde]);
+        ee->envp[bordel_de_merde] = ft_strdup(ee->copy_oldpwd);
+	}
+	//////////////////
 	while (ee->envp[len])
 		len++;
 	sorted_env = malloc(sizeof(char *) * (len + 1));
@@ -188,7 +198,6 @@ void	sort_export(t_ee *ee)
 		i++;
 	}
 	/////////////////// une sorte de copi de l'exo sort_in_tab
-	///////////////////
 	sorted_env[len] = NULL;
 	i_outer = 0;
 	while (i_outer < len - 1)
@@ -206,7 +215,7 @@ void	sort_export(t_ee *ee)
 		}
 		i_outer++;
 	}
-	///////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////
 	int j = 0;
 	while (j < len)
 	{
