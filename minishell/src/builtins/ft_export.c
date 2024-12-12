@@ -148,6 +148,20 @@ void	ft_export(char *input, t_ee *ee)
 	char **args;
 
 	args = ft_split(input, ' ');
+	if (!ee->envp || !ee->envp[0])
+	{
+		if (ee->copy_oldpwd == NULL)
+			printf("⚙️_(o_o;)_⚙️  OLDPWD\n");
+		else if (ee->copy_oldpwd && ft_strcmp(ee->copy_oldpwd, ee->copy_pwd) != 0 && (ee->if_unset__oldpwd == 0))
+			printf("⚙️_(o_o;)_⚙️  OLDPWD=%s\n", ee->copy_oldpwd);
+		if (ee->copy_pwd == NULL)
+			ee->copy_pwd = getcwd(NULL, 0);
+		if (ee->if_unset__pwd == 0)
+			printf("⚙️_(o_o;)_⚙️  PWD=%s\n", ee->copy_pwd);
+		if (ee->if_unset__shlvl == 0)
+			printf("⚙️_(o_o;)_⚙️  SHLVL=1\n");
+		return ;
+	}
 	if (ft_strcmp(args[0], "export=") == 0)
 	{
 		free_split(args);
@@ -178,14 +192,15 @@ void	sort_export(t_ee *ee)
 	char *tmp;
 
 	int len = 0;
-    /////////////////
+	/////////////////
 	int bordel_de_merde = 0;
 	if (ee->copy_oldpwd)
 	{
 		while (ee->envp[bordel_de_merde])
 			bordel_de_merde++;
-        //printf("---------------------------------------------------------------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.%s\n", ee->envp[bordel_de_merde]);
-        ee->envp[bordel_de_merde] = ft_strdup(ee->copy_oldpwd);
+		// printf("---------------------------------------------------------------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.%s\n",
+		// ee->envp[bordel_de_merde];
+		ee->envp[bordel_de_merde] = ft_strdup(ee->copy_oldpwd);
 	}
 	//////////////////
 	while (ee->envp[len])
@@ -217,10 +232,25 @@ void	sort_export(t_ee *ee)
 	}
 	//////////////////////////////////////////////////////////
 	int j = 0;
+	int jo = 0;
 	while (j < len)
 	{
+		if (ee->copy_oldpwd && ft_strcmp(ee->copy_oldpwd, sorted_env[j]) == 0)
+		{
+			sorted_env[j] = NULL;
+			j++;
+		}
+		if (ee->copy_oldpwd && jo == 0)
+		{
+			if (ft_strcmp(sorted_env[j], ee->x_data) == 0)
+			{
+				ft_printf("⚙️_(o_o;)_⚙️  OLDPWD=%s\n", ee->copy_oldpwd);
+				jo = 1;
+			}
+		}
 		ft_printf("⚙️_(o_o;)_⚙️  %s\n", sorted_env[j]);
 		j++;
 	}
 	free(sorted_env);
 }
+
