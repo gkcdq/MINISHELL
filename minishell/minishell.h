@@ -63,7 +63,6 @@ typedef struct s_envp_copy
 	int		if_unset__pwd;
 	int		if_unset__oldpwd;
 	int		if_unset__shlvl;
-	char	*x_data;
 }			t_ee;
 
 // init_c
@@ -106,5 +105,6 @@ void		check_variable_pwd(t_ee *ee);
 void		check_variable_oldpwd(char **envp);
 char		*ft_strjoin_cd(char *s1, char *s2);
 int			ft_strcmpchar(char a, char b);
+char		*ft_strcat(char *dest, const char *src);
 
 #endif

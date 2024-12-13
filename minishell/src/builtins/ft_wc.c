@@ -56,8 +56,6 @@ void	ft_wc(char *input)
 	int		fd;
 	char	buffer[4096];
 	int		i;
-	int		nsm;
-	int		ntm;
 	char	*line;
 	int		check;
 
@@ -65,14 +63,6 @@ void	ft_wc(char *input)
 	wc = malloc(sizeof(t_wc));
 	init_wc_struct(wc);
 	args = ft_split(input, ' ');
-	nsm = 1;
-	ntm = 0;
-	while (args[nsm])
-	{
-		if (ft_strcmp(args[nsm], "-") == 0)
-			ntm = 1;
-		nsm++;
-	}
 	if (args[1] == NULL || ft_strcmp(args[1], "-") == 0)
 	{
 		line = NULL;

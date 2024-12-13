@@ -28,7 +28,6 @@ char	*parse_input_cd(char *input)
 	while (input[i])
 	{
 		if (input[i] == ';' && i > 0 && input[i - 1] != ' ')
-		// Eviter l'accès à input[-1]
 		{
 			input[i] = '\0';
 			break ;

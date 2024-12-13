@@ -184,73 +184,86 @@ void	ft_export(char *input, t_ee *ee)
 	free_split(args);
 }
 
-void	sort_export(t_ee *ee)
-{
-	char **sorted_env;
-	int i_outer;
-	int i_inner;
-	char *tmp;
+char *ft_strcat_export(char *s1, char *s2);
 
-	int len = 0;
-	/////////////////
-	int bordel_de_merde = 0;
+void sort_export(t_ee *ee)
+{
+    char **sorted_env;
+    int len = 0;
+    int i, j;
+    char *tmp;
+
+    while (ee->envp[len])
+        len++;
+    sorted_env = malloc(sizeof(char *) * (len + 2));
+    if (!sorted_env)
+        return;
+    i = 0;
+    while (i < len)
+    {
+        sorted_env[i] = ft_strdup(ee->envp[i]);
+        i++;
+    }
 	if (ee->copy_oldpwd)
-	{
-		while (ee->envp[bordel_de_merde])
-			bordel_de_merde++;
-		// printf("---------------------------------------------------------------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.%s\n",
-		// ee->envp[bordel_de_merde];
-		ee->envp[bordel_de_merde] = ft_strdup(ee->copy_oldpwd);
-	}
-	//////////////////
-	while (ee->envp[len])
-		len++;
-	sorted_env = malloc(sizeof(char *) * (len + 1));
-	int i = 0;
-	while (i < len)
-	{
-		sorted_env[i] = ee->envp[i];
-		i++;
-	}
-	/////////////////// une sorte de copi de l'exo sort_in_tab
-	sorted_env[len] = NULL;
-	i_outer = 0;
-	while (i_outer < len - 1)
-	{
-		i_inner = i_outer + 1;
-		while (i_inner < len)
-		{
-			if (ft_strcmp_dif(sorted_env[i_outer], sorted_env[i_inner]) > 0)
-			{
-				tmp = sorted_env[i_outer];
-				sorted_env[i_outer] = sorted_env[i_inner];
-				sorted_env[i_inner] = tmp;
-			}
-			i_inner++;
-		}
-		i_outer++;
-	}
-	//////////////////////////////////////////////////////////
-	int j = 0;
-	int jo = 0;
-	while (j < len)
-	{
-		if (ee->copy_oldpwd && ft_strcmp(ee->copy_oldpwd, sorted_env[j]) == 0)
-		{
-			sorted_env[j] = NULL;
-			j++;
-		}
-		if (ee->copy_oldpwd && jo == 0)
-		{
-			if (ft_strcmp(sorted_env[j], ee->x_data) == 0)
-			{
-				ft_printf("⚙️_(o_o;)_⚙️  OLDPWD=%s\n", ee->copy_oldpwd);
-				jo = 1;
-			}
-		}
-		ft_printf("⚙️_(o_o;)_⚙️  %s\n", sorted_env[j]);
-		j++;
-	}
-	free(sorted_env);
+    {
+        char *oldpwd = ft_strcat_export("OLDPWD=", ee->copy_oldpwd);
+        if (oldpwd)
+        {
+            sorted_env[len] = oldpwd;
+            len++;
+        }
+    }
+    sorted_env[len] = NULL;
+    i = 0;
+    while (i < len - 1)
+    {
+        j = i + 1;
+        while (j < len)
+        {
+            if (ft_strcmp_dif(sorted_env[i], sorted_env[j]) > 0)
+            {
+                tmp = sorted_env[i];
+                sorted_env[i] = sorted_env[j];
+                sorted_env[j] = tmp;
+            }
+            j++;
+        }
+        i++;
+    }
+
+    // Affichage du tableau trié
+    i = 0;
+    while (i < len)
+    {
+        if (sorted_env[i])
+            ft_printf("⚙️_(o_o;)_⚙️  %s\n", sorted_env[i]);
+        free(sorted_env[i]);
+        i++;
+    }
+    free(sorted_env);
+}
+
+char *ft_strcat_export(char *s1, char *s2)
+{
+    int len1 = ft_strlen(s1);
+    int len2 = ft_strlen(s2);
+    char *result = malloc(sizeof(char) * (len1 + len2 + 1));
+
+    if (!result)
+        return (NULL);
+    int i = 0, j = 0;
+    while (s1[i])
+    {
+        result[i] = s1[i];
+        i++;
+    }
+    while (s2[j])
+    {
+        result[i] = s2[j];
+        i++;
+        j++;
+    }
+    result[i] = '\0';
+    return (result);
 }
 
