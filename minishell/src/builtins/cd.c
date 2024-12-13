@@ -45,23 +45,34 @@ void	ft_cd(char *input, t_ee *ee)
 	cd = malloc(sizeof(t_cd));
 	input = parse_input_cd(input);
 	cd->args = ft_split(input, ' ');
+	ee->copy_oldpwd = getcwd(NULL, 0);
 	if (cd->args[1] == NULL || ft_strcmp(cd->args[0], "~") == 0)
 	{
+		ee->change_confirmed = 1;
 		cd->home = getenv("HOME");
 		if (cd->home == NULL)
 		{
 			printf("🍂_(´~`)_🍂: HOME not set\n");
 			free_split(cd->args);
+			free(cd);
+			printf("\n1\n\n");
 			return ;
 		}
-		ee->change_confirmed = 1;
-		ee->copy_oldpwd = getcwd(NULL, 0);
-		result = chdir(cd->home);
-		ee->copy_pwd = getcwd(NULL, 0);
-		check_variable_pwd(ee);
+		else
+		{
+			result = chdir(cd->home);
+			if (ee->copy_pwd)
+				free(ee->copy_pwd);
+			ee->copy_pwd = getcwd(NULL, 0);
+			check_variable_pwd(ee);
+		}
 	}
 	else
 	{
+		if (ee->copy_pwd)
+			free(ee->copy_pwd);
+		if (ee->copy_oldpwd)
+			free(ee->copy_oldpwd);
 		ee->change_confirmed = 1;
 		ee->copy_oldpwd = getcwd(NULL, 0);
 		result = chdir(cd->args[1]);

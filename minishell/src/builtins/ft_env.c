@@ -124,13 +124,13 @@ void	ft_env(t_ee *ee)
 		if (ee->copy_pwd == NULL)
 			ee->copy_pwd = getcwd(NULL, 0);
 		if (ee->if_unset__pwd == 0)
-			printf("PWD=%s\n", ee->copy_pwd);
+			printf("🌱 PWD=%s\n", ee->copy_pwd);
 		if (ee->if_unset__shlvl == 0)
-			printf("SHLVL=1\n");
-		printf("_=/usr/bin/env\n");
+			printf("🌱 SHLVL=1\n");
+		printf("🌱 _=/usr/bin/env\n");
 		if (ee->copy_oldpwd && ft_strcmp(ee->copy_oldpwd, ee->copy_pwd) != 0
 			&& (ee->if_unset__oldpwd == 0))
-			printf("OLDPWD=%s\n", ee->copy_oldpwd);
+			printf("🌱 OLDPWD=%s\n", ee->copy_oldpwd);
 	}
 	else
 	{
@@ -142,8 +142,8 @@ void	ft_env(t_ee *ee)
 			// ee->copy_pwd) != 0))
 			if (ee->copy_oldpwd && (ee->envp[i + 1] == NULL)
 				&& (ee->if_unset__oldpwd == 0))
-				printf("OLDPWD=%s\n", ee->copy_oldpwd);
-			printf("%s\n", ee->envp[i]);
+				printf("🌱 OLDPWD=%s\n", ee->copy_oldpwd);
+			printf("🌱 %s\n", ee->envp[i]);
 			i++;
 		}
 	}

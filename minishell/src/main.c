@@ -179,18 +179,16 @@ void	interprete_commande(char *input, t_ee *ee)
 	{
 		if (ee->copy_oldpwd)
 			free(ee->copy_oldpwd);
-		if (ee->copy_pwd)
-			free(ee->copy_pwd);
 		ft_cd(input, ee);
 	}
 	// else if (ft_strcmp(trimmed_input, "ls") == 0)
 	//	ft_ls(input);
 	// else if (ft_strcmp(trimmed_input, "clear") == 0)
 	//	ft_clear(input);
+	// else if (ft_strcmp(trimmed_input, "wc") == 0)
+	//	ft_wc(input);
 	else if (ft_strcmp(trimmed_input, "env") == 0)
 		ft_env(ee);
-	//else if (ft_strcmp(trimmed_input, "wc") == 0)
-	//	ft_wc(input);
 	else if (ft_strcmp(trimmed_input, "unset") == 0)
 		ft_unset(input, ee);
 	else if ((ft_strcmp(trimmed_input, "export") == 0)
@@ -399,7 +397,12 @@ void	loop(char *input, t_ee *ee)
 				cumulate_token(input, ee);
 			}
 			else
+			{
+				//if (countain_redirection(input))
+					//fonction qui va parse + exec les redirections(input, ee);
+				//else
 				interprete_commande(input, ee);
+			}
 		}
 	}
 	free(input);
@@ -464,7 +467,8 @@ int	main(int ac, char **av, char **envp)
 		free(ee->copy_oldpwd);
 	if (ee->copy_pwd)
 		free(ee->copy_pwd);
-	free(ee->envp);
+	if (ee->envp)
+		free(ee->envp);
 	free(ee);
 	clear_history();
 	return (0);
