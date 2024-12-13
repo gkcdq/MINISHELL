@@ -19,4 +19,5 @@ void	init_struct(t_ee *ee)
 	ee->if_unset__pwd = 0;
 	ee->if_unset__oldpwd = 0;
 	ee->if_unset__shlvl = 0;
+	ee->lock_path = 0;
 }

@@ -181,12 +181,6 @@ void	interprete_commande(char *input, t_ee *ee)
 			free(ee->copy_oldpwd);
 		ft_cd(input, ee);
 	}
-	// else if (ft_strcmp(trimmed_input, "ls") == 0)
-	//	ft_ls(input);
-	// else if (ft_strcmp(trimmed_input, "clear") == 0)
-	//	ft_clear(input);
-	// else if (ft_strcmp(trimmed_input, "wc") == 0)
-	//	ft_wc(input);
 	else if (ft_strcmp(trimmed_input, "env") == 0)
 		ft_env(ee);
 	else if (ft_strcmp(trimmed_input, "unset") == 0)
@@ -204,36 +198,12 @@ void	interprete_commande(char *input, t_ee *ee)
 	free(token);
 	free(trimmed_input);
 }
-/*char *find_command_path(char *command)
-{
-	char	*path_env;
-	char	*path_dup;
-	char	*dir;
-		char full_path[1024];
-	int		i;
-	int		j;
 
-	path_env = getenv("PATH");
-	path_dup = ft_strdup(path_env);
-	dir = strtok(path_dup, ":");
-	while (dir)
-	{
-		snprintf(full_path, sizeof(full_path), "%s/%s", dir, command);
-		if (access(full_path, X_OK) == 0)
-		{
-			free(path_dup);
-			return (ft_strdup(full_path));
-		}
-		dir = strtok(NULL, ":");
-	}
-	free(path_dup);
-	return (NULL);
-}*/
 char	*ft_strcat(char *dest, const char *src)
 {
-	int i;
-	int j;
-	
+	int	i;
+	int	j;
+
 	i = 0;
 	while (dest[i])
 		i++;
@@ -365,14 +335,135 @@ void	catch_signal(void)
 	signal(SIGQUIT, SIG_IGN);
 }
 
+void	you_shall_not_path(void)
+{
+	char	*path_env;
+
+	path_env = getenv("PATH");
+	if (!path_env || *path_env == '\0')
+		setenv("PATH", "/bin:/usr/bin", 1);
+}
+
+char **parse_dollars(char **args, t_ee *ee)
+{
+    int i, j, k, x, y;
+    char *copy;
+    char **changed_args;
+    char *after_equal;
+
+    changed_args = malloc(sizeof(char *) * (ft_strlonglen(args) + 1));
+    if (!changed_args)
+        return NULL;
+
+    i = 0;
+    while (args[i])
+    {
+        if (args[i][0] == '$')
+        {
+            copy = malloc(sizeof(char) * ft_strlen(args[i]));
+            if (!copy)
+                return NULL;
+            j = 1;
+            k = 0;
+            while (args[i][j])
+            {
+                copy[k++] = args[i][j++];
+            }
+            copy[k] = '\0';
+            x = 0;
+            while (ee->envp[x])
+            {
+                y = 0;
+                if (ft_strncmp(ee->envp[x], copy, ft_strlen(copy)) == 0 && ee->envp[x][ft_strlen(copy)] == '=')
+                {
+                    y = ft_strlen(copy) + 1;
+                    after_equal = ft_strdup(ee->envp[x] + y);
+                    if (!after_equal)
+                        return NULL;
+                    changed_args[i] = after_equal;
+                    break;
+                }
+                x++;
+            }
+
+            if (!ee->envp[x]) 
+                changed_args[i] = ft_strdup(args[i]);
+
+            free(copy); 
+        }
+        else
+            changed_args[i] = ft_strdup(args[i]);
+        i++;
+		//else if (args[i][0] == '$')
+    }
+
+    changed_args[i] = NULL; 
+    return changed_args;
+}
+
+
+char **check_dollars(char *input, t_ee *ee)
+{
+    char **args;
+    char **changed_args;
+
+    args = ft_split(input, ' ');
+    if (!args)
+        return NULL;
+    changed_args = parse_dollars(args, ee);
+    if (!changed_args)
+        return NULL;
+    free_split(args);
+    return changed_args;
+}
+
+char *reconstruct_input(char **changed_args)
+{
+    int i = 0;
+    size_t total_len = 0;
+    char *new_input;
+    char *current_pos;
+
+    while (changed_args[i])
+    {
+        total_len += ft_strlen(changed_args[i]) + 1;
+        i++;
+    }
+
+    new_input = malloc(sizeof(char) * total_len);
+    if (!new_input)
+        return NULL;
+    current_pos = new_input;
+    i = 0;
+    while (changed_args[i])
+    {
+        size_t len = ft_strlen(changed_args[i]);
+        ft_memcpy(current_pos, changed_args[i], len);
+        current_pos += len;
+        if (changed_args[i + 1])
+            *current_pos++ = ' ';
+        i++;
+    }
+
+    *current_pos = '\0';
+    return new_input;
+}
+
+
+
 void	loop(char *input, t_ee *ee)
 {
 	t_token	*tok;
+	char	**args;
+	char **changed_args = NULL;
 
+	if ((!ee->envp || !ee->envp[0]) && ee->lock_path == 0)
+		you_shall_not_path();
 	tok = malloc(sizeof(t_token));
 	tok->found = 0;
+	args = ft_split(input, ' ');
 	input = readline("🍀_(^o^)_🍀  > ");
-	if (input == NULL || *input == '\0')
+	if (input == NULL)
 		ee->minishell_check = 1;
 	if (input && *input)
 	{
@@ -394,17 +485,25 @@ void	loop(char *input, t_ee *ee)
 					free(tok);
 					return ;
 				}
-				cumulate_token(input, ee);
+				changed_args = check_dollars(input, ee);
+                if (!changed_args)
+                    return;
+				free(input);
+				input = reconstruct_input(changed_args);
+                cumulate_token(input, ee);
 			}
 			else
 			{
-				//if (countain_redirection(input))
-					//fonction qui va parse + exec les redirections(input, ee);
-				//else
-				interprete_commande(input, ee);
+				changed_args = check_dollars(input, ee);
+                if (!changed_args)
+                    return;
+				free(input);
+				input = reconstruct_input(changed_args);
+                interprete_commande(input, ee);
 			}
 		}
 	}
+	free_split(changed_args);
 	free(input);
 	free(tok);
 }

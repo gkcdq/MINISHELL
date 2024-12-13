@@ -55,7 +55,6 @@ void	ft_cd(char *input, t_ee *ee)
 			printf("🍂_(´~`)_🍂: HOME not set\n");
 			free_split(cd->args);
 			free(cd);
-			printf("\n1\n\n");
 			return ;
 		}
 		else

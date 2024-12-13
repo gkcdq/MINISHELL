@@ -51,18 +51,28 @@ typedef struct s_wc_fonction
 
 typedef struct s_envp_copy
 {
-	// signal exit
+	//      V signal exit
 	int		minishell_check;
-	// environnement
+	//      V copy l'environnement
 	char	**envp;
+	//      V confirme dans cd le changement de directory
 	int		change_confirmed;
+	//      V copy dans cd le pwd apres le changement de directory
 	char	*copy_pwd;
+	//      V copy dans cd le pwd avant le changement de directory
 	char	*copy_oldpwd;
-	char	*save_oldpwd;
-	char	*last_pwd;
+	//		V condition pour verifier si pwd a ete unset (pour ne plus l'afficher)
 	int		if_unset__pwd;
+	//		V condition pour verifier si oldpwd a ete unset (pour ne plus l'afficher)
 	int		if_unset__oldpwd;
+	//		V condition pour verifier si shlvl a ete unset (pour ne plus l'afficher)
 	int		if_unset__shlvl;
+	//		V (si env -i)lock permettant de ne pas setenv PATH a chaque nouvel input s'il a deja ete unset
+	int		lock_path;
+	//		V etre le tableau de char * de la commande export
+	char	**copy_export_env;
+	//		V save dans export toute les variable d'environnmet sans '='
+	char	**save_inequal_env;
 }			t_ee;
 
 // init_c

@@ -26,6 +26,11 @@ void	ft_unset(char *input, t_ee *ee)
 		free_split(args);
 		return ;
 	}
+	if ((!ee->envp || !ee->envp[0]) && ft_strcmp(args[1], "PATH") == 0)
+	{
+		unsetenv("PATH");
+		ee->lock_path = 1;
+	}
 	new_envp = malloc(sizeof(char *) * (ft_strlonglen(ee->envp) + 1));
 	if (!new_envp)
 	{
