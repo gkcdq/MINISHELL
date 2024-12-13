@@ -344,12 +344,14 @@ void	you_shall_not_path(void)
 		setenv("PATH", "/bin:/usr/bin", 1);
 }
 
-char **parse_dollars(char **args, t_ee *ee)
+/*char **parse_dollars(char **args, t_ee *ee)
 {
-    int i, j, k, x, y;
+    int i, j, k, x, y, m;
     char *copy;
     char **changed_args;
     char *after_equal;
+	char *before_equal;
+	int lock = 0;
 
     changed_args = malloc(sizeof(char *) * (ft_strlonglen(args) + 1));
     if (!changed_args)
@@ -381,21 +383,130 @@ char **parse_dollars(char **args, t_ee *ee)
                     if (!after_equal)
                         return NULL;
                     changed_args[i] = after_equal;
+					lock = 1;
                     break;
                 }
                 x++;
             }
-
             if (!ee->envp[x]) 
                 changed_args[i] = ft_strdup(args[i]);
-
-            free(copy); 
+            free(copy);
         }
         else
+        {
             changed_args[i] = ft_strdup(args[i]);
+        }
+		j = 0;
+		///////////////////////////////////////////////////////
+		if (args[i][0] != '$' && lock == 0)
+		{
+			while(args[i][j] != '$')
+				j++;
+			printf("%c\n", args[i][j]);
+			if(args[i][j] == '$')
+			{
+				m = j - 1;
+				j = 0;
+				before_equal = malloc(sizeof(char) * (m + 1));
+				int h = 0;
+				while(j < m)
+				{
+					before_equal[h] = args[i][j];
+					j++;
+					h++;
+				}
+				before_equal[h] = '\0';
+				changed_args[i] = before_equal;
+				//free(before_equal);
+			}
+		}
+		/////////////////////////////////////////////////////////
         i++;
-		//else if (args[i][0] == '$')
     }
+
+    changed_args[i] = NULL; 
+    return changed_args;
+}*/
+char **parse_dollars(char **args, t_ee *ee)
+{
+    int i, j, k, x, y, m;
+    char *copy;
+    char **changed_args;
+    char *after_equal;
+    char *before_equal;
+    int lock;
+
+    changed_args = malloc(sizeof(char *) * (ft_strlonglen(args) + 1));
+    if (!changed_args)
+        return NULL;
+
+    i = 0;
+    while (args[i])
+    {
+        lock = 0;
+        if (args[i][0] == '$')
+        {
+            copy = malloc(sizeof(char) * ft_strlen(args[i]));
+            if (!copy)
+                return NULL;
+            j = 1;
+            k = 0;
+            while (args[i][j])
+            {
+                copy[k++] = args[i][j++];
+            }
+            copy[k] = '\0';
+            x = 0;
+            while (ee->envp[x])
+            {
+                y = 0;
+                if (ft_strncmp(ee->envp[x], copy, ft_strlen(copy)) == 0 && ee->envp[x][ft_strlen(copy)] == '=')
+                {
+                    y = ft_strlen(copy) + 1;
+                    after_equal = ft_strdup(ee->envp[x] + y);
+                    if (!after_equal)
+                        return NULL;
+                    changed_args[i] = after_equal;
+                    lock = 1;
+                    break;
+                }
+                x++;
+            }
+            if (!lock)
+                changed_args[i] = ft_strdup(args[i]);
+            free(copy);
+        }
+        else
+        {
+            j = 0;
+            while (args[i][j] && args[i][j] != '$')
+                j++;
+
+            if (args[i][j] == '$') // Trouver un `$` dans la chaîne
+            {
+                m = j; // Longueur avant `$`
+                before_equal = malloc(sizeof(char) * (m + 1));
+                if (!before_equal)
+                    return NULL;
+
+                k = 0;
+				while (k < m)
+				{
+                    before_equal[k] = args[i][k];
+					k++;
+				}
+                before_equal[m] = '\0';
+
+                changed_args[i] = before_equal;
+                lock = 1; // Marquer que nous avons traité ce cas
+            }
+
+            if (!lock) // Si aucun `$` n'a été trouvé
+                changed_args[i] = ft_strdup(args[i]);
+        }
+
+        i++;
+    } //for (k = 0; k < m; k++) 
 
     changed_args[i] = NULL; 
     return changed_args;
