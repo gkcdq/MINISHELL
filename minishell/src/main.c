@@ -81,7 +81,10 @@ int	check_token_in_all_string(char *input, t_token *tok)
 		if (input[i] == ';')
 		{
 			if (input[i + 1] == ';')
+			{
+				tok->token = 3;
 				return (1);
+			}
 			while (input[i + 1] <= 32)
 				i++;
 			if (input[i + 1] == ';')
@@ -387,7 +390,7 @@ void	loop(char *input, t_ee *ee)
 						printf("🛠️_(>_<;)_🛠️   : syntax error near unexpected token `;'\n");
 						tok->token = 0;
 					}
-					else
+					else if (tok->token == 3)
 						printf("🛠️_(>_<;)_🛠️   : syntax error near unexpected token `;;'\n");
 					free(input);
 					free(tok);
