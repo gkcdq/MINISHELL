@@ -71,8 +71,7 @@ typedef struct s_envp_copy
 	int		lock_path;
 	//		V etre le tableau de char * de la commande export
 	char	**copy_export_env;
-	//		V save dans export toute les variable d'environnmet sans '='
-	char	**save_inequal_env;
+ 	
 }			t_ee;
 
 // init_c
