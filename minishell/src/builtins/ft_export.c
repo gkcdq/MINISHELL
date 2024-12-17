@@ -59,8 +59,8 @@ void	export_with_args(t_ee *ee, char **args)
 	int j;
 	char **copy_envp;
 	///////////////////////////////
-	//char **copy_export;
-	//int len_export = 0;
+	char **copy_export;
+	int len_export = 0;
 
 	while (args[len])
 		len++;
@@ -70,24 +70,31 @@ void	export_with_args(t_ee *ee, char **args)
 	copy_envp = malloc(sizeof(char *) * (len_envp + len + 1));
 	if (!copy_envp)
 		return ;
-//
-/////////////////////////////////////////////////////////////////////////////////////////
-	/*if (ee->copy_export_env != NULL)
+	//
+	/////////////////////////////////////////////////////////////////////////////////////////
+	if (ee->copy_export_env != NULL)
 	{
 		while (ee->copy_export_env[len_export])
 			len_export++;
 		copy_export = malloc(sizeof(char *) * (len_export + len + 1));
 		if (!copy_export)
 			return ;
+		len_export = 0;
+		while (ee->copy_export_env[len_export])
+		{
+			copy_export[len_export] = ft_strdup(ee->copy_export_env[len_export]);
+			len_export++;
+		}
+		copy_export[len_export] = NULL;
 	}
 	else
 	{
 		copy_export = malloc(sizeof(char *) * (len + 1));
 		if (!copy_export)
 			return ;
-	}*/
-/////////////////////////////////////////////////////////////////////////////////////////
-//
+	}
+	/////////////////////////////////////////////////////////////////////////////////////////
+	//
 	j = 0;
 	while (j < len_envp)
 	{
@@ -120,12 +127,32 @@ void	export_with_args(t_ee *ee, char **args)
 				copy_envp[len_envp] = NULL;
 			}
 		}
+		else
+		{
+			found = 0;
+			j = 0;
+			while (j < len_export)
+			{
+				if (ft_strcmp(copy_export[j], args[i]) == 0)
+				{
+					found = 1;
+					break ;
+				}
+				j++;
+			}
+			if (!found)
+			{
+				copy_export[len_export] = ft_strdup(args[i]);
+				len_export++;
+				copy_export[len_export] = NULL;
+			}
+		}
 		i++;
 	}
 	free_split(ee->envp);
 	ee->envp = copy_envp;
-	//free_split(ee->copy_export_env)
-	//ee->copy
+	free_split(ee->copy_export_env);
+	ee->copy_export_env = copy_export;
 }
 
 void	display_in_env_if_equal(t_ee *ee)

@@ -579,6 +579,8 @@ int	main(int ac, char **av, char **envp)
 		free(ee->copy_pwd);
 	if (ee->envp)
 		free(ee->envp);
+	if (ee->copy_export_env)
+		free_split(ee->copy_export_env);
 	free(ee);
 	clear_history();
 	return (0);
