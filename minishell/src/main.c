@@ -103,7 +103,6 @@ int	check_token_in_all_string(char *input, t_token *tok)
 	return (0);
 }
 
-
 int	check_token(char *input, t_token *token)
 {
 	int	i;
@@ -339,139 +338,137 @@ void	you_shall_not_path(void)
 		setenv("PATH", "/bin:/usr/bin", 1);
 }
 
-char **parse_dollars(char **args, t_ee *ee)
+char	**parse_dollars(char **args, t_ee *ee)
 {
-    int i, j, k, x, y, m;
-    char *copy;
-    char **changed_args;
-    char *after_equal;
-    char *before_equal;
-    int lock;
+	char	*copy;
+	char	**changed_args;
+	char	*after_equal;
+	char	*before_equal;
+	int		lock;
 
-    changed_args = malloc(sizeof(char *) * (ft_strlonglen(args) + 1));
-    if (!changed_args)
-        return NULL;
-    i = 0;
-    while (args[i])
-    {
-        lock = 0;
-        if (args[i][0] == '$')
-        {
-            copy = malloc(sizeof(char) * ft_strlen(args[i]));
-            if (!copy)
-                return NULL;
-            j = 1;
-            k = 0;
-            while (args[i][j])
-                copy[k++] = args[i][j++];
-            copy[k] = '\0';
-            x = 0;
-            while (ee->envp[x])
-            {
-                y = 0;
-                if (ft_strncmp(ee->envp[x], copy, ft_strlen(copy)) == 0 && ee->envp[x][ft_strlen(copy)] == '=')
-                {
-                    y = ft_strlen(copy) + 1;
-                    after_equal = ft_strdup(ee->envp[x] + y);
-                    if (!after_equal)
-                        return NULL;
-                    changed_args[i] = after_equal;
-                    lock = 1;
-                    break;
-                }
-                x++;
-            }
-            if (!lock)
-                changed_args[i] = ft_strdup(args[i]);
-            free(copy);
-        }
-        else
-        {
-            j = 0;
-            while (args[i][j] && args[i][j] != '$')
-                j++;
-            if (args[i][j] == '$')
-            {
-                m = j;
-                before_equal = malloc(sizeof(char) * (m + 1));
-                if (!before_equal)
-                    return NULL;
-
-                k = 0;
+	int i, j, k, x, y, m;
+	changed_args = malloc(sizeof(char *) * (ft_strlonglen(args) + 1));
+	if (!changed_args)
+		return (NULL);
+	i = 0;
+	while (args[i])
+	{
+		lock = 0;
+		if (args[i][0] == '$')
+		{
+			copy = malloc(sizeof(char) * ft_strlen(args[i]));
+			if (!copy)
+				return (NULL);
+			j = 1;
+			k = 0;
+			while (args[i][j])
+				copy[k++] = args[i][j++];
+			copy[k] = '\0';
+			x = 0;
+			while (ee->envp[x])
+			{
+				y = 0;
+				if (ft_strncmp(ee->envp[x], copy, ft_strlen(copy)) == 0
+					&& ee->envp[x][ft_strlen(copy)] == '=')
+				{
+					y = ft_strlen(copy) + 1;
+					after_equal = ft_strdup(ee->envp[x] + y);
+					if (!after_equal)
+						return (NULL);
+					changed_args[i] = after_equal;
+					lock = 1;
+					break ;
+				}
+				x++;
+			}
+			if (!lock)
+				changed_args[i] = ft_strdup(args[i]);
+			free(copy);
+		}
+		else
+		{
+			j = 0;
+			while (args[i][j] && args[i][j] != '$')
+				j++;
+			if (args[i][j] == '$')
+			{
+				m = j;
+				before_equal = malloc(sizeof(char) * (m + 1));
+				if (!before_equal)
+					return (NULL);
+				k = 0;
 				while (k < m)
 				{
-                    before_equal[k] = args[i][k];
+					before_equal[k] = args[i][k];
 					k++;
 				}
-                before_equal[m] = '\0';
-
-                changed_args[i] = before_equal;
-                lock = 1;
-            }
-            if (!lock)
-                changed_args[i] = ft_strdup(args[i]);
-        }
-        i++;
-    } 
-    changed_args[i] = NULL; 
-    return changed_args;
+				before_equal[m] = '\0';
+				changed_args[i] = before_equal;
+				lock = 1;
+			}
+			if (!lock)
+				changed_args[i] = ft_strdup(args[i]);
+		}
+		i++;
+	}
+	changed_args[i] = NULL;
+	return (changed_args);
 }
 
-
-char **check_dollars(char *input, t_ee *ee)
+char	**check_dollars(char *input, t_ee *ee)
 {
-    char **args;
-    char **changed_args;
+	char	**args;
+	char	**changed_args;
 
-    args = ft_split(input, ' ');
-    if (!args)
-        return NULL;
-    changed_args = parse_dollars(args, ee);
-    if (!changed_args)
-        return NULL;
-    free_split(args);
-    return changed_args;
+	args = ft_split(input, ' ');
+	if (!args)
+		return (NULL);
+	changed_args = parse_dollars(args, ee);
+	if (!changed_args)
+		return (NULL);
+	free_split(args);
+	return (changed_args);
 }
 
-char *reconstruct_input(char **changed_args)
+char	*reconstruct_input(char **changed_args)
 {
-    int i = 0;
-    size_t total_len = 0;
-    char *new_input;
-    char *current_pos;
+	int		i;
+	size_t	total_len;
+	char	*new_input;
+	char	*current_pos;
+	size_t	len;
 
-    while (changed_args[i])
-    {
-        total_len += ft_strlen(changed_args[i]) + 1;
-        i++;
-    }
-
-    new_input = malloc(sizeof(char) * total_len);
-    if (!new_input)
-        return NULL;
-    current_pos = new_input;
-    i = 0;
-    while (changed_args[i])
-    {
-        size_t len = ft_strlen(changed_args[i]);
-        ft_memcpy(current_pos, changed_args[i], len);
-        current_pos += len;
-        if (changed_args[i + 1])
-            *current_pos++ = ' ';
-        i++;
-    }
-
-    *current_pos = '\0';
-    return new_input;
+	i = 0;
+	total_len = 0;
+	while (changed_args[i])
+	{
+		total_len += ft_strlen(changed_args[i]) + 1;
+		i++;
+	}
+	new_input = malloc(sizeof(char) * total_len);
+	if (!new_input)
+		return (NULL);
+	current_pos = new_input;
+	i = 0;
+	while (changed_args[i])
+	{
+		len = ft_strlen(changed_args[i]);
+		ft_memcpy(current_pos, changed_args[i], len);
+		current_pos += len;
+		if (changed_args[i + 1])
+			*current_pos++ = ' ';
+		i++;
+	}
+	*current_pos = '\0';
+	return (new_input);
 }
-
-
 
 void	loop(char *input, t_ee *ee)
 {
 	t_token	*tok;
-	char **changed_args = NULL;
+	char	**changed_args;
 
+	changed_args = NULL;
 	if ((!ee->envp || !ee->envp[0]) && ee->lock_path == 0)
 		you_shall_not_path();
 	tok = malloc(sizeof(t_token));
@@ -500,20 +497,20 @@ void	loop(char *input, t_ee *ee)
 					return ;
 				}
 				changed_args = check_dollars(input, ee);
-                if (!changed_args)
-                    return;
+				if (!changed_args)
+					return ;
 				free(input);
 				input = reconstruct_input(changed_args);
-                cumulate_token(input, ee);
+				cumulate_token(input, ee);
 			}
 			else
 			{
 				changed_args = check_dollars(input, ee);
-                if (!changed_args)
-                    return;
+				if (!changed_args)
+					return ;
 				free(input);
 				input = reconstruct_input(changed_args);
-                interprete_commande(input, ee);
+				interprete_commande(input, ee);
 			}
 		}
 	}

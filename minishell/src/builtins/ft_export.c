@@ -1,5 +1,6 @@
 #include "../../minishell.h"
 
+
 int	ft_strcmp_dif(char *s1, char *s2)
 {
 	int i;
@@ -42,69 +43,89 @@ char	*parse_input_simple_export(char *input)
 void	sort_export(t_ee *ee);
 void	sort_export_plus(t_ee *ee);
 
-
-void export_with_args(t_ee *ee, char **args)
+int	ft_found_equal(char c)
 {
-    int i;
-    int len = 0;
-    int found;
-    int cee_len;
+	if (c == '=')
+		return (1);
+	return (0);
+}
+
+void	export_with_args(t_ee *ee, char **args)
+{
+	int i = 1;
+	int len_envp = 0;
+	int found;
+	int len = 0;
 	int j;
+	char **copy_envp;
+	///////////////////////////////
+	//char **copy_export;
+	//int len_export = 0;
 
-    while (ee->envp && ee->envp[len])
-        len++;
-    if (!ee->copy_export_env)
-    {
-        ee->copy_export_env = malloc(sizeof(char *) * 2);
-        if (!ee->copy_export_env)
-            return;
-        ee->copy_export_env[0] = NULL;
-    }
-    i = 1;
-    while (args[i])
-    {
-        if (ft_strchr(args[i], '='))
-        {
-            found = 0;
+	while (args[len])
+		len++;
+	len -= 1;
+	while (ee->envp && ee->envp[len_envp])
+		len_envp++;
+	copy_envp = malloc(sizeof(char *) * (len_envp + len + 1));
+	if (!copy_envp)
+		return ;
+//
+/////////////////////////////////////////////////////////////////////////////////////////
+	/*if (ee->copy_export_env != NULL)
+	{
+		while (ee->copy_export_env[len_export])
+			len_export++;
+		copy_export = malloc(sizeof(char *) * (len_export + len + 1));
+		if (!copy_export)
+			return ;
+	}
+	else
+	{
+		copy_export = malloc(sizeof(char *) * (len + 1));
+		if (!copy_export)
+			return ;
+	}*/
+/////////////////////////////////////////////////////////////////////////////////////////
+//
+	j = 0;
+	while (j < len_envp)
+	{
+		copy_envp[j] = ft_strdup(ee->envp[j]);
+		j++;
+	}
+	copy_envp[len_envp] = NULL;
+	while (args[i])
+	{
+		if (ft_strchr(args[i], '='))
+		{
+			found = 0;
 			j = 0;
-            while (ee->copy_export_env[j])
-            {
-                if (ft_strncmp(ee->copy_export_env[j], args[i], ft_strchr(args[i], '=') - args[i]) == 0)
-                {
-                    free(ee->copy_export_env[j]);
-                    ee->copy_export_env[j] = ft_strdup(args[i]);
-                    found = 1;
-                    break;
-                }
+			while (j < len_envp)
+			{
+				if (ft_strncmp(copy_envp[j], args[i], ft_strchr(args[i], '=')
+						- args[i]) == 0)
+				{
+					free(copy_envp[j]);
+					copy_envp[j] = ft_strdup(args[i]);
+					found = 1;
+					break ;
+				}
 				j++;
-            }
-            if (!found)
-            {
-                cee_len = 0;
-                while (ee->copy_export_env[cee_len])
-                    cee_len++;
-                ee->copy_export_env = realloc(ee->copy_export_env, sizeof(char *) * (cee_len + 2));
-                if (!ee->copy_export_env)
-                    return;
-                ee->copy_export_env[cee_len] = ft_strdup(args[i]);
-                ee->copy_export_env[cee_len + 1] = NULL;
-            }
-        }
-        else
-        {
-            cee_len = 0;
-            while (ee->copy_export_env[cee_len])
-                cee_len++;
-            ee->copy_export_env = realloc(ee->copy_export_env, sizeof(char *) * (cee_len + 2));
-            if (!ee->copy_export_env)
-                return;
-            ee->copy_export_env[cee_len] = ft_strdup(args[i]);
-            ee->copy_export_env[cee_len + 1] = NULL;
-        }
-
-        i++;
-    }
-
+			}
+			if (!found)
+			{
+				copy_envp[len_envp] = ft_strdup(args[i]);
+				len_envp++;
+				copy_envp[len_envp] = NULL;
+			}
+		}
+		i++;
+	}
+	free_split(ee->envp);
+	ee->envp = copy_envp;
+	//free_split(ee->copy_export_env)
+	//ee->copy
 }
 
 void	display_in_env_if_equal(t_ee *ee)
@@ -176,11 +197,6 @@ void	display_in_env_if_equal(t_ee *ee)
 	ee->envp = tmp;
 }
 
-
-
-
-
-
 void	ft_export(char *input, t_ee *ee)
 {
 	char **args;
@@ -219,7 +235,8 @@ void	ft_export(char *input, t_ee *ee)
 	else
 	{
 		export_with_args(ee, args);
-		display_in_env_if_equal(ee);
+		// free_split(ee->copy_export_env);
+		// display_in_env_if_equal(ee);
 	}
 	free_split(args);
 }
@@ -288,8 +305,6 @@ void	sort_export(t_ee *ee)
 	free(sorted_env);
 }
 
-
-
 void	sort_export_plus(t_ee *ee)
 {
 	char **sorted_env;
@@ -335,8 +350,6 @@ void	sort_export_plus(t_ee *ee)
 	}
 	free(sorted_env);
 }
-
-
 
 char	*ft_strcat_export(char *s1, char *s2)
 {

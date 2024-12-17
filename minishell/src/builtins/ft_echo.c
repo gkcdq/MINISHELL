@@ -1,7 +1,4 @@
 #include "../../minishell.h"
-#include <stdbool.h>
-#include <stdio.h>
-#include <string.h>
 
 void	ft_echo(char *input)
 {
