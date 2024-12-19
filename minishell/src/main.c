@@ -187,7 +187,12 @@ void	interprete_commande(char *input, t_ee *ee)
 		ft_cd(input, ee);
 	}
 	else if (ft_strcmp(trimmed_input, "env") == 0)
-		ft_env(ee);
+	{
+		if (ee->path_is_not_able == 0)
+			ft_env(ee);
+		else
+			ft_printf("🌳(´•︵•`)🌳: env: No such file or directory\n");
+	}
 	else if (ft_strcmp(trimmed_input, "unset") == 0)
 		ft_unset(input, ee);
 	else if ((ft_strcmp(trimmed_input, "export") == 0)
@@ -550,6 +555,24 @@ char	**copy_envp(char **envp)
 	return (copy);
 }
 
+char	*save_initial_path(t_ee *ee)
+{
+	int i = 0;
+	char *tmp;
+
+	tmp = NULL;
+	while (ee->envp[i])
+	{
+		if (ee->envp[i][0] == 'P' && ee->envp[i][1] == 'A' && ee->envp[i][2] == 'T' && ee->envp[i][3] == 'H' && ee->envp[i][4] == '=')
+		{
+			tmp = ft_strdup(ee->envp[i]);
+			break ;
+		}
+		i++;
+	}
+	return (tmp);
+}
+
 int	main(int ac, char **av, char **envp)
 {
 	t_ee	*ee;
@@ -562,6 +585,8 @@ int	main(int ac, char **av, char **envp)
 	(void)av;
 	init_struct(ee);
 	ee->envp = copy_envp(envp);
+	ee->save_initial_path = save_initial_path(ee);
+	ft_printf("%s\n", ee->save_initial_path);
 	while (ee->minishell_check == 0)
 	{
 		catch_signal();
@@ -580,7 +605,9 @@ int	main(int ac, char **av, char **envp)
 	if (ee->envp)
 		free(ee->envp);
 	if (ee->copy_export_env)
-		free_split(ee->copy_export_env);
+		free(ee->copy_export_env);
+	if (ee->save_initial_path)
+		free(ee->save_initial_path);
 	free(ee);
 	clear_history();
 	return (0);

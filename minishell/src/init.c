@@ -21,4 +21,6 @@ void	init_struct(t_ee *ee)
 	ee->if_unset__shlvl = 0;
 	ee->lock_path = 0;
 	ee->copy_export_env = NULL;
+	ee->path_is_not_able = 0;
+	ee->save_initial_path = NULL;
 }

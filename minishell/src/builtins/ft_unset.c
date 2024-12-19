@@ -56,7 +56,7 @@ void	ft_unset(char *input, t_ee *ee)
 				if (ft_strcmp("PATH", args[j]) == 0)
 				{
 					unsetenv("PATH");
-					//passer une variable a 1 pour bloquer env
+					ee->path_is_not_able = 1;
 				}
 				skip = 1;
 				break ;
@@ -71,6 +71,7 @@ void	ft_unset(char *input, t_ee *ee)
 		i++;
 	}
 	new_envp[k] = NULL;
+
 	free_split(ee->envp);
 	ee->envp = new_envp;
 	i = 1;

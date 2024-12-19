@@ -155,7 +155,7 @@ void	export_with_args(t_ee *ee, char **args)
 	ee->copy_export_env = copy_export;
 }
 
-void	display_in_env_if_equal(t_ee *ee)
+/*void	display_in_env_if_equal(t_ee *ee)
 {
 	int i, j, k;
 	char **tmp;
@@ -222,7 +222,7 @@ void	display_in_env_if_equal(t_ee *ee)
 	tmp[i] = NULL;
 	free(ee->envp);
 	ee->envp = tmp;
-}
+}*/
 
 void	ft_export(char *input, t_ee *ee)
 {
@@ -255,16 +255,16 @@ void	ft_export(char *input, t_ee *ee)
 		input = parse_input_simple_export(input);
 		if (ft_strcmp(input, "export") == 0)
 			sort_export(ee);
-		if (ee->copy_export_env)
+		if (ee->copy_export_env && ee->copy_export_env[0])
 			sort_export_plus(ee);
 		free(input);
 	}
 	else
 	{
 		export_with_args(ee, args);
-		// free_split(ee->copy_export_env);
-		// display_in_env_if_equal(ee);
+		//display_in_env_if_equal(ee);
 	}
+	check_if_path_is_set(ee, args);
 	free_split(args);
 }
 
@@ -339,6 +339,8 @@ void	sort_export_plus(t_ee *ee)
 	int i, j;
 	char *tmp;
 
+	if (!ee->copy_export_env)
+		return ;
 	while (ee->copy_export_env[len])
 		len++;
 	sorted_env = malloc(sizeof(char *) * (len + 1));
@@ -383,7 +385,6 @@ char	*ft_strcat_export(char *s1, char *s2)
 	int len1 = ft_strlen(s1);
 	int len2 = ft_strlen(s2);
 	char *result = malloc(sizeof(char) * (len1 + len2 + 1));
-
 	if (!result)
 		return (NULL);
 	int i = 0, j = 0;
@@ -400,4 +401,21 @@ char	*ft_strcat_export(char *s1, char *s2)
 	}
 	result[i] = '\0';
 	return (result);
+}
+
+void check_if_path_is_set(t_ee *ee, char **args)
+{
+    int i;
+
+    i = 0;
+    while (args[i])
+    {
+        if (ft_strcmp(args[i], "PATH=/bin:/usr/bin") == 0 || (ee->save_initial_path && ft_strcmp(args[i], ee->save_initial_path) == 0))
+        {
+            setenv("PATH", "/bin:/usr/bin", 1);
+            ee->path_is_not_able = 0;
+            break;
+        }
+        i++;
+    }
 }
