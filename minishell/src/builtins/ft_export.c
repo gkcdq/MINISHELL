@@ -122,7 +122,7 @@ char	*parse_input_simple_export(char *input)
 	return (copy);
 }
 
-void	sort_export(t_ee *ee);
+void	sort_export(t_ee *ee, char **sorted);
 void	sort_export_plus(t_ee *ee);
 
 int	ft_found_equal(char c)
@@ -336,20 +336,54 @@ void	export_with_args(t_ee *ee, char **args)
 	ee->copy_export_env = copy_export;
 }
 
-//char	**copi_colle(t_ee *ee)
-//{
-	//char *tmp;
+char	**copi_colle(t_ee *ee)
+{
+	char **tmp;
+	int i;
+	int j;
 
-	//if (ee->copy_export_env)
+	if (ee->copy_export_env && ee->envp)
+	{
+		tmp = malloc(sizeof(char *) * (ft_strlonglen(ee->copy_export_env) + ft_strlonglen(ee->envp) + 1));
+		i = 0;
+		while (ee->envp[i])
+		{
+			tmp[i] = ft_strdup(ee->envp[i]);
+			i++;
+		}
+		tmp[i] = NULL;
+		j = 0;
+		while (ee->copy_export_env[j])
+		{
+			tmp[i] = ee->copy_export_env[j];
+			i++;
+			j++;
+		}
+		tmp[i] = NULL;
+		return (tmp);
+	}
+	else if (!ee->copy_export_env && ee->envp)
+	{
+		tmp = malloc(sizeof(char *) * (ft_strlonglen(ee->envp) + 1));
+		i = 0;
+		while (ee->envp[i])
+		{
+			tmp[i] = ft_strdup(ee->envp[i]);
+			i++;
+		}
+		tmp[i] = NULL;
+		return (tmp);
+	}
+	return (NULL);
 
-//}
+}
 
 void	ft_export(char *input, t_ee *ee)
 {
 	char **args;
-	//char **sorted_env;
+	char **sorted_env;
 
-	//sorted_env = NULL;
+	sorted_env = NULL;
 	args = ft_split(input, ' ');
 	if (!ee->envp || !ee->envp[0])
 	{
@@ -376,10 +410,10 @@ void	ft_export(char *input, t_ee *ee)
 	{
 		input = parse_input_simple_export(input);
 		if (ft_strcmp(input, "export") == 0)
-		//sorted_env = copi_colle(ee);
-		//	sort_export(ee);
-		if (ee->copy_export_env && ee->copy_export_env[0])
-			sort_export_plus(ee);
+		sorted_env = copi_colle(ee);
+			sort_export(ee, sorted_env);
+		if (sorted_env)
+			free_split(sorted_env);
 		free(input);
 	}
 	else
@@ -390,7 +424,7 @@ void	ft_export(char *input, t_ee *ee)
 
 char	*ft_strcat_export(char *s1, char *s2);
 
-void	sort_export(t_ee *ee)
+void	sort_export(t_ee *ee, char **sorted)
 {
 	char **sorted_env;
 	int len = 0;
@@ -398,7 +432,7 @@ void	sort_export(t_ee *ee)
 	char *tmp;
 	char *oldpwd;
 
-	while (ee->envp[len])
+	while (sorted[len])
 		len++;
 	sorted_env = malloc(sizeof(char *) * (len + 2));
 	if (!sorted_env)
@@ -406,7 +440,7 @@ void	sort_export(t_ee *ee)
 	i = 0;
 	while (i < len)
 	{
-		sorted_env[i] = ft_strdup(ee->envp[i]);
+		sorted_env[i] = ft_strdup(sorted[i]);
 		i++;
 	}
 	if (ee->copy_oldpwd)
@@ -452,7 +486,7 @@ void	sort_export(t_ee *ee)
 	free(sorted_env);
 }
 
-void	sort_export_plus(t_ee *ee)
+/*void	sort_export_plus(t_ee *ee)
 {
 	char **sorted_env;
 	int len = 0;
@@ -498,7 +532,7 @@ void	sort_export_plus(t_ee *ee)
 		i++;
 	}
 	free(sorted_env);
-}
+}*/
 
 char	*ft_strcat_export(char *s1, char *s2)
 {
