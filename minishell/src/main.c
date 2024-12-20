@@ -605,7 +605,7 @@ int	main(int ac, char **av, char **envp)
 	if (ee->envp)
 		free(ee->envp);
 	if (ee->copy_export_env)
-		free(ee->copy_export_env);
+		free_split(ee->copy_export_env);
 	if (ee->save_initial_path)
 		free(ee->save_initial_path);
 	free(ee);
