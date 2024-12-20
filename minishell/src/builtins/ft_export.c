@@ -336,14 +336,24 @@ void	export_with_args(t_ee *ee, char **args)
 	ee->copy_export_env = copy_export;
 }
 
+//char	**copi_colle(t_ee *ee)
+//{
+	//char *tmp;
+
+	//if (ee->copy_export_env)
+
+//}
+
 void	ft_export(char *input, t_ee *ee)
 {
 	char **args;
+	//char **sorted_env;
 
+	//sorted_env = NULL;
 	args = ft_split(input, ' ');
 	if (!ee->envp || !ee->envp[0])
 	{
-		if (ee->copy_oldpwd == NULL)
+		if (ee->copy_oldpwd == NULL && ee->if_unset__oldpwd == 0)
 			printf("🏗️ 🏡 OLDPWD\n");
 		else if (ee->copy_oldpwd && ft_strcmp(ee->copy_oldpwd,
 				ee->copy_pwd) != 0 && (ee->if_unset__oldpwd == 0))
@@ -366,7 +376,8 @@ void	ft_export(char *input, t_ee *ee)
 	{
 		input = parse_input_simple_export(input);
 		if (ft_strcmp(input, "export") == 0)
-			sort_export(ee);
+		//sorted_env = copi_colle(ee);
+		//	sort_export(ee);
 		if (ee->copy_export_env && ee->copy_export_env[0])
 			sort_export_plus(ee);
 		free(input);
