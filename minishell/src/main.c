@@ -586,7 +586,7 @@ int	main(int ac, char **av, char **envp)
 	init_struct(ee);
 	ee->envp = copy_envp(envp);
 	ee->save_initial_path = save_initial_path(ee);
-	ft_printf("%s\n", ee->save_initial_path);
+	//ft_printf("%s\n", ee->save_initial_path);
 	while (ee->minishell_check == 0)
 	{
 		catch_signal();

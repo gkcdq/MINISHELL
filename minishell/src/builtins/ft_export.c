@@ -275,6 +275,7 @@ void	export_with_args(t_ee *ee, char **args)
 	int len_export = 0;
 	int count_args_without_equal = 0;
 	int len = 0;
+	int count_equal = 0;
 	int j = 0;
 
 	while (args[len])
@@ -283,23 +284,28 @@ void	export_with_args(t_ee *ee, char **args)
 		{
 			count_args_without_equal++;
 		}
+		else
+			count_equal++;
 		len++;
 	}
 	while (ee->envp && ee->envp[len_envp])
 		len_envp++;
-	copy_envp = malloc(sizeof(char *) * (len_envp + len + 1));
-	if (!copy_envp)
-		return ;
-	j = 0;
-	while (j < len_envp)
+	if (count_equal > 0)
 	{
-		copy_envp[j] = ft_strdup(ee->envp[j]);
-		j++;
+		copy_envp = malloc(sizeof(char *) * (len_envp + count_equal + 1));
+		if (!copy_envp)
+			return ;
+		j = 0;
+		while (j < len_envp)
+		{
+			copy_envp[j] = ft_strdup(ee->envp[j]);
+			j++;
+		}
+		copy_envp[len_envp] = NULL;
 	}
-	copy_envp[len_envp] = NULL;
 	if (ee->copy_export_env)
 	{
-		while (ee->copy_export_env[len_export])
+		while (ee->copy_export_env && ee->copy_export_env[len_export])
 			len_export++;
 		copy_export = malloc(sizeof(char *) * (len_export
 					+ count_args_without_equal + 1));
@@ -330,9 +336,11 @@ void	export_with_args(t_ee *ee, char **args)
 		copy_export[len_export] = NULL;
 	handle_env_with_equals(args, &copy_envp, &len_envp);
 	handle_export_without_equals(args, &copy_export, &len_export);
-	free_split(ee->envp);
+	if (ee->envp)
+		free_split(ee->envp);
 	ee->envp = copy_envp;
-	free_split(ee->copy_export_env);
+	if (ee->copy_export_env)
+		free_split(ee->copy_export_env);
 	ee->copy_export_env = copy_export;
 }
 
@@ -344,7 +352,8 @@ char	**copi_colle(t_ee *ee)
 
 	if (ee->copy_export_env && ee->envp)
 	{
-		tmp = malloc(sizeof(char *) * (ft_strlonglen(ee->copy_export_env) + ft_strlonglen(ee->envp) + 1));
+		tmp = malloc(sizeof(char *) * (ft_strlonglen(ee->copy_export_env)
+					+ ft_strlonglen(ee->envp) + 1));
 		i = 0;
 		while (ee->envp[i])
 		{
@@ -375,7 +384,6 @@ char	**copi_colle(t_ee *ee)
 		return (tmp);
 	}
 	return (NULL);
-
 }
 
 void	ft_export(char *input, t_ee *ee)
@@ -410,8 +418,8 @@ void	ft_export(char *input, t_ee *ee)
 	{
 		input = parse_input_simple_export(input);
 		if (ft_strcmp(input, "export") == 0)
-		sorted_env = copi_colle(ee);
-			sort_export(ee, sorted_env);
+			sorted_env = copi_colle(ee);
+		sort_export(ee, sorted_env);
 		if (sorted_env)
 			free_split(sorted_env);
 		free(input);
