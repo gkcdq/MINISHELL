@@ -386,11 +386,78 @@ char	**copi_colle(t_ee *ee)
 	return (NULL);
 }
 
+char **tri_for_export(char **both_tab)
+{
+    int len = 0;
+    char **unique_tab = NULL;
+
+    // Compte le nombre d'éléments dans both_tab
+    while (both_tab[len])
+        len++;
+
+    // Alloue un tableau pour contenir les éléments uniques
+    unique_tab = malloc(sizeof(char *) * (len + 1));
+    if (!unique_tab)
+        return NULL;
+
+    int unique_len = 0;
+
+    // Filtrage des doublons
+    for (int i = 0; i < len; i++)
+    {
+        char *current = both_tab[i];
+        char *current_name = strtok(strdup(current), "="); // Récupère le nom avant '='
+        int is_unique = 1;
+
+        for (int j = 0; j < unique_len; j++)
+        {
+            char *existing_name = strtok(strdup(unique_tab[j]), "="); // Nom dans unique_tab
+            if (strcmp(current_name, existing_name) == 0)
+            {
+                is_unique = 0;
+                free(existing_name);
+                break;
+            }
+            free(existing_name);
+        }
+
+        free(current_name);
+
+        if (is_unique)
+        {
+            unique_tab[unique_len] = strdup(current); // Ajoute l'entrée unique
+            unique_len++;
+        }
+    }
+
+    unique_tab[unique_len] = NULL; // Terminateur NULL
+
+    // Trie alphabétique
+    for (int i = 0; i < unique_len - 1; i++)
+    {
+        for (int j = i + 1; j < unique_len; j++)
+        {
+            if (strcmp(unique_tab[i], unique_tab[j]) > 0)
+            {
+                char *temp = unique_tab[i];
+                unique_tab[i] = unique_tab[j];
+                unique_tab[j] = temp;
+            }
+        }
+    }
+
+    return unique_tab;
+}
+
+
+
 void	ft_export(char *input, t_ee *ee)
 {
 	char **args;
+	char **concatene_both;
 	char **sorted_env;
 
+	concatene_both = NULL;
 	sorted_env = NULL;
 	args = ft_split(input, ' ');
 	if (!ee->envp || !ee->envp[0])
@@ -418,10 +485,11 @@ void	ft_export(char *input, t_ee *ee)
 	{
 		input = parse_input_simple_export(input);
 		if (ft_strcmp(input, "export") == 0)
-			sorted_env = copi_colle(ee);
+			concatene_both = copi_colle(ee);
+		sorted_env = tri_for_export(concatene_both);
 		sort_export(ee, sorted_env);
-		if (sorted_env)
-			free_split(sorted_env);
+		free_split(concatene_both);
+		free_split(sorted_env);
 		free(input);
 	}
 	else
