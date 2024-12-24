@@ -1,75 +1,5 @@
 #include "../../minishell.h"
 
-
-/*void	display_in_env_if_equal(t_ee *ee)
-{
-	int i, j, k;
-	char **tmp;
-	int len_one;
-	int equal = 0;
-
-	i = 0;
-	while (ee->copy_export_env[i])
-	{
-		if (ft_strchr(ee->copy_export_env[i], '='))
-			equal++;
-		i++;
-	}
-	len_one = ft_strlonglen(ee->envp);
-	tmp = malloc(sizeof(char *) * (len_one + equal + 1));
-	i = 0;
-	while (ee->envp[i])
-	{
-		tmp[i] = ft_strdup(ee->envp[i]);
-		i++;
-	}
-	j = 0;
-	while (ee->copy_export_env[j])
-	{
-		int key_length;
-		char *equal_sign = ft_strchr(ee->copy_export_env[j], '=');
-		if (equal_sign)
-			key_length = equal_sign - ee->copy_export_env[j];
-		else
-			key_length = ft_strlen(ee->copy_export_env[j]);
-		char *new_key = ft_substr(ee->copy_export_env[j], 0, key_length);
-		int found = 0;
-		k = 0;
-		while (k < i)
-		{
-			equal_sign = ft_strchr(tmp[k], '=');
-			if (equal_sign)
-				key_length = equal_sign - tmp[k];
-			else
-				key_length = ft_strlen(tmp[k]);
-
-			char *existing_key = ft_substr(tmp[k], 0, key_length);
-
-			if (ft_strcmp(existing_key, new_key) == 0)
-			{
-				if (ft_strchr(ee->copy_export_env[j], '='))
-				{
-					free(tmp[k]);
-					tmp[k] = ft_strdup(ee->copy_export_env[j]);
-				}
-				found = 1;
-			}
-			free(existing_key);
-			k++;
-		}
-		free(new_key);
-		if (!found && ft_strchr(ee->copy_export_env[j], '='))
-		{
-			tmp[i] = ft_strdup(ee->copy_export_env[j]);
-			i++;
-		}
-		j++;
-	}
-	tmp[i] = NULL;
-	free(ee->envp);
-	ee->envp = tmp;
-}*/
-
 char	*ft_strndup(const char *s, size_t n)
 {
 	char *dup;
@@ -132,371 +62,182 @@ int	ft_found_equal(char c)
 	return (0);
 }
 
-void	handle_env_with_equals(char **args, char ***copy_envp, int *len_envp)
+void handle_env_with_equals(char **args, char ***copy_envp, int *len_envp)
 {
-	int i = 1;
-	int found, j;
-
-	while (args[i])
-	{
-		if (args[i][0] == '=')
-			ft_printf("🔥_(╬ Ò﹏Ó)_🔥: export: %s: not a valid identifier\n",
-				args[i]);
-		if (ft_strchr(args[i], '=') && args[i][0] != '=')
-		{
-			found = 0;
-			j = 0;
-			while (j < *len_envp)
-			{
-				if (ft_strncmp((*copy_envp)[j], args[i], ft_strchr(args[i], '=')
-						- args[i]) == 0)
-				{
-					free((*copy_envp)[j]);
-					(*copy_envp)[j] = ft_strdup(args[i]);
-					found = 1;
-					break ;
-				}
-				j++;
-			}
-			if (!found)
-			{
-				(*copy_envp)[*len_envp] = ft_strdup(args[i]);
-				(*len_envp)++;
-				(*copy_envp)[*len_envp] = NULL;
-			}
-		}
-		i++;
-	}
-}
-
-int	ft_check_equal(char *s)
-{
-	int i = 0;
-
-	while (s[i])
-	{
-		if (s[i] == '=')
-			return (1);
-		i++;
-	}
-	return (0);
-}
-
-void	handle_export_without_equals(char **args, char ***copy_export,
-		int *len_export)
-{
-	int i = 1;
-	int k;
-	int found, j;
-	char *new_entry = NULL;
-	char *new_name = NULL;
-	char *current_name = NULL;
-
-	while (args[i])
-	{
-		if (ft_check_equal(args[i]) == 1)
-		{
-			if (args[i + 1])
-				i++;
-			else
-				return ;
-		}
-		found = 0;
-		j = 0;
-		if (args[i][0] != '=')
-		{
-			while (j < *len_export)
-			{
-				current_name = ft_strndup((*copy_export)[j],
-						ft_strchr((*copy_export)[j], '=') - (*copy_export)[j]);
-				if (ft_strchr(args[i], '='))
-					new_name = ft_strndup(args[i], ft_strchr(args[i], '=')
-							- args[i]);
-				else
-					new_name = ft_strndup(args[i], ft_strlen(args[i]));
-				if (ft_strcmp(current_name, new_name) == 0)
-				{
-					found = 1;
-					if (ft_strchr(args[i], '='))
-					{
-						free((*copy_export)[j]);
-						(*copy_export)[j] = ft_strdup(args[i]);
-						if (!(*copy_export)[j])
-						{
-							k = 0;
-							while (k < *len_export)
-							{
-								free((*copy_export)[k]);
-								k++;
-							}
-							free(*copy_export);
-							*copy_export = NULL;
-							return ;
-						}
-					}
-					free(current_name);
-					free(new_name);
-					break ;
-				}
-				free(current_name);
-				free(new_name);
-				j++;
-			}
-
-			if (!found)
-			{
-				new_entry = ft_strdup(args[i]);
-				if (!new_entry)
-				{
-					k = 0;
-					while (k < *len_export)
-					{
-						free((*copy_export)[k]);
-						k++;
-					}
-					free(*copy_export);
-					*copy_export = NULL;
-					return ;
-				}
-				(*copy_export)[*len_export] = new_entry;
-				(*len_export)++;
-				(*copy_export)[*len_export] = NULL;
-			}
-		}
-		i++;
-	}
-}
-
-void	export_with_args(t_ee *ee, char **args)
-{
-	char **copy_envp = NULL;
-	char **copy_export = NULL;
-	int len_envp = 0;
-	int len_export = 0;
-	int count_args_without_equal = 0;
-	int len = 0;
-	int count_equal = 0;
-	int j = 0;
-
-	while (args[len])
-	{
-		if (!ft_strchr(args[len], '='))
-		{
-			count_args_without_equal++;
-		}
-		else
-			count_equal++;
-		len++;
-	}
-	while (ee->envp && ee->envp[len_envp])
-		len_envp++;
-	if (count_equal > 0)
-	{
-		copy_envp = malloc(sizeof(char *) * (len_envp + count_equal + 1));
-		if (!copy_envp)
-			return ;
-		j = 0;
-		while (j < len_envp)
-		{
-			copy_envp[j] = ft_strdup(ee->envp[j]);
-			j++;
-		}
-		copy_envp[len_envp] = NULL;
-	}
-	if (ee->copy_export_env)
-	{
-		while (ee->copy_export_env && ee->copy_export_env[len_export])
-			len_export++;
-		copy_export = malloc(sizeof(char *) * (len_export
-					+ count_args_without_equal + 1));
-		if (!copy_export)
-		{
-			free_split(copy_envp);
-			return ;
-		}
-		j = 0;
-		while (j < len_export)
-		{
-			copy_export[j] = ft_strdup(ee->copy_export_env[j]);
-			j++;
-		}
-	}
-	else if (count_args_without_equal > 0)
-	{
-		copy_export = malloc(sizeof(char *) * (count_args_without_equal + 1));
-		if (!copy_export)
-		{
-			free_split(copy_envp);
-			return ;
-		}
-	}
-	else
-		copy_export = NULL;
-	if (copy_export)
-		copy_export[len_export] = NULL;
-	handle_env_with_equals(args, &copy_envp, &len_envp);
-	handle_export_without_equals(args, &copy_export, &len_export);
-	if (ee->envp)
-		free_split(ee->envp);
-	ee->envp = copy_envp;
-	if (ee->copy_export_env)
-		free_split(ee->copy_export_env);
-	ee->copy_export_env = copy_export;
-}
-
-char	**copi_colle(t_ee *ee)
-{
-	char **tmp;
-	int i;
-	int j;
-
-	if (ee->copy_export_env && ee->envp)
-	{
-		tmp = malloc(sizeof(char *) * (ft_strlonglen(ee->copy_export_env)
-					+ ft_strlonglen(ee->envp) + 1));
-		i = 0;
-		while (ee->envp[i])
-		{
-			tmp[i] = ft_strdup(ee->envp[i]);
-			i++;
-		}
-		tmp[i] = NULL;
-		j = 0;
-		while (ee->copy_export_env[j])
-		{
-			tmp[i] = ee->copy_export_env[j];
-			i++;
-			j++;
-		}
-		tmp[i] = NULL;
-		return (tmp);
-	}
-	else if (!ee->copy_export_env && ee->envp)
-	{
-		tmp = malloc(sizeof(char *) * (ft_strlonglen(ee->envp) + 1));
-		i = 0;
-		while (ee->envp[i])
-		{
-			tmp[i] = ft_strdup(ee->envp[i]);
-			i++;
-		}
-		tmp[i] = NULL;
-		return (tmp);
-	}
-	return (NULL);
-}
-
-char **tri_for_export(char **both_tab)
-{
-    int len = 0;
-    char **unique_tab = NULL;
-
-    // Compte le nombre d'éléments dans both_tab
-    while (both_tab[len])
-        len++;
-
-    // Alloue un tableau pour contenir les éléments uniques
-    unique_tab = malloc(sizeof(char *) * (len + 1));
-    if (!unique_tab)
-        return NULL;
-
-    int unique_len = 0;
-
-    // Filtrage des doublons
-    for (int i = 0; i < len; i++)
+    for (int i = 1; args[i]; i++)
     {
-        char *current = both_tab[i];
-        char *current_name = strtok(strdup(current), "="); // Récupère le nom avant '='
-        int is_unique = 1;
-
-        for (int j = 0; j < unique_len; j++)
+        if (args[i][0] == '=')
         {
-            char *existing_name = strtok(strdup(unique_tab[j]), "="); // Nom dans unique_tab
-            if (strcmp(current_name, existing_name) == 0)
+            ft_printf("🔥_(╬ Ò﹏Ó)_🔥: export: %s: not a valid identifier\n", args[i]);
+            continue;
+        }
+        if (ft_strchr(args[i], '=') && args[i][0] != '=')
+        {
+            int found = 0;
+            for (int j = 0; j < *len_envp; j++)
             {
-                is_unique = 0;
-                free(existing_name);
+                size_t key_len = ft_strchr(args[i], '=') - args[i];
+                if (ft_strncmp((*copy_envp)[j], args[i], key_len) == 0 && (*copy_envp)[j][key_len] == '=')
+                {
+                    free((*copy_envp)[j]);
+                    (*copy_envp)[j] = ft_strdup(args[i]);
+                    found = 1;
+                    break;
+                }
+            }
+            if (!found)
+            {
+                (*copy_envp)[*len_envp] = ft_strdup(args[i]);
+                (*len_envp)++;
+                (*copy_envp)[*len_envp] = NULL;
+            }
+        }
+    }
+}
+
+int ft_check_equal(const char *s)
+{
+    return (ft_strchr(s, '=') != NULL);
+}
+
+void handle_export_without_equals(char **args, char ***copy_export, int *len_export)
+{
+    for (int i = 1; args[i]; i++)
+    {
+        if (ft_check_equal(args[i]))
+            continue;
+
+        int found = 0;
+        for (int j = 0; j < *len_export; j++)
+        {
+            char *current_name = ft_strndup((*copy_export)[j], ft_strchr((*copy_export)[j], '=') - (*copy_export)[j]);
+            if (ft_strcmp(current_name, args[i]) == 0)
+            {
+                found = 1;
+                free(current_name);
                 break;
             }
-            free(existing_name);
+            free(current_name);
         }
 
-        free(current_name);
-
-        if (is_unique)
+        if (!found)
         {
-            unique_tab[unique_len] = strdup(current); // Ajoute l'entrée unique
-            unique_len++;
+            (*copy_export)[*len_export] = ft_strdup(args[i]);
+            (*len_export)++;
+            (*copy_export)[*len_export] = NULL;
         }
     }
-
-    unique_tab[unique_len] = NULL; // Terminateur NULL
-
-    // Trie alphabétique
-    for (int i = 0; i < unique_len - 1; i++)
-    {
-        for (int j = i + 1; j < unique_len; j++)
-        {
-            if (strcmp(unique_tab[i], unique_tab[j]) > 0)
-            {
-                char *temp = unique_tab[i];
-                unique_tab[i] = unique_tab[j];
-                unique_tab[j] = temp;
-            }
-        }
-    }
-
-    return unique_tab;
 }
 
-
-
-void	ft_export(char *input, t_ee *ee)
+void export_with_args(t_ee *ee, char **args)
 {
-	char **args;
-	char **concatene_both;
-	char **sorted_env;
+    char **copy_envp = NULL;
+    char **copy_export = NULL;
+    int len_envp = 0, len_export = 0;
+    int count_equal = 0, count_args_without_equal = 0;
 
-	concatene_both = NULL;
-	sorted_env = NULL;
-	args = ft_split(input, ' ');
-	if (!ee->envp || !ee->envp[0])
-	{
-		if (ee->copy_oldpwd == NULL && ee->if_unset__oldpwd == 0)
-			printf("🏗️ 🏡 OLDPWD\n");
-		else if (ee->copy_oldpwd && ft_strcmp(ee->copy_oldpwd,
-				ee->copy_pwd) != 0 && (ee->if_unset__oldpwd == 0))
-			printf("🏗️ 🏡 OLDPWD=%s\n", ee->copy_oldpwd);
-		if (ee->copy_pwd == NULL)
-			ee->copy_pwd = getcwd(NULL, 0);
-		if (ee->if_unset__pwd == 0)
-			printf("🏗️ 🏡 PWD=%s\n", ee->copy_pwd);
-		if (ee->if_unset__shlvl == 0)
-			printf("🏗️ 🏡 SHLVL=1\n");
-		free_split(args);
-		return ;
-	}
-	if (ft_strcmp(args[0], "export=") == 0)
-	{
-		free_split(args);
-		return ;
-	}
-	if (args[1] == NULL)
-	{
-		input = parse_input_simple_export(input);
-		if (ft_strcmp(input, "export") == 0)
-			concatene_both = copi_colle(ee);
-		sorted_env = tri_for_export(concatene_both);
-		sort_export(ee, sorted_env);
-		free_split(concatene_both);
-		free_split(sorted_env);
-		free(input);
-	}
-	else
-		export_with_args(ee, args);
-	check_if_path_is_set(ee, args);
-	free_split(args);
+    for (int i = 1; args[i]; i++)
+    {
+        if (ft_check_equal(args[i]))
+            count_equal++;
+        else
+            count_args_without_equal++;
+    }
+
+    if (ee->envp)
+    {
+        while (ee->envp[len_envp])
+            len_envp++;
+        copy_envp = malloc(sizeof(char *) * (len_envp + count_equal + 1));
+        for (int i = 0; i < len_envp; i++)
+            copy_envp[i] = ft_strdup(ee->envp[i]);
+        copy_envp[len_envp] = NULL;
+    }
+    else
+        copy_envp = malloc(sizeof(char *) * (count_equal + 1));
+
+    if (ee->copy_export_env)
+    {
+        while (ee->copy_export_env[len_export])
+            len_export++;
+        copy_export = malloc(sizeof(char *) * (len_export + count_args_without_equal + 1));
+        for (int i = 0; i < len_export; i++)
+            copy_export[i] = ft_strdup(ee->copy_export_env[i]);
+    }
+    else if (count_args_without_equal > 0)
+        copy_export = malloc(sizeof(char *) * (count_args_without_equal + 1));
+
+    if (copy_export)
+        copy_export[len_export] = NULL;
+
+    handle_env_with_equals(args, &copy_envp, &len_envp);
+    handle_export_without_equals(args, &copy_export, &len_export);
+
+    free_split(ee->envp);
+    ee->envp = copy_envp;
+
+    free_split(ee->copy_export_env);
+    ee->copy_export_env = copy_export;
 }
+
+char **copi_colle(t_ee *ee)
+{
+    int len_envp = ft_strlonglen(ee->envp);
+    int len_export = ft_strlonglen(ee->copy_export_env);
+    char **tmp = malloc(sizeof(char *) * (len_envp + len_export + 1));
+
+    int i = 0;
+    for (; i < len_envp; i++)
+        tmp[i] = ft_strdup(ee->envp[i]);
+
+    for (int j = 0; j < len_export; j++, i++)
+        tmp[i] = ft_strdup(ee->copy_export_env[j]);
+
+    tmp[i] = NULL;
+    return tmp;
+}
+
+void ft_export(char *input, t_ee *ee)
+{
+    char **args = ft_split(input, ' ');
+
+    if (!ee->envp || !ee->envp[0])
+    {
+        if (!ee->copy_oldpwd && ee->if_unset__oldpwd == 0)
+            printf("🏗️ 🏡 OLDPWD\n");
+        else if (ee->copy_oldpwd && ft_strcmp(ee->copy_oldpwd, ee->copy_pwd) != 0 && ee->if_unset__oldpwd == 0)
+            printf("🏗️ 🏡 OLDPWD=%s\n", ee->copy_oldpwd);
+        if (!ee->copy_pwd)
+            ee->copy_pwd = getcwd(NULL, 0);
+        if (ee->if_unset__pwd == 0)
+            printf("🏗️ 🏡 PWD=%s\n", ee->copy_pwd);
+        if (ee->if_unset__shlvl == 0)
+            printf("🏗️ 🏡 SHLVL=1\n");
+        free_split(args);
+        return;
+    }
+
+    if (ft_strcmp(args[0], "export=") == 0)
+    {
+        free_split(args);
+        return;
+    }
+
+    if (!args[1])
+    {
+        char **sorted_env = copi_colle(ee);
+        sort_export(ee, sorted_env);
+        free_split(sorted_env);
+    }
+    else
+    {
+        export_with_args(ee, args);
+        check_if_path_is_set(ee, args);
+    }
+
+    free_split(args);
+}
+
 
 char	*ft_strcat_export(char *s1, char *s2);
 
