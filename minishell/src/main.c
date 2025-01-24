@@ -162,69 +162,6 @@ int	token_found(char *input, t_token *tok)
 
 void	execute_external_command(char *command, t_ee *ee);
 
-void	interprete_commande(char *input, t_ee *ee)
-{
-	char	*trimmed_input;
-	t_token	*token;
-
-	token = malloc(sizeof(t_token));
-	if (!token)
-		return ;
-	token->token = 0;
-	trimmed_input = skip_isspace_for_fonctions(input, token);
-	if (!trimmed_input)
-	{
-		free(token);
-		return ;
-	}
-	if (token->token == 1)
-	{
-		printf("🛠️_(>_<;)_🛠️   : syntax error near unexpected token ';'\n");
-		free(token);
-		return ;
-	}
-	else if (ft_strcmp(trimmed_input, "exit") == 0)
-	{
-		if (ft_strcmp(trimmed_input, "exit") == 0 && ft_strcmp(trimmed_input,
-				input) == 0)
-		{
-			printf("🏃 exit\n");
-			ee->minishell_check = 1;
-		}
-		else
-			ft_exit(input, ee);
-	}
-	else if (ft_strcmp(trimmed_input, "pwd") == 0)
-		ft_pwd();
-	else if ((ft_strcmp(trimmed_input, "cd") == 0) || (ft_strcmp(trimmed_input,
-				"~") == 0))
-	{
-		if (ee->copy_oldpwd)
-			free(ee->copy_oldpwd);
-		ft_cd(input, ee);
-	}
-	else if (ft_strcmp(trimmed_input, "env") == 0)
-	{
-		if (ee->path_is_not_able == 0)
-			ft_env(ee);
-		else
-			ft_printf("🌳(´•︵•`)🌳: env: No such file or directory\n");
-	}
-	else if (ft_strcmp(trimmed_input, "unset") == 0)
-		ft_unset(input, ee);
-	else if ((ft_strcmp(trimmed_input, "export") == 0)
-		|| (ft_strcmp(trimmed_input, "export=") == 0))
-		ft_export(input, ee);
-	else if (ft_strcmp(trimmed_input, "echo") == 0)
-		ft_echo(input);
-	else
-	{
-		if (ee->minishell_check == 0)
-			execute_external_command(input, ee);
-	}
-	free(token);
-	free(trimmed_input);
-}
 
 char	*ft_strcat(char *dest, const char *src)
 {
@@ -278,24 +215,7 @@ char	*find_command_path(char *command)
 	return (full_path);
 }
 
-/*int is_command_in_envp(char *command, t_ee *ee)
-{
-    int i = 0;
-    char *env_value;
-    char *env_command;
 
-    while (ee->envp[i] != NULL)
-    {
-        if ((env_value = ft_strchr(ee->envp[i], '=')) != NULL)
-        {
-            env_command = env_value + 1;
-            if (ft_strcmp(command, env_command) == 0)
-                return 1;
-        }
-        i++;
-    }
-    return 0;
-}*/
 
 
 void	execute_external_command(char *command, t_ee *ee)
@@ -375,30 +295,7 @@ int cumulate_token(char *input, t_ee *ee)
 }
 
 
-/*int	cumulate_token(char *input, t_ee *ee)
-{
-	static int	i = 0;
-	char		copy[1024];
-	int			j;
 
-	j = 0;
-	if (!input || input[i] == '\0')
-		return (1);
-	while (input[i] != '\0' && input[i] != ';')
-		copy[j++] = input[i++];
-	copy[j] = '\0';
-	if (ft_strchr(copy, '|')) 
-        execute_pipeline(copy, ee);
-	else
-		interprete_commande(copy, ee);
-	if (input[i] == ';')
-		i++;
-	if (input[i] != '\0')
-		cumulate_token(input, ee);
-	else
-		i = 0;
-	return (0);
-}*/
 
 void	handle_sigint(int sig)
 {
@@ -718,13 +615,322 @@ char *handle_quotes(char *input, t_ee *ee)
 
 
 
+
+int	check_string(char *input)
+{
+	int	i;
+
+	i = 0;
+	while (input[i])
+	{
+		if (input[i] > 32)
+			return (0);
+		i++;
+	}
+	return (1);
+}
+
+char	**copy_envp(char **envp)
+{
+	int		i;
+	char	**copy;
+
+	copy = malloc(sizeof(char *) * (ft_strlonglen(envp) + 1));
+	i = 0;
+	check_variable_oldpwd(envp);
+	while (envp[i])
+	{
+		copy[i] = ft_strdup(envp[i]);
+		i++;
+	}
+	copy[i] = NULL;
+	return (copy);
+}
+
+char	*save_initial_path(t_ee *ee)
+{
+	int i = 0;
+	char *tmp;
+
+	tmp = NULL;
+	while (ee->envp[i])
+	{
+		if (ee->envp[i][0] == 'P' && ee->envp[i][1] == 'A' && ee->envp[i][2] == 'T' && ee->envp[i][3] == 'H' && ee->envp[i][4] == '=')
+		{
+			tmp = ft_strdup(ee->envp[i]);
+			break ;
+		}
+		i++;
+	}
+	return (tmp);
+}
+
+
+
+
+
+
+
+/////////////////////////////faire les redirections dans interprete_commande
+
+int	find_redirection(char *input)
+{
+	int i = 0;
+
+	while(input && input[i])
+	{
+		if (input[i] == '>' || input[i] == '<')
+			return (1);
+		i++;
+	}
+	return (0);
+}
+
+int	find_type_of_redirection(char *tmp_in)
+{
+	int i = 0;
+
+	while (tmp_in && tmp_in[i])
+	{
+		if (tmp_in[i] == '>' && tmp_in[i + 1] != '>')
+			return (1);
+		else if (tmp_in[i] == '>' && tmp_in[i + 1] == '>')
+			return (2);
+		else if (tmp_in[i] == '<' && tmp_in[i + 1] != '<')
+			return (3);
+		else if (tmp_in[i] == '<' && tmp_in[i + 1] == '<')
+			return (4);
+		i++;
+	}
+	return (0);
+}
+
+char	*parse_exev_input(char *tmp_in)
+{
+	int i = 0;
+	int j = 0;
+	char *return_input;
+
+	while (tmp_in && tmp_in[i])
+	{
+		if (tmp_in[i] == '>' || tmp_in[i] == '<')
+			break;
+		i++;
+	}
+	return_input = malloc(sizeof(char) * i + 1);
+	while (j < i)
+	{
+		return_input[j] = tmp_in[j];
+		j++;
+	}
+	return_input[j] = '\0';
+	return (return_input);
+}
+
+int	for_same_comportement(t_redir *re, char **split_in)
+{
+	(void)re;
+	char *path = find_command_path(split_in[0]);
+	if (!path)
+		return (1);
+	return (0);
+}
+
+void handle_redirection(char *input, t_ee *ee)
+{
+    char *tmp_in;
+    char **split_in;
+	int last_name;
+    int file;
+    pid_t pid;
+	char *path;
+	//pour execv
+	char *input_execv;
+	char **split_execv;
+	t_redir *re;
+
+    (void)ee;
+	re = malloc(sizeof(t_redir));
+	re->command_fail = 0;
+    tmp_in = input;
+	///
+	input_execv = parse_exev_input(tmp_in);
+	split_execv = ft_split(input_execv, ' ');
+	if (!split_execv || !split_execv[0])
+    {
+        free_split(split_execv);
+        return;
+    }
+	///
+    split_in = ft_split(tmp_in, ' ');
+    if (!split_in || !split_in[0])
+    {
+        free_split(split_in);
+        return;
+    }
+	last_name = ft_strlonglen(split_in);
+    pid = fork();
+    if (pid == -1)
+    {
+        free_split(split_in);
+        return;
+    }
+    if (pid == 0) // proc enfant
+    {
+        if (find_type_of_redirection(tmp_in) == 1) // >
+        {
+            file = open(split_in[last_name - 1], O_WRONLY | O_CREAT | O_TRUNC, 0777);
+            if (file == -1)
+            {
+                exit(EXIT_FAILURE);
+            }
+            dup2(file, STDOUT_FILENO);
+			//////////////////////////////
+			path = find_command_path(split_in[0]);
+			if (!path)
+			{
+				re->command_fail = 1;
+			}
+			else
+			{
+				execv(path, split_execv);
+			}
+			//////////////////////////////
+            close(file);
+        }
+        else if (find_type_of_redirection(tmp_in) == 2) // >>
+        {
+            file = open(split_in[last_name - 1], O_WRONLY | O_CREAT | O_APPEND, 0777);
+            if (file == -1)
+            {
+                exit(EXIT_FAILURE);
+            }
+            dup2(file, STDOUT_FILENO);
+			//////////////////////////////
+			path = find_command_path(split_in[0]);
+			if (!path)
+			{
+				re->command_fail = 1;
+			}
+			else
+			{
+				execv(path, split_execv);
+			}
+			//////////////////////////////
+            close(file);
+        }
+        else if (find_type_of_redirection(tmp_in) == 3) // <
+        {
+            file = open(split_in[2], O_RDONLY);
+            if (file == -1)
+            {
+                exit(EXIT_FAILURE);
+            }
+            dup2(file, STDIN_FILENO);
+            close(file);
+        }
+        else if (find_type_of_redirection(tmp_in) == 4) // <<
+        {
+            printf("nsm\n");
+        }
+        free_split(split_in);
+        exit(EXIT_SUCCESS);
+    }
+    else
+    {
+        int status;
+        waitpid(pid, &status, 0);
+    }
+	re->command_fail = for_same_comportement(re, split_in);
+	if (re->command_fail == 1)
+		ft_printf("🍁_(`へ´*)_🍁: %s: command not found\n", split_execv[0]);
+	free_split(split_execv);
+    free_split(split_in);
+    return;
+}
+
+
+///////////////////////////////////////////////////////////////////////////
+void	interprete_commande(char *input, t_ee *ee)
+{
+	char	*trimmed_input;
+	t_token	*token;
+
+	token = malloc(sizeof(t_token));
+	token->token = 0;
+	if (!token)
+			return ;
+	token->token = 0;
+	if (find_redirection(input) == 1)
+	{
+		handle_redirection(input, ee);
+		free(token);
+		return;
+	}
+	else
+	{
+		trimmed_input = skip_isspace_for_fonctions(input, token);
+		if (!trimmed_input)
+		{
+			free(token);
+			return ;
+		}
+		if (token->token == 1)
+		{
+			printf("🛠️_(>_<;)_🛠️   : syntax error near unexpected token ';'\n");
+			free(token);
+			return ;
+		}
+		else if (ft_strcmp(trimmed_input, "exit") == 0)
+		{
+			if (ft_strcmp(trimmed_input, "exit") == 0 && ft_strcmp(trimmed_input,
+					input) == 0)
+			{
+				printf("🏃 exit\n");
+				ee->minishell_check = 1;
+			}
+			else
+				ft_exit(input, ee);
+		}
+		else if (ft_strcmp(trimmed_input, "pwd") == 0)
+			ft_pwd();
+		else if ((ft_strcmp(trimmed_input, "cd") == 0) || (ft_strcmp(trimmed_input, "~") == 0))
+		{
+			if (ee->copy_oldpwd)
+				free(ee->copy_oldpwd);
+			ft_cd(input, ee);
+		}
+		else if (ft_strcmp(trimmed_input, "env") == 0)
+		{
+			if (ee->path_is_not_able == 0)
+				ft_env(ee);
+			else
+				ft_printf("🌳(´•︵•`)🌳: env: No such file or directory\n");
+		}
+		else if (ft_strcmp(trimmed_input, "unset") == 0)
+			ft_unset(input, ee);
+		else if ((ft_strcmp(trimmed_input, "export") == 0)
+			|| (ft_strcmp(trimmed_input, "export=") == 0))
+			ft_export(input, ee);
+		else if (ft_strcmp(trimmed_input, "echo") == 0)
+			ft_echo(input);
+		else
+		{
+			if (ee->minishell_check == 0)
+				execute_external_command(input, ee);
+		}
+		free(token);
+		free(trimmed_input);
+	}
+}
+
 void loop(char *input, t_ee *ee)
 {
     t_token *tok;
     char **changed_args;
 	char *cleaned_input;
 
-	//// Pour les quotes V
+	//// Pour les quotes 
     int single_quotes = 0;
     int double_quotes = 0;
     int i;
@@ -808,67 +1014,6 @@ void loop(char *input, t_ee *ee)
             }
             if (ft_strchr(input, '|') && cumulate_token(input, ee) == 1)
             	execute_pipeline(input, ee);
-			else if (!ft_strchr(input, '|') && cumulate_token(input, ee) == 1 ||&& || ||) 
-			{
-                changed_args = check_dollars(input, ee);
-                if (!changed_args)
-                    return;
-                free(input);
-                input = reconstruct_input(changed_args);
-                interprete_commande(input, ee);
-            }
-        }
-    }
-    free_split(changed_args);
-    free(input);
-    free(tok);
-}
-
-
-
-
-/*void loop(char *input, t_ee *ee)
-{
-    t_token *tok;
-    char **changed_args;
-
-    changed_args = NULL;
-    if ((!ee->envp || !ee->envp[0]) && ee->lock_path == 0)
-        you_shall_not_path();
-    tok = malloc(sizeof(t_token));
-    tok->found = 0;
-    input = readline("🍀_(^o^)_🍀  > ");
-    if (input == NULL)
-        ee->minishell_check = 1;
-    if (input && *input) 
-	{
-        add_history(input);
-        if (check_string(input) == 0) 
-		{
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			if (token_found(input, tok) == 1)
-			{
-				if (check_token_in_all_string(input, tok) == 1)
-				{
-					if (tok->token == 2)
-					{
-						printf("🛠️_(>_<;)_🛠️   : syntax error near unexpected token `;'\n");
-						tok->token = 0;
-					}
-					else if (tok->token == 3)
-						printf("🛠️_(>_<;)_🛠️   : syntax error near unexpected token `;;'\n");
-					free(input);
-					free(tok);
-					return ;
-				}
-			}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			if (ft_strchr(input, '|') && cumulate_token(input, ee) == 1) 
-			{
-                execute_pipeline(input, ee);
-            }
 			else if (!ft_strchr(input, '|') && cumulate_token(input, ee) == 1) 
 			{
                 changed_args = check_dollars(input, ee);
@@ -883,118 +1028,6 @@ void loop(char *input, t_ee *ee)
     free_split(changed_args);
     free(input);
     free(tok);
-}*/
-
-
-
-
-/// 			ANCIENNE LOOP
-
-
-
-/*void	loop(char *input, t_ee *ee)
-{
-	t_token	*tok;
-	char	**changed_args;
-
-	changed_args = NULL;
-	if ((!ee->envp || !ee->envp[0]) && ee->lock_path == 0)
-		you_shall_not_path();
-	tok = malloc(sizeof(t_token));
-	tok->found = 0;
-	input = readline("🍀_(^o^)_🍀  > ");
-	if (input == NULL)
-		ee->minishell_check = 1;
-	if (input && *input)
-	{
-		add_history(input);
-		if (check_string(input) == 0)
-		{
-			if (token_found(input, tok) == 1)
-			{
-				if (check_token_in_all_string(input, tok) == 1)
-				{
-					if (tok->token == 2)
-					{
-						printf("🛠️_(>_<;)_🛠️   : syntax error near unexpected token `;'\n");
-						tok->token = 0;
-					}
-					else if (tok->token == 3)
-						printf("🛠️_(>_<;)_🛠️   : syntax error near unexpected token `;;'\n");
-					free(input);
-					free(tok);
-					return ;
-				}
-				changed_args = check_dollars(input, ee);
-				if (!changed_args)
-					return ;
-				free(input);
-				input = reconstruct_input(changed_args);
-				cumulate_token(input, ee);
-			}
-			else
-			{
-				changed_args = check_dollars(input, ee);
-				if (!changed_args)
-					return ;
-				free(input);
-				input = reconstruct_input(changed_args);
-				interprete_commande(input, ee);
-			}
-		}
-	}
-	free_split(changed_args);
-	free(input);
-	free(tok);
-}*/
-
-int	check_string(char *input)
-{
-	int	i;
-
-	i = 0;
-	while (input[i])
-	{
-		if (input[i] > 32)
-			return (0);
-		i++;
-	}
-	return (1);
-}
-
-char	**copy_envp(char **envp)
-{
-	int		i;
-	char	**copy;
-
-	copy = malloc(sizeof(char *) * (ft_strlonglen(envp) + 1));
-	i = 0;
-	check_variable_oldpwd(envp);
-	while (envp[i])
-	{
-		copy[i] = ft_strdup(envp[i]);
-		i++;
-	}
-	copy[i] = NULL;
-	return (copy);
-}
-
-char	*save_initial_path(t_ee *ee)
-{
-	int i = 0;
-	char *tmp;
-
-	tmp = NULL;
-	while (ee->envp[i])
-	{
-		if (ee->envp[i][0] == 'P' && ee->envp[i][1] == 'A' && ee->envp[i][2] == 'T' && ee->envp[i][3] == 'H' && ee->envp[i][4] == '=')
-		{
-			tmp = ft_strdup(ee->envp[i]);
-			break ;
-		}
-		i++;
-	}
-	return (tmp);
 }
 
 int	main(int ac, char **av, char **envp)

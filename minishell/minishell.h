@@ -12,6 +12,7 @@
 # include <sys/types.h>         // pid_t, etc.
 # include <sys/wait.h>          // wait, waitpid, etc.
 # include <termios.h>           // tcsetattr, tcgetattr
+# include <fcntl.h>
 
 extern int	g_omg_le_plus_beau_du_tieks_ca_dit_koi_le_sang_trkl_la_bess_j_ai_vu_tu_connais_ici_c_est_la_debrouille;
 
@@ -51,31 +52,24 @@ typedef struct s_wc_fonction
 
 typedef struct s_envp_copy
 {
-	//      V signal exit
 	int		minishell_check;
-	//      V copy l'environnement
 	char	**envp;
-	//      V confirme dans cd le changement de directory
 	int		change_confirmed;
-	//      V copy dans cd le pwd apres le changement de directory
 	char	*copy_pwd;
-	//      V copy dans cd le pwd avant le changement de directory
 	char	*copy_oldpwd;
-	//		V condition pour verifier si pwd a ete unset (pour ne plus l'afficher)
 	int		if_unset__pwd;
-	//		V condition pour verifier si oldpwd a ete unset (pour ne plus l'afficher)
 	int		if_unset__oldpwd;
-	//		V condition pour verifier si shlvl a ete unset (pour ne plus l'afficher)
 	int		if_unset__shlvl;
-	//		V (si env -i) lock permettant de ne pas setenv PATH a chaque nouvel input s'il a deja ete unset
 	int		lock_path;
-	//		V sert a bloquer les commande si le PATH est retire
 	int		path_is_not_able;
-	//		V etre le tableau de char * de la commande export
 	char	**copy_export_env;
-	//		V enregistre le path initiale si existant
 	char	*save_initial_path;
 }			t_ee;
+
+typedef struct s_redirection
+{
+	int command_fail;
+}			t_redir;
 
 // init_c
 int			ft_strlonglen(char **s);
@@ -122,6 +116,7 @@ void		check_if_path_is_set(t_ee *ee, char **args);
 void 		execute_pipeline(char *input, t_ee *ee);
 char		*reconstruct_input(char **changed_args);
 char		**check_dollars(char *input, t_ee *ee);
+void		interprete_commande(char *input, t_ee *ee);
 
 
 #endif
