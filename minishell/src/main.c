@@ -230,18 +230,9 @@ void	execute_external_command(char *command, t_ee *ee)
 	path = find_command_path(args[0]);
 	if (!path)
 	{
-		/*if (is_command_in_envp(command, ee) == 1)
-		{
-			printf("%s\n", command);
-			free_split(args);
-			return ;
-		}
-		else
-		{*/
-			ft_printf("🍁_(`へ´*)_🍁: %s: command not found\n", args[0]);
-			free_split(args);
-			return ;
-		//}
+		ft_printf("🍁_(`へ´*)_🍁: %s: command not found\n", args[0]);
+		free_split(args);
+		return ;
 	}
 	pid = fork();
 	if (pid == 0)
@@ -563,9 +554,8 @@ char *handle_quotes(char *input, t_ee *ee)
         return NULL;
     while (input[i])
 	{
-        if ((input[i] == '\'' || input[i] == '"') && quote == '\0') {
+        if ((input[i] == '\'' || input[i] == '"') && quote == '\0')
             quote = input[i++];
-        }
 		else if (input[i] == quote)
 		{
             quote = '\0';
@@ -736,9 +726,202 @@ int	for_same_comportement(t_redir *re, char **split_in)
 	return (0);
 }
 
+char *unstick_to_re_stick(char *tmp_in)
+{
+    int i = 0, j = 0;
+    int count_how_many_sep = 0;
+    char *good_sep;
+
+    while (tmp_in && tmp_in[i])
+    {
+        if ((tmp_in[i] > 32 && (tmp_in[i + 1] == '<' || tmp_in[i + 1] == '>')) ||
+            ((tmp_in[i] == '<' || tmp_in[i] == '>') && tmp_in[i + 1] > 32))
+        {
+            count_how_many_sep++;
+        }
+        i++;
+    }
+    good_sep = malloc(sizeof(char) * (i + count_how_many_sep + 1));
+    if (!good_sep)
+        return NULL;
+    i = 0;
+    while (tmp_in && tmp_in[i])
+    {
+        if (tmp_in[i] > 32 && (tmp_in[i + 1] == '<' || tmp_in[i + 1] == '>'))
+        {
+            good_sep[j++] = tmp_in[i];
+            good_sep[j++] = ' ';
+        }
+        else if ((tmp_in[i] == '<' || tmp_in[i] == '>') && tmp_in[i + 1] > 32)
+        {
+            good_sep[j++] = tmp_in[i];
+            good_sep[j++] = ' ';
+        }
+        else
+            good_sep[j++] = tmp_in[i];
+        i++;
+    }
+    good_sep[j] = '\0';
+    return good_sep;
+}
+static int open_available(char **tmpfilename)
+{
+    int fd;
+    char *tmp_dir = "/tmp/tmp_for_heredoc_";
+    char *idxstr;
+    char *final_filename;
+    int i;
+
+    i = 0;
+    while (i < 65535)
+    {
+        idxstr = ft_itoa(i);
+        final_filename = (char *)malloc(strlen(tmp_dir) + strlen(idxstr) + 1); 
+        if (!final_filename)
+        {
+            free(idxstr);
+            return (-1);
+        }
+        strcpy(final_filename, tmp_dir);
+        ft_strcat(final_filename, idxstr);
+        free(idxstr);
+        fd = open(final_filename, O_WRONLY | O_CREAT | O_EXCL, 0644);
+        if (fd >= 0)
+        {
+            *tmpfilename = final_filename;
+            return fd;
+        }
+        free(final_filename);
+        i++;
+    }
+    return (-1);
+}
+
+static void sigint_in_heredoc_handler(int sig)
+{
+    if (sig == SIGINT)
+    {
+        close(STDIN_FILENO);
+    }
+}
+
+char	*herdoc_command_parse(char *tmp_in)
+{
+	int i = 0, j = 0;
+	char *return_input;
+
+	while (tmp_in[i])
+	{
+		if (tmp_in[i] == '<' || tmp_in[i] == '>')
+			break;
+		i++;
+	}
+	return_input = malloc(sizeof(char) * i + 1);
+	while (j < i)
+	{
+		return_input[j] = tmp_in[j];
+		j++;
+	}
+	return_input[j] = '\0';
+	return (return_input);
+}
+
+int write_to_tmpfile(int fd, char *limit, char *command)
+{
+    char *input;
+    int stdin_bak;
+    char *path;
+    pid_t pid;
+    char tmp_file_path[] = "/tmp/heredoc_tmp";
+    char **clear_command;
+
+    clear_command = ft_split(command, ' ');
+    if (!clear_command || !clear_command[0])
+	{
+		free_split(clear_command);
+        return -1;
+	}
+    ft_printf("clear_command[0] = %s\n", clear_command[0]);
+    if (clear_command[1])
+        ft_printf("clear_command[1] = %s\n", clear_command[1]);
+    stdin_bak = dup(STDIN_FILENO);
+    signal(SIGINT, sigint_in_heredoc_handler);
+    fd = open(tmp_file_path, O_RDWR | O_CREAT | O_TRUNC, 0644);
+    if (fd == -1)
+        return -1;
+    while (1) 
+	{
+        input = readline("✍️  ");
+        if (input == NULL || ft_strcmp(input, limit) == 0) 
+		{
+            if (input)
+                free(input);
+            break;
+        }
+        ft_putendl_fd(input, fd);
+        free(input);
+    }
+    signal(SIGINT, SIG_DFL);
+    close(fd);
+    fd = open(tmp_file_path, O_RDONLY);
+    if (fd == -1) 
+	{
+        unlink(tmp_file_path);
+        return -1;
+    }
+    dup2(stdin_bak, STDIN_FILENO);
+    close(stdin_bak);
+    pid = fork();
+    if (pid == -1) 
+	{
+        close(fd);
+        unlink(tmp_file_path);
+        return -1;
+    }
+    if (pid == 0) 
+	{
+        dup2(fd, STDIN_FILENO);
+        close(fd);
+        path = find_command_path(clear_command[0]);
+        if (!path) 
+            exit(EXIT_FAILURE);
+        if (execv(path, clear_command) == -1) 
+		{
+            perror("execv");
+            exit(EXIT_FAILURE);
+        }
+    }
+    waitpid(pid, NULL, 0);
+    close(fd);
+    unlink(tmp_file_path);
+    free_split(clear_command);
+    return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 void handle_redirection(char *input, t_ee *ee)
 {
     char *tmp_in;
+	char *if_need_sep;
     char **split_in;
 	int last_name;
     int file;
@@ -748,27 +931,33 @@ void handle_redirection(char *input, t_ee *ee)
 	char *input_execv;
 	char **split_execv;
 	t_redir *re;
+	//pour here-doc
+	int fd;
+    char *tmpfilename;
+	char *herdoc_command;
 
     (void)ee;
 	re = malloc(sizeof(t_redir));
 	re->command_fail = 0;
-    tmp_in = input;
-	///
+	tmp_in = input;
 	input_execv = parse_exev_input(tmp_in);
 	split_execv = ft_split(input_execv, ' ');
 	if (!split_execv || !split_execv[0])
     {
         free_split(split_execv);
+		free(re);
+		free(input_execv);
         return;
     }
-	///
-    split_in = ft_split(tmp_in, ' ');
+	if_need_sep = unstick_to_re_stick(tmp_in);
+    split_in = ft_split(if_need_sep, ' ');
     if (!split_in || !split_in[0])
     {
         free_split(split_in);
         return;
     }
 	last_name = ft_strlonglen(split_in);
+	herdoc_command = herdoc_command_parse(tmp_in);
     pid = fork();
     if (pid == -1)
     {
@@ -787,14 +976,7 @@ void handle_redirection(char *input, t_ee *ee)
             dup2(file, STDOUT_FILENO);
 			//////////////////////////////
 			path = find_command_path(split_in[0]);
-			if (!path)
-			{
-				re->command_fail = 1;
-			}
-			else
-			{
-				execv(path, split_execv);
-			}
+			execv(path, split_execv);
 			//////////////////////////////
             close(file);
         }
@@ -808,34 +990,63 @@ void handle_redirection(char *input, t_ee *ee)
             dup2(file, STDOUT_FILENO);
 			//////////////////////////////
 			path = find_command_path(split_in[0]);
-			if (!path)
-			{
-				re->command_fail = 1;
-			}
-			else
-			{
-				execv(path, split_execv);
-			}
+			execv(path, split_execv);
 			//////////////////////////////
             close(file);
         }
         else if (find_type_of_redirection(tmp_in) == 3) // <
         {
-            file = open(split_in[2], O_RDONLY);
+            file = open(split_in[last_name - 1], O_RDONLY);
             if (file == -1)
             {
                 exit(EXIT_FAILURE);
             }
             dup2(file, STDIN_FILENO);
+			path = find_command_path(split_execv[0]);
+			execv(path, split_execv);
             close(file);
         }
+		//////////////////////////////////////////////////////////////////////////
         else if (find_type_of_redirection(tmp_in) == 4) // <<
         {
-            printf("nsm\n");
+			int ret;
+			fd = open_available(&tmpfilename);
+			if (fd < 0)
+			{
+    			free_split(split_in);
+    			free_split(split_execv);
+    			free(re);
+    			return;
+			}
+			ret = write_to_tmpfile(fd, split_in[last_name - 1], herdoc_command);
+			close(fd);
+			if (ret != 0)
+            {
+                unlink(tmpfilename);
+                free(tmpfilename);
+                free_split(split_in);
+                free_split(split_execv);
+                free(re);
+                return;
+            }
+			fd = open(tmpfilename, O_RDONLY);
+			if (fd < 0)
+			{
+    			unlink(tmpfilename);
+    			free(tmpfilename);
+    			free_split(split_in);
+    			free_split(split_execv);
+    			free(re);
+    			return;
+			}
+			close(fd);
+			unlink(tmpfilename);
+			free(tmpfilename);
+			free_split(split_in);
+			free_split(split_execv);
+			free(re);
         }
-        free_split(split_in);
-        exit(EXIT_SUCCESS);
-    }
+	}
     else
     {
         int status;
