@@ -723,6 +723,8 @@ int	for_same_comportement(t_redir *re, char **split_in)
 	char *path = find_command_path(split_in[0]);
 	if (!path)
 		return (1);
+	if (path)
+		free(path);
 	return (0);
 }
 
@@ -803,27 +805,6 @@ static void sigint_in_heredoc_handler(int sig)
     {
         close(STDIN_FILENO);
     }
-}
-
-char	*herdoc_command_parse(char *tmp_in)
-{
-	int i = 0, j = 0;
-	char *return_input;
-
-	while (tmp_in[i])
-	{
-		if (tmp_in[i] == '<' || tmp_in[i] == '>')
-			break;
-		i++;
-	}
-	return_input = malloc(sizeof(char) * i + 1);
-	while (j < i)
-	{
-		return_input[j] = tmp_in[j];
-		j++;
-	}
-	return_input[j] = '\0';
-	return (return_input);
 }
 
 int write_to_tmpfile(int fd, char *limit, char *command)
@@ -921,144 +902,135 @@ int write_to_tmpfile(int fd, char *limit, char *command)
 void handle_redirection(char *input, t_ee *ee)
 {
     char *tmp_in;
-	char *if_need_sep;
-    char **split_in;
-	int last_name;
+    char *if_need_sep;
+    char **split_in = NULL;
+    int last_name;
     int file;
     pid_t pid;
-	char *path;
-	//pour execv
-	char *input_execv;
-	char **split_execv;
-	t_redir *re;
-	//pour here-doc
-	int fd;
-    char *tmpfilename;
-	char *herdoc_command;
+    char *path;
+    // Pour execv
+    char *input_execv = NULL;
+    char **split_execv = NULL;
+    t_redir *re = NULL;
+    // Pour here-doc
+    int fd;
+    char *tmpfilename = NULL;
 
     (void)ee;
-	re = malloc(sizeof(t_redir));
-	re->command_fail = 0;
-	tmp_in = input;
-	input_execv = parse_exev_input(tmp_in);
-	split_execv = ft_split(input_execv, ' ');
-	if (!split_execv || !split_execv[0])
-    {
+    re = malloc(sizeof(t_redir));
+    if (!re)
+        return;
+    re->command_fail = 0;
+    tmp_in = input;
+    input_execv = parse_exev_input(tmp_in);
+    split_execv = ft_split(input_execv, ' ');
+    if (!split_execv || !split_execv[0]) 
+	{
         free_split(split_execv);
-		free(re);
-		free(input_execv);
+        free(re);
+        free(input_execv);
         return;
     }
-	if_need_sep = unstick_to_re_stick(tmp_in);
+    if_need_sep = unstick_to_re_stick(tmp_in);
     split_in = ft_split(if_need_sep, ' ');
-    if (!split_in || !split_in[0])
-    {
+    if (!split_in || !split_in[0]) 
+	{
         free_split(split_in);
+        free_split(split_execv);
+        free(re);
+        free(input_execv);
         return;
     }
-	last_name = ft_strlonglen(split_in);
-	herdoc_command = herdoc_command_parse(tmp_in);
+    last_name = ft_strlonglen(split_in);
+	path = find_command_path(split_in[0]);
     pid = fork();
-    if (pid == -1)
-    {
+    if (pid == -1) 
+	{
         free_split(split_in);
+        free_split(split_execv);
+        free(re);
+        free(input_execv);
         return;
     }
     if (pid == 0) // proc enfant
-    {
+	{
         if (find_type_of_redirection(tmp_in) == 1) // >
-        {
+		{
             file = open(split_in[last_name - 1], O_WRONLY | O_CREAT | O_TRUNC, 0777);
             if (file == -1)
-            {
                 exit(EXIT_FAILURE);
-            }
             dup2(file, STDOUT_FILENO);
-			//////////////////////////////
-			path = find_command_path(split_in[0]);
-			execv(path, split_execv);
-			//////////////////////////////
+			//path = find_command_path(split_in[0]);
+            execv(path, split_execv);
             close(file);
-        }
-        else if (find_type_of_redirection(tmp_in) == 2) // >>
-        {
+        } 
+		else if (find_type_of_redirection(tmp_in) == 2) // >>
+		{
             file = open(split_in[last_name - 1], O_WRONLY | O_CREAT | O_APPEND, 0777);
             if (file == -1)
-            {
                 exit(EXIT_FAILURE);
-            }
+
             dup2(file, STDOUT_FILENO);
-			//////////////////////////////
-			path = find_command_path(split_in[0]);
-			execv(path, split_execv);
-			//////////////////////////////
+            //path = find_command_path(split_in[0]);
+            execv(path, split_execv);
             close(file);
-        }
-        else if (find_type_of_redirection(tmp_in) == 3) // <
-        {
+        } 
+		else if (find_type_of_redirection(tmp_in) == 3) // <
+		{
             file = open(split_in[last_name - 1], O_RDONLY);
             if (file == -1)
-            {
                 exit(EXIT_FAILURE);
-            }
+
             dup2(file, STDIN_FILENO);
-			path = find_command_path(split_execv[0]);
-			execv(path, split_execv);
+            //path = find_command_path(split_execv[0]);
+            execv(path, split_execv);
             close(file);
-        }
-		//////////////////////////////////////////////////////////////////////////
-        else if (find_type_of_redirection(tmp_in) == 4) // <<
-        {
-			int ret;
-			fd = open_available(&tmpfilename);
-			if (fd < 0)
-			{
-    			free_split(split_in);
-    			free_split(split_execv);
-    			free(re);
-    			return;
-			}
-			ret = write_to_tmpfile(fd, split_in[last_name - 1], herdoc_command);
-			close(fd);
-			if (ret != 0)
-            {
+        } else if (find_type_of_redirection(tmp_in) == 4) // <<
+		{
+            int ret;
+            fd = open_available(&tmpfilename);
+            if (fd < 0)
+                exit(EXIT_FAILURE);
+
+            ret = write_to_tmpfile(fd, split_in[last_name - 1], input_execv);
+            close(fd);
+            if (ret != 0) {
                 unlink(tmpfilename);
                 free(tmpfilename);
-                free_split(split_in);
-                free_split(split_execv);
-                free(re);
-                return;
+                exit(EXIT_FAILURE);
             }
-			fd = open(tmpfilename, O_RDONLY);
-			if (fd < 0)
-			{
-    			unlink(tmpfilename);
-    			free(tmpfilename);
-    			free_split(split_in);
-    			free_split(split_execv);
-    			free(re);
-    			return;
-			}
-			close(fd);
-			unlink(tmpfilename);
-			free(tmpfilename);
-			free_split(split_in);
-			free_split(split_execv);
-			free(re);
+
+            fd = open(tmpfilename, O_RDONLY);
+            if (fd < 0) {
+                unlink(tmpfilename);
+                free(tmpfilename);
+                exit(EXIT_FAILURE);
+            }
+
+            dup2(fd, STDIN_FILENO);
+            close(fd);
+            unlink(tmpfilename);
+            free(tmpfilename);
         }
-	}
-    else
-    {
+        exit(EXIT_SUCCESS);
+    }
+	else 
+	{ // Proc parent
         int status;
         waitpid(pid, &status, 0);
     }
-	re->command_fail = for_same_comportement(re, split_in);
-	if (re->command_fail == 1)
-		ft_printf("🍁_(`へ´*)_🍁: %s: command not found\n", split_execv[0]);
-	free_split(split_execv);
+    re->command_fail = for_same_comportement(re, split_in);
+    if (re->command_fail == 1)
+        ft_printf("🍁_(`へ´*)_🍁: %s: command not found\n", split_execv[0]);
+    free_split(split_execv);
     free_split(split_in);
+    free(input_execv);
+	free(if_need_sep);
+	free(path);
+    free(re);
     return;
 }
+
 
 
 ///////////////////////////////////////////////////////////////////////////
