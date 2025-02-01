@@ -235,6 +235,8 @@ void	execute_external_command(char *command, t_ee *ee)
 	if (!path)
 	{
 		ft_printf("🍁_(`へ´*)_🍁: %s: command not found\n", args[0]);
+		if (ee->command_with_and == 1)
+			ee->check_and_validity = 1;
 		free_split(args);
 		return ;
 	}
@@ -260,34 +262,57 @@ void	execute_external_command(char *command, t_ee *ee)
 
 int cumulate_token(char *input, t_ee *ee)
 {
-    int i = 0;
+    int i = 0, j = 0;
     char copy[1024];
-    int j = 0;
     char **changed_args;
+    bool success = true;
 
-	if (!input || input[i] == '\0')
-		return (1);
+    if (!input || input[i] == '\0')
+        return (1);
     while (input[i] != '\0')
     {
-        while (input[i] != '\0' && input[i] != ';')
+        j = 0;
+
+        while (input[i] != '\0' && input[i] != ';' && !(input[i] == '&' && input[i + 1] == '&'))
             copy[j++] = input[i++];
         copy[j] = '\0';
-        changed_args = check_dollars(copy, ee);
-        if (!changed_args)
-            return 1;
-        char *reconstructed_input = reconstruct_input(changed_args);
-        if (ft_strchr(reconstructed_input, '|'))
-            execute_pipeline(reconstructed_input, ee);
-        else
-                interprete_commande(reconstructed_input, ee);
-        free_split(changed_args);
-        free(reconstructed_input);
+
+        if (success)
+        {
+            changed_args = check_dollars(copy, ee);
+            if (!changed_args)
+                return 1;
+            char *reconstructed_input = reconstruct_input(changed_args);
+
+            if (ft_strchr(reconstructed_input, '|'))
+                success = execute_pipeline(reconstructed_input, ee) == 0;
+            else
+                success = interprete_commande(reconstructed_input, ee) == 0;
+
+            free_split(changed_args);
+            free(reconstructed_input);
+        }
+        if (ee->check_and_validity == 1)
+        {
+			success = false;
+			ee->check_and_validity = 0;
+        }
+		ee->command_with_and = 0;
         if (input[i] == ';')
+        {
+            success = true;
             i++;
-        j = 0;
+        }
+        else if (input[i] == '&' && input[i + 1] == '&')
+        {
+            ee->command_with_and = 1;
+            i += 2;
+        }
     }
     return 0;
 }
+
+
 
 
 
@@ -448,7 +473,7 @@ char	*reconstruct_input(char **changed_args)
 // Pour les pipe il faut d abord detecter si y'en a si oui il faut split avec '|' comme separateur
 // pour diviser l'input en deux puis exec la commande qui contient le pipe 
 
-void execute_pipeline(char *input, t_ee *ee) 
+int execute_pipeline(char *input, t_ee *ee) 
 {
     char **commands;
     int pipe_fd[2];
@@ -501,6 +526,7 @@ void execute_pipeline(char *input, t_ee *ee)
         close(prev_fd);
     while (wait(NULL) > 0);
     free_split(commands);
+	return (0);
 }
 
 
@@ -1033,7 +1059,7 @@ void handle_redirection(char *input, t_ee *ee)
 
 
 ///////////////////////////////////////////////////////////////////////////
-void	interprete_commande(char *input, t_ee *ee)
+int	interprete_commande(char *input, t_ee *ee)
 {
 	char	*trimmed_input;
 	t_token	*token;
@@ -1041,13 +1067,13 @@ void	interprete_commande(char *input, t_ee *ee)
 	token = malloc(sizeof(t_token));
 	token->token = 0;
 	if (!token)
-			return ;
+			return (0);
 	token->token = 0;
 	if (find_redirection(input) == 1)
 	{
 		handle_redirection(input, ee);
 		free(token);
-		return;
+		return (0);
 	}
 	else
 	{
@@ -1055,13 +1081,13 @@ void	interprete_commande(char *input, t_ee *ee)
 		if (!trimmed_input)
 		{
 			free(token);
-			return ;
+			return (0);
 		}
 		if (token->token == 1)
 		{
 			printf("🛠️_(>_<;)_🛠️   : syntax error near unexpected token ';'\n");
 			free(token);
-			return ;
+			return (0);
 		}
 		else if (ft_strcmp(trimmed_input, "exit") == 0)
 		{
@@ -1104,6 +1130,7 @@ void	interprete_commande(char *input, t_ee *ee)
 		free(token);
 		free(trimmed_input);
 	}
+	return (0);
 }
 /////////////////////////////////////////////////////////////////
 
@@ -1214,7 +1241,7 @@ void loop(char *input, t_ee *ee)
             }
             if (ft_strchr(input, '|') && cumulate_token(input, ee) == 1)
             	execute_pipeline(input, ee);
-			else if (!ft_strchr(input, '|') && cumulate_token(input, ee) == 1) 
+			else if (!ft_strchr(input, '|') && cumulate_token(input, ee) == 1)
 			{
                 changed_args = check_dollars(input, ee);
                 if (!changed_args)

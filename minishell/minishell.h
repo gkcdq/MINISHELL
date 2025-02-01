@@ -64,6 +64,9 @@ typedef struct s_envp_copy
 	int		path_is_not_able;
 	char	**copy_export_env;
 	char	*save_initial_path;
+	int		check_and_validity;
+	int		command_with_and;
+	int		command_with_or;
 }			t_ee;
 
 typedef struct s_redirection
@@ -113,10 +116,10 @@ char		*ft_strjoin_cd(char *s1, char *s2);
 int			ft_strcmpchar(char a, char b);
 char		*ft_strcat(char *dest, const char *src);
 void		check_if_path_is_set(t_ee *ee, char **args);
-void 		execute_pipeline(char *input, t_ee *ee);
+int 		execute_pipeline(char *input, t_ee *ee);
 char		*reconstruct_input(char **changed_args);
 char		**check_dollars(char *input, t_ee *ee);
-void		interprete_commande(char *input, t_ee *ee);
+int		interprete_commande(char *input, t_ee *ee);
 
 
 #endif

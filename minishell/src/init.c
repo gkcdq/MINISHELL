@@ -23,4 +23,7 @@ void	init_struct(t_ee *ee)
 	ee->copy_export_env = NULL;
 	ee->path_is_not_able = 0;
 	ee->save_initial_path = NULL;
+	ee->check_and_validity = 0;
+	ee->command_with_and = 0;
+	ee->command_with_or = 0;
 }
