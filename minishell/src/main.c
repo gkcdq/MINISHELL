@@ -95,6 +95,10 @@ int	check_token_in_all_string(char *input, t_token *tok)
 	i = 0;
 	while (input[i])
 	{
+		if (input[i] == '|')
+		{
+
+		}
 		if (input[i] == ';')
 		{
 			if (input[i + 1] == '\0')
@@ -822,9 +826,9 @@ int write_to_tmpfile(int fd, char *limit, char *command)
 		free_split(clear_command);
         return -1;
 	}
-    ft_printf("clear_command[0] = %s\n", clear_command[0]);
+    /*ft_printf("clear_command[0] = %s\n", clear_command[0]);
     if (clear_command[1])
-        ft_printf("clear_command[1] = %s\n", clear_command[1]);
+        ft_printf("clear_command[1] = %s\n", clear_command[1]);*/
     stdin_bak = dup(STDIN_FILENO);
     signal(SIGINT, sigint_in_heredoc_handler);
     fd = open(tmp_file_path, O_RDWR | O_CREAT | O_TRUNC, 0644);
@@ -913,7 +917,7 @@ void handle_redirection(char *input, t_ee *ee)
     char **split_execv = NULL;
     t_redir *re = NULL;
     // Pour here-doc
-    int fd;
+    int fd;                                          
     char *tmpfilename = NULL;
 
     (void)ee;
@@ -960,7 +964,6 @@ void handle_redirection(char *input, t_ee *ee)
             if (file == -1)
                 exit(EXIT_FAILURE);
             dup2(file, STDOUT_FILENO);
-			//path = find_command_path(split_in[0]);
             execv(path, split_execv);
             close(file);
         } 
@@ -969,9 +972,7 @@ void handle_redirection(char *input, t_ee *ee)
             file = open(split_in[last_name - 1], O_WRONLY | O_CREAT | O_APPEND, 0777);
             if (file == -1)
                 exit(EXIT_FAILURE);
-
             dup2(file, STDOUT_FILENO);
-            //path = find_command_path(split_in[0]);
             execv(path, split_execv);
             close(file);
         } 
@@ -980,33 +981,31 @@ void handle_redirection(char *input, t_ee *ee)
             file = open(split_in[last_name - 1], O_RDONLY);
             if (file == -1)
                 exit(EXIT_FAILURE);
-
             dup2(file, STDIN_FILENO);
-            //path = find_command_path(split_execv[0]);
             execv(path, split_execv);
             close(file);
-        } else if (find_type_of_redirection(tmp_in) == 4) // <<
+        }
+		else if (find_type_of_redirection(tmp_in) == 4) // <<
 		{
             int ret;
             fd = open_available(&tmpfilename);
             if (fd < 0)
                 exit(EXIT_FAILURE);
-
             ret = write_to_tmpfile(fd, split_in[last_name - 1], input_execv);
             close(fd);
-            if (ret != 0) {
+            if (ret != 0) 
+			{
                 unlink(tmpfilename);
                 free(tmpfilename);
                 exit(EXIT_FAILURE);
             }
-
             fd = open(tmpfilename, O_RDONLY);
-            if (fd < 0) {
+            if (fd < 0) 
+			{
                 unlink(tmpfilename);
                 free(tmpfilename);
                 exit(EXIT_FAILURE);
             }
-
             dup2(fd, STDIN_FILENO);
             close(fd);
             unlink(tmpfilename);
@@ -1106,6 +1105,24 @@ void	interprete_commande(char *input, t_ee *ee)
 		free(trimmed_input);
 	}
 }
+/////////////////////////////////////////////////////////////////
+
+int detect_op_logique_or(char *input)
+{
+	int i = 0;
+
+	while (input && input[i])
+	{
+		if (input[i] == '|' && input[i + 1] == '|')
+			return (1);
+	}
+	return (0);
+}
+
+
+
+
+/////////////////////////////////////////////////////////////////
 
 void loop(char *input, t_ee *ee)
 {
