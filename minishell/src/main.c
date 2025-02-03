@@ -1137,21 +1137,22 @@ int	interprete_commande(char *input, t_ee *ee)
 	{
 		if (check_after_or(input) == 0)
 		{
-        command_before_or = strndup(input, ft_strchr(input, '|') - input);
-        command_after_or = ft_strchr(input, '|') + 2;
-		//ft_printf("2 ip > %s\n", command_before_or);
-		//ft_printf("3 ip > %s\n", command_after_or);
-		if (ft_strchr(command_before_or, '|'))
-            execute_pipeline(command_before_or, ee);
-		else
-        	interprete_commande(command_before_or, ee);
-        if (/*ee->command_with_or == 1 &&*/ ee->confirmed_command == 0)
-            interprete_commande(command_after_or, ee);	
-        free(command_before_or);
-		free(token);
-		ee->command_with_or = 0;
-		ee->confirmed_command = 0;
-        return (0);
+			//gerer les cas pour les pipes (refaire une fonction qui copi bien la commande avec le pipe)
+        	command_before_or = strndup(input, ft_strchr(input, '|') - input);
+        	command_after_or = ft_strchr(input, '|') + 2;
+			//ft_printf("2 ip > %s\n", command_before_or);
+			//ft_printf("3 ip > %s\n", command_after_or);
+			if (ft_strchr(command_before_or, '|'))
+        	    execute_pipeline(command_before_or, ee);
+			else
+        		interprete_commande(command_before_or, ee);
+        	if (/*ee->command_with_or == 1 &&*/ ee->confirmed_command == 0)
+        	    interprete_commande(command_after_or, ee);	
+        	free(command_before_or);
+			free(token);
+			ee->command_with_or = 0;
+			ee->confirmed_command = 0;
+        	return (0);
 		}
 		/*faire le "else" ici si on veut faire les bonus dans les regles de l'art (mini here-doc)*/
     }
