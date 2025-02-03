@@ -4,7 +4,7 @@ void	ft_env(t_ee *ee)
 {
 	int	i;
 
-	if (!ee->envp || !ee->envp[0])
+	if ((!ee->envp || !ee->envp[0]) && ee->lock_path == 0)
 	{
 		if (ee->copy_pwd == NULL)
 			ee->copy_pwd = getcwd(NULL, 0);

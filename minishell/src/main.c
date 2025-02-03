@@ -238,6 +238,7 @@ void	execute_external_command(char *command, t_ee *ee)
 		if (ee->command_with_and == 1)
 			ee->check_and_validity = 1;
 		ee->command_with_or = 1;
+		ee->confirmed_command = 0;
 		free_split(args);
 		return ;
 	}
@@ -273,7 +274,7 @@ int cumulate_token(char *input, t_ee *ee)
 
     if (!input || input[i] == '\0')
         return (1);
-ft_printf("1 ct > %s\n", input);
+	//ft_printf("1 ct > %s\n", input);
     while (input[i] != '\0')
     {
         j = 0;
@@ -288,7 +289,7 @@ ft_printf("1 ct > %s\n", input);
             if (!changed_args)
                 return 1;
             reconstructed_input = reconstruct_input(changed_args);
-			ft_printf("2 ct > %s\n", reconstructed_input);
+			//ft_printf("2 ct > %s\n", reconstructed_input);
 			if (find_pipe(reconstructed_input) == 1 && find_or(reconstructed_input) == 0)
 				execute_pipeline(reconstructed_input, ee);
 			else
@@ -1131,20 +1132,20 @@ int	interprete_commande(char *input, t_ee *ee)
 	if (!token)
 			return (0);
 	token->token = 0;
-	ft_printf("1 > %s\n", input);
+	//ft_printf("1 > %s\n", input);
 	if (find_or(input) == 1)
 	{
 		if (check_after_or(input) == 0)
 		{
         command_before_or = strndup(input, ft_strchr(input, '|') - input);
         command_after_or = ft_strchr(input, '|') + 2;
-		ft_printf("2 ip > %s\n", command_before_or);
-		ft_printf("3 ip > %s\n", command_after_or);
+		//ft_printf("2 ip > %s\n", command_before_or);
+		//ft_printf("3 ip > %s\n", command_after_or);
 		if (ft_strchr(command_before_or, '|'))
             execute_pipeline(command_before_or, ee);
 		else
         	interprete_commande(command_before_or, ee);
-        if (ee->command_with_or == 1 && ee->confirmed_command == 0)
+        if (/*ee->command_with_or == 1 &&*/ ee->confirmed_command == 0)
             interprete_commande(command_after_or, ee);	
         free(command_before_or);
 		free(token);
@@ -1186,27 +1187,45 @@ int	interprete_commande(char *input, t_ee *ee)
 				ft_exit(input, ee);
 		}
 		else if (ft_strcmp(trimmed_input, "pwd") == 0)
+		{
 			ft_pwd();
+			ee->confirmed_command = 1;
+		}
 		else if ((ft_strcmp(trimmed_input, "cd") == 0) || (ft_strcmp(trimmed_input, "~") == 0))
 		{
 			if (ee->copy_oldpwd)
 				free(ee->copy_oldpwd);
 			ft_cd(input, ee);
+			ee->confirmed_command = 1;
 		}
 		else if (ft_strcmp(trimmed_input, "env") == 0)
 		{
-			if (ee->path_is_not_able == 0)
+			if (ee->path_is_not_able == 0 && ee->lock_path == 0)
+			{
 				ft_env(ee);
+				ee->confirmed_command = 1;
+			}
 			else
+			{
 				ft_printf("🌳(´•︵•`)🌳: env: No such file or directory\n");
+				ee->confirmed_command = 0;
+			}
 		}
 		else if (ft_strcmp(trimmed_input, "unset") == 0)
+		{
 			ft_unset(input, ee);
-		else if ((ft_strcmp(trimmed_input, "export") == 0)
-			|| (ft_strcmp(trimmed_input, "export=") == 0))
+			ee->confirmed_command = 1;
+		}
+		else if ((ft_strcmp(trimmed_input, "export") == 0) || (ft_strcmp(trimmed_input, "export=") == 0))
+		{
 			ft_export(input, ee);
+			ee->confirmed_command = 1;
+		}
 		else if (ft_strcmp(trimmed_input, "echo") == 0)
+		{
 			ft_echo(input);
+			ee->confirmed_command = 1;
+		}
 		else
 		{
 			if (ee->minishell_check == 0)
