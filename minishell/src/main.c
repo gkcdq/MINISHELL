@@ -1153,7 +1153,7 @@ int	interprete_commande(char *input, t_ee *ee)
 		ee->confirmed_command = 0;
         return (0);
 		}
-		/*faire le "else" ici si on veut faire les bonus dans les regles de l'art*/
+		/*faire le "else" ici si on veut faire les bonus dans les regles de l'art (mini here-doc)*/
     }
 	if (find_redirection(input) == 1)
 	{
