@@ -67,6 +67,7 @@ typedef struct s_envp_copy
 	int		check_and_validity;
 	int		command_with_and;
 	int		command_with_or;
+	int		confirmed_command;
 }			t_ee;
 
 typedef struct s_redirection
@@ -120,6 +121,8 @@ int 		execute_pipeline(char *input, t_ee *ee);
 char		*reconstruct_input(char **changed_args);
 char		**check_dollars(char *input, t_ee *ee);
 int		interprete_commande(char *input, t_ee *ee);
+int	find_pipe(char *input);
+int	find_or(char *input);
 
 
 #endif
