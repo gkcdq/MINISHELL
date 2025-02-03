@@ -378,7 +378,7 @@ void ft_export(char *input, t_ee *ee)
 {
     char **args;
 	char **sorted_env;
-	char **concatene_both_tab;
+	char **concatene_both_tab = NULL;
 	
 	args = ft_split(input, ' ');
     if (!ee->envp || !ee->envp[0])

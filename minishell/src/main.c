@@ -1,6 +1,7 @@
 #include "../minishell.h"
 
-int		g_omg_le_plus_beau_du_tieks_ca_dit_koi_le_sang_trkl_la_bess_j_ai_vu_tu_connais_ici_c_est_la_debrouille;
+static int g_heredoc_interrupted = 0;
+
 
 int	ft_strcmp(char *s1, char *s2)
 {
@@ -274,7 +275,6 @@ int cumulate_token(char *input, t_ee *ee)
 
     if (!input || input[i] == '\0')
         return (1);
-	//ft_printf("1 ct > %s\n", input);
     while (input[i] != '\0')
     {
         j = 0;
@@ -289,14 +289,14 @@ int cumulate_token(char *input, t_ee *ee)
             if (!changed_args)
                 return 1;
             reconstructed_input = reconstruct_input(changed_args);
-			//ft_printf("2 ct > %s\n", reconstructed_input);
 			if (find_pipe(reconstructed_input) == 1 && find_or(reconstructed_input) == 0)
 				execute_pipeline(reconstructed_input, ee);
 			else
             	success = interprete_commande(reconstructed_input, ee) == 0;
-
-            free_split(changed_args);
-            free(reconstructed_input);
+			if (changed_args)
+            	free_split(changed_args);
+			if (reconstructed_input)
+            	free(reconstructed_input);
         }
         if (ee->check_and_validity == 1)
         {
@@ -845,44 +845,66 @@ static int open_available(char **tmpfilename)
     return (-1);
 }
 
-static void sigint_in_heredoc_handler(int sig)
+
+
+
+
+
+void handle_herdoc_sigint(int sig)
 {
-    if (sig == SIGINT)
-    {
-        close(STDIN_FILENO);
-    }
+    (void)sig;
+    g_heredoc_interrupted = 1;
+    write(STDOUT_FILENO, "\n", 1); 
+    rl_replace_line("", 0);                     
+    rl_done = 1;
+	close(STDIN_FILENO);                  
 }
 
-int write_to_tmpfile(int fd, char *limit, char *command)
+int write_to_tmpfile(int fd, char *limit, char *command, t_ee *ee)
 {
-    char *input;
+    char *input = NULL;
     int stdin_bak;
     char *path;
     pid_t pid;
     char tmp_file_path[] = "/tmp/heredoc_tmp";
     char **clear_command;
 
+    (void)ee;
     clear_command = ft_split(command, ' ');
     if (!clear_command || !clear_command[0])
-	{
-		free_split(clear_command);
+    {
+        free_split(clear_command);
         return -1;
-	}
-    /*ft_printf("clear_command[0] = %s\n", clear_command[0]);
-    if (clear_command[1])
-        ft_printf("clear_command[1] = %s\n", clear_command[1]);*/
+    }
+
     stdin_bak = dup(STDIN_FILENO);
-    signal(SIGINT, sigint_in_heredoc_handler);
+    signal(SIGINT, handle_herdoc_sigint);  // Enregistrer le gestionnaire de signal
+    g_heredoc_interrupted = 0;
     fd = open(tmp_file_path, O_RDWR | O_CREAT | O_TRUNC, 0644);
     if (fd == -1)
+    {
+        free_split(clear_command);
         return -1;
-    while (1) 
-	{
-        input = readline("✍️  ");
-        if (input == NULL || ft_strcmp(input, limit) == 0) 
-		{
-            if (input)
-                free(input);
+    }
+
+    while (!g_heredoc_interrupted)
+    {
+        input = readline("🗒️🖊️  ");
+        if (g_heredoc_interrupted)
+        {
+			if (input)
+            	free(input);
+            close(fd);
+            unlink(tmp_file_path);
+			if (clear_command)
+            	free_split(clear_command);
+            signal(SIGINT, SIG_DFL);
+            rl_done = 0;
+            return (-1);
+        }
+        if (!input || ft_strcmp(input, limit) == 0)
+        {
+            free(input);
             break;
         }
         ft_putendl_fd(input, fd);
@@ -891,29 +913,33 @@ int write_to_tmpfile(int fd, char *limit, char *command)
     signal(SIGINT, SIG_DFL);
     close(fd);
     fd = open(tmp_file_path, O_RDONLY);
-    if (fd == -1) 
-	{
+    if (fd == -1)
+    {
         unlink(tmp_file_path);
+        free_split(clear_command);
         return -1;
     }
+
     dup2(stdin_bak, STDIN_FILENO);
     close(stdin_bak);
+
     pid = fork();
-    if (pid == -1) 
-	{
+    if (pid == -1)
+    {
         close(fd);
         unlink(tmp_file_path);
+        free_split(clear_command);
         return -1;
     }
-    if (pid == 0) 
-	{
+    if (pid == 0)
+    {
         dup2(fd, STDIN_FILENO);
         close(fd);
         path = find_command_path(clear_command[0]);
-        if (!path) 
+        if (!path)
             exit(EXIT_FAILURE);
-        if (execv(path, clear_command) == -1) 
-		{
+        if (execv(path, clear_command) == -1)
+        {
             perror("execv");
             exit(EXIT_FAILURE);
         }
@@ -924,6 +950,8 @@ int write_to_tmpfile(int fd, char *limit, char *command)
     free_split(clear_command);
     return 0;
 }
+
+
 
 
 
@@ -962,7 +990,6 @@ void handle_redirection(char *input, t_ee *ee)
     int fd;                                          
     char *tmpfilename = NULL;
 
-    (void)ee;
     re = malloc(sizeof(t_redir));
     if (!re)
         return;
@@ -1029,11 +1056,10 @@ void handle_redirection(char *input, t_ee *ee)
         }
 		else if (find_type_of_redirection(tmp_in) == 4) // <<
 		{
-            int ret;
             fd = open_available(&tmpfilename);
             if (fd < 0)
                 exit(EXIT_FAILURE);
-            ret = write_to_tmpfile(fd, split_in[last_name - 1], input_execv);
+            int ret = write_to_tmpfile(fd, split_in[last_name - 1], input_execv, ee);
             close(fd);
             if (ret != 0) 
 			{
@@ -1063,6 +1089,7 @@ void handle_redirection(char *input, t_ee *ee)
     re->command_fail = for_same_comportement(re, split_in);
     if (re->command_fail == 1)
         ft_printf("🍁_(`へ´*)_🍁: %s: command not found\n", split_execv[0]);
+	// rajouter peut etre un truc ici pour le && et ||
     free_split(split_execv);
     free_split(split_in);
     free(input_execv);
@@ -1107,15 +1134,73 @@ int	find_or(char *input)
 
 char *copy_before_or(char *src)
 {
-	//char *tmp;
-	int i = 0;//j = 0;
+	char *tmp;
+	int i = 0;
+	int j = 0;
 
 	while (src && src[i])
 	{
-		return ( NULL);
+		if (src[i] == '|' && src[i + 1] == '|')
+			break;
 		i++;
 	}
-	return ( NULL);
+	tmp = malloc(sizeof(char) * i + 1);
+	while (j < i)
+	{
+		tmp[j] = src[j];
+		j++;
+	}
+	tmp[j] = '\0';
+	return (tmp);
+}
+
+char *copy_after_or(char *src)
+{
+	int i = 0;
+	int k = 0;
+	int j = 0;
+	char *tmp;
+
+	printf("src = %s\n", src);
+	while (src && src[i])
+	{
+		if (src[i] == '|' && src[i + 1] == '|')
+			break;
+		i++;
+	}
+	i += 2;
+	if (src[i] == '\0')
+		return (NULL);
+	printf("src[i] = %c\n", src[i]);
+	k = ft_strlen(src);
+	tmp = malloc(sizeof(char) * (k - i + 1));
+	if (!tmp)
+	{
+		free (tmp);
+		return (NULL);
+	}
+	while (i < k)
+	{
+		tmp[j] = src[i];
+		i++;
+		j++;
+	}
+	tmp[j] = '\0';
+	return (tmp);
+}
+
+void check_path_in_or_with_pipe(char *input, t_ee *ee)
+{
+	char **split_input;
+	char *path;
+
+	split_input = ft_split(input, ' ');
+	path = find_command_path(split_input[0]);
+	if (path)
+		ee->confirmed_command = 1;
+	free_split(split_input);
+	free(path);
+	return ;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -1127,29 +1212,43 @@ int	interprete_commande(char *input, t_ee *ee)
 	char *command_before_or;
 	char *command_after_or;
 
-	token = malloc(sizeof(t_token));
-	token->token = 0;
-	if (!token)
-			return (0);
-	token->token = 0;
+
 	//ft_printf("1 > %s\n", input);
 	if (find_or(input) == 1)
 	{
 		if (check_after_or(input) == 0)
 		{
 			//gerer les cas pour les pipes (refaire une fonction qui copi bien la commande avec le pipe)
-        	command_before_or = strndup(input, ft_strchr(input, '|') - input);
-        	command_after_or = ft_strchr(input, '|') + 2;
-			//ft_printf("2 ip > %s\n", command_before_or);
-			//ft_printf("3 ip > %s\n", command_after_or);
+        	//command_before_or = strndup(input, ft_strchr(input, '|') - input);
+			command_before_or = copy_before_or(input);
 			if (ft_strchr(command_before_or, '|'))
+				command_after_or = copy_after_or(input);
+			else
+        		command_after_or = ft_strchr(input, '|') + 2;
+			ft_printf("2 ip > %s\n", command_before_or);
+			ft_printf("3 ip > %s\n", command_after_or);
+			if (ft_strchr(command_before_or, '|'))
+			{
         	    execute_pipeline(command_before_or, ee);
+				check_path_in_or_with_pipe(command_before_or, ee);
+			}
+			else if (find_redirection(command_before_or) == 1)
+			{
+				printf("jo\n");
+				handle_redirection(command_before_or, ee);
+				if (command_before_or)
+        			free(command_before_or);
+				printf("jo 2\n");
+				return (0);
+			}
 			else
         		interprete_commande(command_before_or, ee);
         	if (/*ee->command_with_or == 1 &&*/ ee->confirmed_command == 0)
-        	    interprete_commande(command_after_or, ee);	
-        	free(command_before_or);
-			free(token);
+        	    interprete_commande(command_after_or, ee);
+			if (command_before_or)
+        		free(command_before_or);
+			if (command_after_or)
+				free(command_after_or);
 			ee->command_with_or = 0;
 			ee->confirmed_command = 0;
         	return (0);
@@ -1158,22 +1257,29 @@ int	interprete_commande(char *input, t_ee *ee)
     }
 	if (find_redirection(input) == 1)
 	{
+		printf("omg\n");
 		handle_redirection(input, ee);
-		free(token);
 		return (0);
 	}
 	else
 	{
+		token = malloc(sizeof(t_token));
+		token->token = 0;
+		if (!token)
+			return (0);
+		token->token = 0; 
 		trimmed_input = skip_isspace_for_fonctions(input, token);
 		if (!trimmed_input)
 		{
-			free(token);
+			if (token)
+				free(token);
 			return (0);
 		}
 		if (token->token == 1)
 		{
 			printf("🛠️_(>_<;)_🛠️   : syntax error near unexpected token ';'\n");
-			free(token);
+			if (token)
+				free(token);
 			return (0);
 		}
 		else if (ft_strcmp(trimmed_input, "exit") == 0)
@@ -1232,8 +1338,10 @@ int	interprete_commande(char *input, t_ee *ee)
 			if (ee->minishell_check == 0)
 				execute_external_command(input, ee);
 		}
-		free(token);
-		free(trimmed_input);
+		if (token)
+			free(token);
+		if (trimmed_input)
+			free(trimmed_input);
 	}
 	return (0);
 }

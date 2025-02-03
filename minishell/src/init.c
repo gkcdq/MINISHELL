@@ -27,4 +27,5 @@ void	init_struct(t_ee *ee)
 	ee->command_with_and = 0;
 	ee->command_with_or = 0;
 	ee->confirmed_command = 0;
+	ee->space = 0;
 }
