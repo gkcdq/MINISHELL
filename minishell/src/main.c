@@ -1257,7 +1257,6 @@ int	interprete_commande(char *input, t_ee *ee)
     }
 	if (find_redirection(input) == 1)
 	{
-		printf("omg\n");
 		handle_redirection(input, ee);
 		return (0);
 	}
