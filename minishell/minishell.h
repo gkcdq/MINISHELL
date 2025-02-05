@@ -68,7 +68,7 @@ typedef struct s_envp_copy
 	int		command_with_and;
 	int		command_with_or;
 	int		confirmed_command;
-	int		space;
+	int		signal;
 }			t_ee;
 
 typedef struct s_redirection
@@ -99,7 +99,7 @@ void		ft_unset(char *input, t_ee *ee);
 // export.c
 void		ft_export(char *input, t_ee *ee);
 // echo.c
-void		ft_echo(char *input);
+void		ft_echo(char *input, t_ee *ee);
 // wc.c
 void		ft_wc(char *input);
 

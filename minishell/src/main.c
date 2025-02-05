@@ -1,6 +1,6 @@
 #include "../minishell.h"
 
-static int g_heredoc_interrupted = 0;
+static int g_status = 0;
 
 
 int	ft_strcmp(char *s1, char *s2)
@@ -230,12 +230,12 @@ void	execute_external_command(char *command, t_ee *ee)
 	pid_t	pid;
 	int		status;
 
-	(void)ee;
 	args = ft_split(command, ' ');
 	path = find_command_path(args[0]);
 	if (!path)
 	{
 		ft_printf("🍁_(`へ´*)_🍁: %s: command not found\n", args[0]);
+		ee->signal = 127;
 		if (ee->command_with_and == 1)
 			ee->check_and_validity = 1;
 		ee->command_with_or = 1;
@@ -257,6 +257,17 @@ void	execute_external_command(char *command, t_ee *ee)
 	else if (pid > 0)
 	{
 		waitpid(pid, &status, 0);
+		if (WIFEXITED(status)) 
+		{
+    		if (!g_status) 
+			{
+    	   			ee->signal = WEXITSTATUS(status);
+					if (ee->signal != 0 && ee->signal != 1 && ee->signal != 2)
+						ee->signal = 128 + ee->signal;
+    		}
+			else
+				ee->signal = 0;
+		}
 	}
 	else
 		perror("fork");
@@ -282,7 +293,6 @@ int cumulate_token(char *input, t_ee *ee)
         while (input[i] != '\0' && input[i] != ';' && !(input[i] == '&' && input[i + 1] == '&'))
             copy[j++] = input[i++];
         copy[j] = '\0';
-
         if (success)
         {
             changed_args = check_dollars(copy, ee);
@@ -341,14 +351,17 @@ void	handle_sigint(int sig)
 		rl_replace_line("", 0);
 		rl_on_new_line();
 		rl_redisplay();
+		g_status = 130;
 	}
 }
 
-void	catch_signal(void)
+void	catch_signal(t_ee *ee)
 {
+	(void)ee;
 	signal(SIGINT, handle_sigint);
 	signal(SIGQUIT, SIG_IGN);
 }
+
 
 void	you_shall_not_path(void)
 {
@@ -850,15 +863,17 @@ static int open_available(char **tmpfilename)
 
 
 
-void handle_herdoc_sigint(int sig)
+
+
+void handle_herdoc_sigint(int status)
 {
-    (void)sig;
-    g_heredoc_interrupted = 1;
-    write(STDOUT_FILENO, "\n", 1); 
-    rl_replace_line("", 0);                     
-    rl_done = 1;
-	close(STDIN_FILENO);                  
+	rl_replace_line("", 0);
+    ft_putendl_fd("\n", 1);
+    rl_on_new_line();
+	unlink("/tmp/heredoc_tmp");
+    exit(status);
 }
+
 
 int write_to_tmpfile(int fd, char *limit, char *command, t_ee *ee)
 {
@@ -876,21 +891,18 @@ int write_to_tmpfile(int fd, char *limit, char *command, t_ee *ee)
         free_split(clear_command);
         return -1;
     }
-
     stdin_bak = dup(STDIN_FILENO);
-    signal(SIGINT, handle_herdoc_sigint);  // Enregistrer le gestionnaire de signal
-    g_heredoc_interrupted = 0;
+	signal(SIGINT, handle_herdoc_sigint);
     fd = open(tmp_file_path, O_RDWR | O_CREAT | O_TRUNC, 0644);
     if (fd == -1)
     {
         free_split(clear_command);
         return -1;
     }
-
-    while (!g_heredoc_interrupted)
+    while (1)
     {
-        input = readline("🗒️🖊️  ");
-        if (g_heredoc_interrupted)
+		input = readline("🗒️🖊️  ");
+		/*if (g_status)
         {
 			if (input)
             	free(input);
@@ -898,10 +910,9 @@ int write_to_tmpfile(int fd, char *limit, char *command, t_ee *ee)
             unlink(tmp_file_path);
 			if (clear_command)
             	free_split(clear_command);
-            signal(SIGINT, SIG_DFL);
             rl_done = 0;
-            return (-1);
-        }
+            return (10);
+        }*/
         if (!input || ft_strcmp(input, limit) == 0)
         {
             free(input);
@@ -910,7 +921,6 @@ int write_to_tmpfile(int fd, char *limit, char *command, t_ee *ee)
         ft_putendl_fd(input, fd);
         free(input);
     }
-    signal(SIGINT, SIG_DFL);
     close(fd);
     fd = open(tmp_file_path, O_RDONLY);
     if (fd == -1)
@@ -973,6 +983,8 @@ int write_to_tmpfile(int fd, char *limit, char *command, t_ee *ee)
 
 
 
+
+
 void handle_redirection(char *input, t_ee *ee)
 {
     char *tmp_in;
@@ -989,6 +1001,7 @@ void handle_redirection(char *input, t_ee *ee)
     // Pour here-doc
     int fd;                                          
     char *tmpfilename = NULL;
+	int status;
 
     re = malloc(sizeof(t_redir));
     if (!re)
@@ -1017,7 +1030,7 @@ void handle_redirection(char *input, t_ee *ee)
     last_name = ft_strlonglen(split_in);
 	path = find_command_path(split_in[0]);
     pid = fork();
-    if (pid == -1) 
+    if (pid == -1)
 	{
         free_split(split_in);
         free_split(split_execv);
@@ -1025,13 +1038,17 @@ void handle_redirection(char *input, t_ee *ee)
         free(input_execv);
         return;
     }
+	signal(SIGINT, SIG_IGN);
     if (pid == 0) // proc enfant
 	{
         if (find_type_of_redirection(tmp_in) == 1) // >
 		{
             file = open(split_in[last_name - 1], O_WRONLY | O_CREAT | O_TRUNC, 0777);
             if (file == -1)
+			{
+				ft_printf("🔒_(o◇o)_🔒  : Permission denied\n");
                 exit(EXIT_FAILURE);
+			}
             dup2(file, STDOUT_FILENO);
             execv(path, split_execv);
             close(file);
@@ -1040,7 +1057,10 @@ void handle_redirection(char *input, t_ee *ee)
 		{
             file = open(split_in[last_name - 1], O_WRONLY | O_CREAT | O_APPEND, 0777);
             if (file == -1)
+            {
+				ft_printf("🔒_(o◇o)_🔒  : Permission denied\n");
                 exit(EXIT_FAILURE);
+			}
             dup2(file, STDOUT_FILENO);
             execv(path, split_execv);
             close(file);
@@ -1049,7 +1069,10 @@ void handle_redirection(char *input, t_ee *ee)
 		{
             file = open(split_in[last_name - 1], O_RDONLY);
             if (file == -1)
+			{
+				ft_printf("🔒_(o◇o)_🔒  : Permission denied\n");
                 exit(EXIT_FAILURE);
+			}
             dup2(file, STDIN_FILENO);
             execv(path, split_execv);
             close(file);
@@ -1058,7 +1081,10 @@ void handle_redirection(char *input, t_ee *ee)
 		{
             fd = open_available(&tmpfilename);
             if (fd < 0)
+            {
+				ft_printf("🔒_(o◇o)_🔒  : Permission denied\n");
                 exit(EXIT_FAILURE);
+			}
             int ret = write_to_tmpfile(fd, split_in[last_name - 1], input_execv, ee);
             close(fd);
             if (ret != 0) 
@@ -1082,14 +1108,25 @@ void handle_redirection(char *input, t_ee *ee)
         exit(EXIT_SUCCESS);
     }
 	else 
-	{ // Proc parent
-        int status;
         waitpid(pid, &status, 0);
-    }
+	if (WIFEXITED(status)) 
+	{
+    	if (!g_status) 
+		{
+    	    ee->signal = WEXITSTATUS(status);
+			if (ee->signal != 0 && ee->signal != 1)
+				ee->signal = 128 + ee->signal;
+    	}
+	}
+	signal(SIGINT, handle_sigint);
     re->command_fail = for_same_comportement(re, split_in);
-    if (re->command_fail == 1)
-        ft_printf("🍁_(`へ´*)_🍁: %s: command not found\n", split_execv[0]);
-	// rajouter peut etre un truc ici pour le && et ||
+    if (re->command_fail == 1 )
+	{
+        	ft_printf("🍁_(`へ´*)_🍁: %s: command not found\n", split_execv[0]);
+			ee->confirmed_command = 0;
+	}
+	else
+		ee->confirmed_command = 1;
     free_split(split_execv);
     free_split(split_in);
     free(input_execv);
@@ -1194,7 +1231,9 @@ void check_path_in_or_with_pipe(char *input, t_ee *ee)
 	char **split_input;
 	char *path;
 
+	//ft_printf("% -- s\n", input);
 	split_input = ft_split(input, ' ');
+	//ft_printf(" // %s\n", split_input[0]);
 	path = find_command_path(split_input[0]);
 	if (path)
 		ee->confirmed_command = 1;
@@ -1224,9 +1263,7 @@ int	interprete_commande(char *input, t_ee *ee)
 			if (ft_strchr(command_before_or, '|'))
 				command_after_or = copy_after_or(input);
 			else
-        		command_after_or = ft_strchr(input, '|') + 2;
-			ft_printf("2 ip > %s\n", command_before_or);
-			ft_printf("3 ip > %s\n", command_after_or);
+        		command_after_or = ft_strdup(ft_strchr(input, '|') + 2);
 			if (ft_strchr(command_before_or, '|'))
 			{
         	    execute_pipeline(command_before_or, ee);
@@ -1234,16 +1271,30 @@ int	interprete_commande(char *input, t_ee *ee)
 			}
 			else if (find_redirection(command_before_or) == 1)
 			{
-				printf("jo\n");
 				handle_redirection(command_before_or, ee);
-				if (command_before_or)
-        			free(command_before_or);
-				printf("jo 2\n");
-				return (0);
+				if (ee->confirmed_command == 1)
+				{
+					if (command_before_or)
+        				free(command_before_or);
+					if (command_after_or)
+						free(command_after_or);
+					return (0);
+				}
+				else
+				{
+					interprete_commande(command_after_or, ee);
+					if (command_before_or)
+        				free(command_before_or);
+					if (command_after_or)
+						free(command_after_or);
+					ee->command_with_or = 0;
+					ee->confirmed_command = 0;
+					return (0);
+				}
 			}
 			else
         		interprete_commande(command_before_or, ee);
-        	if (/*ee->command_with_or == 1 &&*/ ee->confirmed_command == 0)
+        	if (ee->confirmed_command == 0)
         	    interprete_commande(command_after_or, ee);
 			if (command_before_or)
         		free(command_before_or);
@@ -1329,19 +1380,30 @@ int	interprete_commande(char *input, t_ee *ee)
 		}
 		else if (ft_strcmp(trimmed_input, "echo") == 0)
 		{
-			ft_echo(input);
+			ft_echo(input, ee);
 			ee->confirmed_command = 1;
+		}
+		else if (ft_strcmp(trimmed_input, "$?") == 0)
+		{
+			ft_printf("🍁_(`へ´*)_🍁: 0: command not found\n");
+			ee->signal = 127;
 		}
 		else
 		{
 			if (ee->minishell_check == 0)
 				execute_external_command(input, ee);
+			if (token)
+				free(token);
+			if (trimmed_input)
+				free(trimmed_input);
+			return (0);
 		}
 		if (token)
 			free(token);
 		if (trimmed_input)
 			free(trimmed_input);
 	}
+	ee->signal = 0;
 	return (0);
 }
 /////////////////////////////////////////////////////////////////
@@ -1390,16 +1452,62 @@ void loop(char *input, t_ee *ee)
 	{
         ee->minishell_check = 1;
 	}
+	i = 0;
+	////////////////////////////////////////
+	while (input[i] && input[i] <= 32)
+		i++;
+	if (input[i] && input[i] == '&')
+	{
+		if (input[i + 1] == '&')
+			printf("🛠️_(>_<;)_🛠️   : syntax error near unexpected token `&&'\n");
+		else
+			printf("🛠️_(>_<;)_🛠️   : syntax error near unexpected token `&'\n");
+		ee->signal = 2;
+		free(input);
+    	free(tok);
+    	return;
+	}
+	if (input[i] && input[i] == '|')
+	{
+		if (input[i + 1] == '|')
+			printf("🛠️_(>_<;)_🛠️   : syntax error near unexpected token `||'\n");
+		else
+			printf("🛠️_(>_<;)_🛠️   : syntax error near unexpected token `|'\n");
+		ee->signal = 2;
+		free(input);
+    	free(tok);
+    	return;
+	}
+	if (input[i] && input[i] == ';')
+	{
+		if (input[i + 1] == ';')
+			printf("🛠️_(>_<;)_🛠️   : syntax error near unexpected token `;;'\n");
+		else
+			printf("🛠️_(>_<;)_🛠️   : syntax error near unexpected token `;'\n");
+		ee->signal = 2;
+		free(input);
+    	free(tok);
+    	return;
+	}
+	///////////////////////////////////////
+	if (g_status == 130)
+    {
+        // Affiche le code d'erreur immédiatement après Ctrl+C
+        ee->signal = 130;
+        g_status = 0; // Réinitialiser g_status après l'affichage du message
+    }
 	while (input && *input)
     {
         single_quotes = 0;
         double_quotes = 0;
-        for (i = 0; input[i] != '\0'; i++)
+		i = 0;
+        while (input[i])
         {
             if (input[i] == '\'')
                 single_quotes++;
             else if (input[i] == '"')
                 double_quotes++;
+			i++;
         }
         if (single_quotes % 2 != 0 || double_quotes % 2 != 0)
         {
@@ -1420,7 +1528,6 @@ void loop(char *input, t_ee *ee)
             strcpy(temp, input);
             strcat(temp, next_line);
 			strcat(temp, "\n");
-
             free(input);
             free(next_line);
             input = temp;
@@ -1447,8 +1554,11 @@ void loop(char *input, t_ee *ee)
                         printf("🛠️_(>_<;)_🛠️   : syntax error near unexpected token `;'\n");
                         tok->token = 0;
                     } 
-					else if (tok->token == 3) 
+					else if (tok->token == 3)
+					{
                         printf("🛠️_(>_<;)_🛠️   : syntax error near unexpected token `;;'\n");
+					}
+					ee->signal = 2;
                     free(input);
                     free(tok);
                     return;
@@ -1472,6 +1582,7 @@ void loop(char *input, t_ee *ee)
     free(tok);
 }
 
+
 int	main(int ac, char **av, char **envp)
 {
 	t_ee	*ee;
@@ -1485,11 +1596,9 @@ int	main(int ac, char **av, char **envp)
 	init_struct(ee);
 	ee->envp = copy_envp(envp);
 	ee->save_initial_path = save_initial_path(ee);
+	catch_signal(ee);
 	while (ee->minishell_check == 0)
-	{
-		catch_signal();
 		loop(input, ee);
-	}
 	i = 0;
 	while (ee->envp[i])
 	{

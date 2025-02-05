@@ -19,6 +19,7 @@ char	*parse_input_cd(char *input)
 	return (input);
 }
 
+
 void	ft_cd(char *input, t_ee *ee)
 {
 	t_cd *cd;

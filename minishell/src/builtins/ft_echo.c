@@ -1,6 +1,6 @@
 #include "../../minishell.h"
 
-void	ft_echo(char *input)
+void	ft_echo(char *input, t_ee *ee)
 {
 	char	**args;
 	bool	no_newline;
@@ -16,7 +16,10 @@ void	ft_echo(char *input)
 	}
 	while (args[i])
 	{
-		ft_printf("%s", args[i]);
+		if (ft_strcmp(args[i], "$?") == 0)
+			ft_printf("%d", ee->signal);
+		else
+			ft_printf("%s", args[i]);
 		if (args[i + 1])
 			ft_printf(" ");
 		i++;
