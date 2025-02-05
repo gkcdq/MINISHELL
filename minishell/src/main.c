@@ -1451,6 +1451,9 @@ void loop(char *input, t_ee *ee)
     if (input == NULL)
 	{
         ee->minishell_check = 1;
+		free(input);
+		free(tok);
+		return ;
 	}
 	i = 0;
 	////////////////////////////////////////
