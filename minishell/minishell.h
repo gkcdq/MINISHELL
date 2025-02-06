@@ -124,6 +124,7 @@ char		**check_dollars(char *input, t_ee *ee);
 int		interprete_commande(char *input, t_ee *ee);
 int	find_pipe(char *input);
 int	find_or(char *input);
-
+void handle_redirection(char *input, t_ee *ee);
+int	find_redirection(char *input);
 
 #endif
