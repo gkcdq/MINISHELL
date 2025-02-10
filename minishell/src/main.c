@@ -689,9 +689,8 @@ int execute_pipeline_heredoc(char *input, t_ee *ee)
 	{
 		ft_printf("🍁_(`へ´*)_🍁: %s: command not found\n", check_path[0]);
 		ee->signal = 127;
-		ee->confirmed_command = 0;
+		ee->confirmed_command = 1;
 	}
-
     return 0;
 }
 
@@ -1255,14 +1254,6 @@ char *handle_redirection_with_pipe(char *input, t_ee *ee, int *heredoc_fd, int *
         perror("🔒 Erreur allocation mémoire");
         return NULL;
     }
-	if (!path)
-	{
-		ft_printf("🍁_(`へ´*)_🍁: %s: command not found\n", split_in[0]);
-		ee->signal = 127;
-		ee->confirmed_command = 0;
-	}
-	else
-		ee->confirmed_command = 1;
     free_split(split_in);
     free(input_execv);
     free(path);
