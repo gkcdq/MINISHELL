@@ -126,5 +126,7 @@ int	find_pipe(char *input);
 int	find_or(char *input);
 void handle_redirection(char *input, t_ee *ee);
 int	find_redirection(char *input);
+char *handle_redirection_with_pipe(char *input, t_ee *ee, int *heredoc_fd, int *input_fd, int *output_fd);
+int execute_pipeline_heredoc(char *input, t_ee *ee);
 
 #endif

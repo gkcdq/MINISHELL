@@ -279,7 +279,7 @@ int	find_parenthesis(char *input);
 
 int cumulate_token(char *input, t_ee *ee)
 {
-    int i = 0, j = 0, t = 0;
+    int i = 0, j = 0; //t = 0;
     char copy[1024];
 
     char **changed_args;
@@ -291,7 +291,7 @@ int cumulate_token(char *input, t_ee *ee)
     while (input[i] != '\0')
     {
         j = 0;
-		t = 0;
+		//t = 0;
         while (input[i] != '\0' && input[i] != ';' && !(input[i] == '&' && input[i + 1] == '&'))
 		{
             	copy[j++] = input[i++];
@@ -311,8 +311,16 @@ int cumulate_token(char *input, t_ee *ee)
 					printf("1\n");
 					execute_pipeline(reconstructed_input, ee);
 				}
+				else if (find_pipe(reconstructed_input) == 1 && find_redirection(reconstructed_input) == 1)
+				{
+					printf("2\n");
+					execute_pipeline_heredoc(reconstructed_input, ee);
+				}
 				else
+				{
+					printf("3\n");
         	    	success = interprete_commande(reconstructed_input, ee) == 0;
+				}
 				if (changed_args)
         	    	free_split(changed_args);
 				if (reconstructed_input)
@@ -577,6 +585,114 @@ int execute_pipeline(char *input, t_ee *ee)
     while (wait(NULL) > 0);
     free_split(commands);
 	return (0);
+}
+
+int execute_pipeline_heredoc(char *input, t_ee *ee)
+{
+    char **commands;
+	char **check_path;
+    int pipe_fd[2];
+    int prev_fd = -1;
+    pid_t pid;
+    int i = 0;
+
+    commands = ft_split(input, '|');
+    while (commands[i])
+    {
+        int heredoc_fd, input_fd, output_fd;
+        char *final_command = handle_redirection_with_pipe(commands[i], ee, &heredoc_fd, &input_fd, &output_fd);
+        if (!final_command)
+        {
+            perror("🔒 Erreur lors du traitement des redirections");
+            free_split(commands);
+            return -1;
+        }
+
+        if (pipe(pipe_fd) == -1)
+        {
+            perror("pipe");
+            exit(EXIT_FAILURE);
+        }
+
+        pid = fork();
+        if (pid == -1)
+        {
+            perror("fork");
+            exit(EXIT_FAILURE);
+        }
+
+        if (pid == 0) // Processus enfant
+        {
+            if (prev_fd != -1)
+            {
+                dup2(prev_fd, STDIN_FILENO);
+                close(prev_fd);
+            }
+
+            if (heredoc_fd != -1)
+            {
+                dup2(heredoc_fd, STDIN_FILENO);
+                close(heredoc_fd);
+            }
+            else if (input_fd != -1)
+            {
+                dup2(input_fd, STDIN_FILENO);
+                close(input_fd);
+            }
+
+            if (commands[i + 1])
+            {
+                dup2(pipe_fd[1], STDOUT_FILENO);
+            }
+
+            if (output_fd != -1)
+            {
+                dup2(output_fd, STDOUT_FILENO);
+                close(output_fd);
+            }
+
+            close(pipe_fd[0]);
+            close(pipe_fd[1]);
+
+            // Exécuter la commande après application des redirections
+            interprete_commande(final_command, ee);
+
+            exit(EXIT_FAILURE);
+        }
+        else
+        {
+            close(pipe_fd[1]);
+            if (prev_fd != -1)
+            {
+                close(prev_fd);
+            }
+            prev_fd = pipe_fd[0];
+
+            if (heredoc_fd != -1)
+                close(heredoc_fd);
+            if (input_fd != -1)
+                close(input_fd);
+            if (output_fd != -1)
+                close(output_fd);
+        }
+
+        free(final_command);
+        i++;
+    }
+    if (prev_fd != -1)
+        close(prev_fd);
+    while (wait(NULL) > 0);
+    free_split(commands);
+	check_path = ft_split(input, ' ');
+	char *path = find_command_path(check_path[0]);
+	if (!path)
+	{
+		ft_printf("🍁_(`へ´*)_🍁: %s: command not found\n", check_path[0]);
+		ee->signal = 127;
+		ee->confirmed_command = 0;
+	}
+
+    return 0;
 }
 
 
@@ -1034,6 +1150,126 @@ char *foud_delimiter(char **split_in);
 
 
 
+char *handle_redirection_with_pipe(char *input, t_ee *ee, int *heredoc_fd, int *input_fd, int *output_fd)
+{
+    char **split_in = NULL;
+    //char *if_need_sep;
+    char *input_execv = NULL;
+    int last_name;
+    char *path;
+    char *final_command;
+    t_redir *re = NULL;
+
+    // Here-doc
+    char *heredoc_tmpfile = NULL;
+    int fd;
+    char *delimiter = NULL;
+
+    *heredoc_fd = -1;
+    *input_fd = -1;
+    *output_fd = -1;
+
+    printf("input = %s\n", input);
+    re = malloc(sizeof(t_redir));
+    if (!re)
+        return NULL;
+    re->command_fail = 0;
+    input_execv = parse_exev_input(input);
+    split_in = ft_split(unstick_to_re_stick(input), ' ');
+    if (!split_in || !split_in[0])
+    {
+        free_split(split_in);
+        free(re);
+        free(input_execv);
+        return NULL;
+    }
+    last_name = ft_strlonglen(split_in);
+    path = find_command_path(split_in[0]);
+    for (int i = 1; i < last_name; i++)
+    {
+        if (strcmp(split_in[i], "<<") == 0)
+        {
+            printf("Here-doc détecté, delimiter: %s\n", split_in[i + 1]);
+
+            fd = open_available(&heredoc_tmpfile);
+            if (fd < 0)
+            {
+                perror("🔒 Erreur création fichier here-doc");
+                return NULL;
+            }
+
+            delimiter = split_in[i + 1];
+            int ret = write_to_tmpfile(fd, delimiter, ee);
+            close(fd);
+            if (ret != 0)
+            {
+                perror("🔒 Erreur écriture here-doc");
+                unlink(heredoc_tmpfile);
+                return NULL;
+            }
+
+            *heredoc_fd = open(heredoc_tmpfile, O_RDONLY);
+            if (*heredoc_fd < 0)
+            {
+                perror("🔒 Erreur ouverture fichier here-doc");
+                unlink(heredoc_tmpfile);
+                return NULL;
+            }
+            i++;
+        }
+        else if (strcmp(split_in[i], "<") == 0)
+        {
+            *input_fd = open(split_in[i + 1], O_RDONLY);
+            if (*input_fd < 0)
+            {
+                perror("🔒 Erreur ouverture fichier '<'");
+                return NULL;
+            }
+            i++;
+        }
+        else if (strcmp(split_in[i], ">") == 0)
+        {
+            *output_fd = open(split_in[i + 1], O_WRONLY | O_CREAT | O_TRUNC, 0777);
+            if (*output_fd < 0)
+            {
+                perror("🔒 Erreur ouverture fichier '>'");
+                return NULL;
+            }
+            i++;
+        }
+        else if (strcmp(split_in[i], ">>") == 0)
+        {
+            *output_fd = open(split_in[i + 1], O_WRONLY | O_CREAT | O_APPEND, 0777);
+            if (*output_fd < 0)
+            {
+                perror("🔒 Erreur ouverture fichier '>>'");
+                return NULL;
+            }
+            i++;
+        }
+    }
+    // Préparer la commande sans les redirections
+    final_command = strdup(input_execv);
+    if (!final_command)
+    {
+        perror("🔒 Erreur allocation mémoire");
+        return NULL;
+    }
+	if (!path)
+	{
+		ft_printf("🍁_(`へ´*)_🍁: %s: command not found\n", split_in[0]);
+		ee->signal = 127;
+		ee->confirmed_command = 0;
+	}
+	else
+		ee->confirmed_command = 1;
+    free_split(split_in);
+    free(input_execv);
+    free(path);
+    free(re);
+    return final_command;
+}
+
 
 
 
@@ -1073,7 +1309,7 @@ void handle_redirection(char *input, t_ee *ee)
 
 
 
-	printf("input = %s\n", input);
+	printf("hdr - input = %s\n", input);
     re = malloc(sizeof(t_redir));
     if (!re)
         return;
@@ -1211,6 +1447,14 @@ void handle_redirection(char *input, t_ee *ee)
             }
         }
     }
+	if (!path)
+	{
+		ft_printf("🍁_(`へ´*)_🍁: %s: command not found\n", split_in[0]);
+		ee->signal = 127;
+		ee->confirmed_command = 0;
+	}
+	else
+		ee->confirmed_command = 1;
     signal(SIGINT, handle_sigint);  
     free_split(split_execv);
     free_split(split_in);
