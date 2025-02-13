@@ -128,5 +128,10 @@ void handle_redirection(char *input, t_ee *ee);
 int	find_redirection(char *input);
 char *handle_redirection_with_pipe(char *input, t_ee *ee, int *heredoc_fd, int *input_fd, int *output_fd);
 int execute_pipeline_heredoc(char *input, t_ee *ee);
+int cumulate_token(char *input, t_ee *ee);
+char *copy_before_or(char *src);
+char *copy_after_or(char *src);
+void check_path_in_or_with_pipe(char *input, t_ee *ee);
+int check_after_or(char *input);
 
 #endif
