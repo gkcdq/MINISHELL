@@ -1702,6 +1702,7 @@ int	interprete_commande(char *input, t_ee *ee)
 			{
 				ee->save_result = 1;
 			}
+			free(see_what_after);
 			free(path);
 			//ft_printf("%s\n", command_after_or);
 			cumulate_token(command_before_or, ee);
@@ -1710,7 +1711,10 @@ int	interprete_commande(char *input, t_ee *ee)
 			{
         	    cumulate_token(command_after_or, ee);
 				if (ee->save_result == 1)
+				{
 					ee->check_and_validity = 1;
+					ee->save_result = 0;
+				}
 			}
 			if (command_before_or)
         		free(command_before_or);
