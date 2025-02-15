@@ -426,13 +426,33 @@ void	its_just_a_parenthese(char *input, t_ee *ee)
         waitpid(pid, &status, 0);
         if (WIFEXITED(status))
             ee->signal = WEXITSTATUS(status);
-		//if (ee->signal == 127)
-		//	ee->check_and_validity = 1;
+		if (ee->signal == 127)
+			ee->check_and_validity = 1;
     }
     free(clean_input);
 }
 
+int	check_after_token(char *input, int i)
+{
+	int confirme;
 
+	confirme = 0;
+	if (input[i] && input[i + 1])
+		i++;
+	while (input[i] && input[i] <= 32)
+	{
+		if (input[i] > 32)
+		{
+			confirme = 1;
+			break ;
+		}
+		i++;
+	}
+	if (confirme == 1)
+		return (0);
+	else
+		return (1);
+}
 
 int cumulate_token(char *input, t_ee *ee)
 {
@@ -473,22 +493,27 @@ int cumulate_token(char *input, t_ee *ee)
 				if (find_parenthesis(copy) == 1)
 				{
 					//ft_printf("-  1  -\n");
+					//ft_printf("%s\n\n", reconstruted_input);
 					its_just_a_parenthese(copy, ee);
 					//printf("ee->signal = %d\n", ee->signal);
 				}
 				else if (find_pipe(reconstructed_input) == 1 && find_or(reconstructed_input) == 0 && find_redirection(reconstructed_input) == 0)
 				{
 					//printf("-  2  -\n");
+					//ft_printf("%s\n\n", reconstruted_input);
 					execute_pipeline(reconstructed_input, ee);
 					//printf("%d\n", ee->check_and_validity);
 				}
 				else if (find_pipe(reconstructed_input) == 1 && find_redirection(reconstructed_input) == 1)
 				{
 					//printf("-  3  -\n");
+					//ft_printf("%s\n\n", reconstruted_input);
 					execute_pipeline_heredoc(reconstructed_input, ee);
 				}
 				else
 				{
+					//printf("-  4  -\n");
+					//ft_printf("%s\n\n", reconstruted_input);
         	    	success = interprete_commande(reconstructed_input, ee) == 0;
 				}
 				if (changed_args)
@@ -506,7 +531,10 @@ int cumulate_token(char *input, t_ee *ee)
         	if (input[i] == ';')
         	{
         	    success = true;
-        	    i++;
+				if (check_after_token(input, i) == 1)
+					break ;
+				else
+        	    	i++;
         	}
 			if (input[i] == '&' && input[i + 1] == '&')
 				i += 2;
@@ -695,6 +723,56 @@ int calcul_check_path(char **check_path)
 	return (i);
 }	
 
+#include <stdlib.h>
+
+char *parse_input_pipeline(char *input)
+{
+	int i = 0, j = 0, count = 0;
+	char *tmp;
+
+	if (!input) // Vérification de l'entrée NULL
+		return (NULL);
+
+	// Première boucle : compter le nombre d'espaces supplémentaires à ajouter
+	while (input[i])
+	{
+		if (input[i] == '|')
+		{
+			if (i > 0 && input[i - 1] > 32) // Vérifie si '|' est collé à un mot avant
+				count++;
+			if (input[i + 1] && input[i + 1] > 32) // Vérifie si '|' est collé à un mot après
+				count++;
+		}
+		i++;
+	}
+
+	// Allocation mémoire pour la nouvelle chaîne
+	tmp = malloc(sizeof(char) * (i + count + 1));
+	if (!tmp)
+		return (NULL);
+
+	// Deuxième boucle : construction de la nouvelle chaîne avec espaces
+	i = 0;
+	while (input[i])
+	{
+		if (input[i] == '|')
+		{
+			if (j > 0 && tmp[j - 1] > 32) // Ajoute un espace avant '|' si nécessaire
+				tmp[j++] = ' ';
+			tmp[j++] = '|';
+			if (input[i + 1] && input[i + 1] > 32) // Ajoute un espace après '|' si nécessaire
+				tmp[j++] = ' ';
+		}
+		else
+			tmp[j++] = input[i];
+		i++;
+	}
+	tmp[j] = '\0';
+
+	return (tmp);
+}
+
+
 int execute_pipeline(char *input, t_ee *ee) 
 {
     char **commands;
@@ -703,6 +781,7 @@ int execute_pipeline(char *input, t_ee *ee)
     pid_t pid;
     int i = 0;
 
+	input = parse_input_pipeline(input);
     commands = ft_split(input, '|');
     while (commands[i])
 	{
@@ -764,12 +843,18 @@ int execute_pipeline(char *input, t_ee *ee)
 	if (!path)
 	{
 		ee->signal = 127;
+		ee->check_and_validity = 1;
 		ee->confirmed_command = 0;
 	}
 	else
+	{
+		ee->signal = 0;
+		ee->check_and_validity = 0;
 		ee->confirmed_command = 1;
+	}
 	free_split(check_path);
 	free(path);
+	free(input);
 	return (0);
 }
 
@@ -867,7 +952,14 @@ int execute_pipeline_heredoc(char *input, t_ee *ee)
 	if (!path)
 	{
 		ee->signal = 127;
+		ee->check_and_validity = 1;
 		ee->confirmed_command = 0;
+	}
+	else
+	{
+		ee->signal = 0;
+		ee->check_and_validity = 0;
+		ee->confirmed_command = 1;
 	}
     return 0;
 }
@@ -1629,7 +1721,9 @@ char *copy_after_or(char *src)
 	int j = 0;
 	char *tmp;
 
-	//printf("src = %s\n", src);
+	if (!src || src == NULL)
+		return (NULL);
+	//printf("\tsrc = %s\n", src);
 	while (src && src[i])
 	{
 		if (src[i] == '(')
@@ -1641,9 +1735,9 @@ char *copy_after_or(char *src)
 			break;
 		i++;
 	}
-	i += 2;
 	if (src[i] == '\0')
 		return (NULL);
+	i += 2;
 	//printf("src[i] = %c\n", src[i]);
 	k = ft_strlen(src);
 	tmp = malloc(sizeof(char) * (k - i + 1));
@@ -1659,6 +1753,9 @@ char *copy_after_or(char *src)
 		j++;
 	}
 	tmp[j] = '\0';
+	//printf("tmp = %s\n", tmp);
+	if (tmp == NULL)
+		free(tmp);
 	return (tmp);
 }
 
@@ -1850,6 +1947,43 @@ int	find_pipe(char *input)
 
 /////////////////////////////////////////////////////////////////
 
+int	check_the_end(char *input)
+{
+	int i = 0;
+	int count_first = 0;
+	int count_last = 0;
+
+	while (input && input[i])
+		i++;
+	while (input[i - 1] <= 32)
+		i--;
+	i--;
+	if (input[i] == '(')
+	{
+		ft_printf("🛠️_(>_<;)_🛠️   : syntax error near unexpected token `newline'\n");
+		return (1);
+	}
+	if ((input[i] == '|' || input[i] == '&'))
+		return (1);
+	i = 0;
+	while (input[i])
+	{
+		if (input[i] == '(')
+			count_first++;
+		if (input[i] == ')')
+			count_last++;
+		i++;
+	}
+	if (count_last > count_first)
+	{
+		ft_printf("🛠️_(>_<;)_🛠️   : syntax error near unexpected token `)'\n");
+		return (1);
+	}
+	if (count_last < count_first)
+		return (1);
+	return (0);
+}
+
 void loop(char *input, t_ee *ee)
 {
     t_token *tok;
@@ -1877,9 +2011,15 @@ void loop(char *input, t_ee *ee)
 		free(tok);
 		return ;
 	}
-	printf("%s\n", input);
+	add_history(input);
+	int check = check_the_end(input);
+	if (check == 1)
+	{
+		free(input);
+		free(tok);
+		return ;
+	}
 	i = 0;
-	////////////////////////////////////////
 	while (input[i] && input[i] <= 32)
 		i++;
 	if (input[i] && input[i] == '&')
@@ -1936,12 +2076,10 @@ void loop(char *input, t_ee *ee)
 		}
 		i++;
 	}
-	///////////////////////////////////////
 	if (g_status == 130)
     {
-        // Affiche le code d'erreur immédiatement après Ctrl+C
         ee->signal = 130;
-        g_status = 0; // Réinitialiser g_status après l'affichage du message
+        g_status = 0;
     }
 	while (input && *input)
     {
@@ -1986,7 +2124,7 @@ void loop(char *input, t_ee *ee)
     }
     if (input && *input)
 	{
-        add_history(input);
+        //add_history(input);
         cleaned_input = handle_quotes(input, ee);
         free(input);
         input = cleaned_input;
@@ -2011,8 +2149,9 @@ void loop(char *input, t_ee *ee)
                     return;
                 }
             }
-			printf("%s\n", input);
-            if (find_pipe(input) == 0 && cumulate_token(input, ee) == 1)
+			//printf("%s\n", input);
+			cumulate_token(input, ee);
+            /*if (find_pipe(input) == 0 && cumulate_token(input, ee) == 1)
             	execute_pipeline(input, ee);
 			else if (find_pipe(input) == 1 && cumulate_token(input, ee) == 1)
 			{
@@ -2022,7 +2161,7 @@ void loop(char *input, t_ee *ee)
                 free(input);
                 input = reconstruct_input(changed_args);
                 interprete_commande(input, ee);
-            }
+            }*/
         }
     }
     free_split(changed_args);
