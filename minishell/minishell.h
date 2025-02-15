@@ -69,6 +69,7 @@ typedef struct s_envp_copy
 	int		command_with_or;
 	int		confirmed_command;
 	int		signal;
+	int		save_result;
 }			t_ee;
 
 typedef struct s_redirection

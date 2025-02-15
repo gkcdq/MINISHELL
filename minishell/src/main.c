@@ -234,7 +234,6 @@ void	execute_external_command(char *command, t_ee *ee)
 	path = find_command_path(args[0]);
 	if (!path)
 	{
-		printf("3");
 		ft_printf("🍁_(`へ´*)_🍁: %s: command not found\n", args[0]);
 		ee->signal = 127;
 		if (ee->command_with_and == 1)
@@ -358,6 +357,7 @@ int	do_you_find_or_what(char *input)
 	return (0);
 }
 
+
 void	its_just_a_parenthese(char *input, t_ee *ee)
 {
     char *clean_input;
@@ -368,7 +368,6 @@ void	its_just_a_parenthese(char *input, t_ee *ee)
 	if (do_you_find_or_what(input) == 1)
 	{
 		command_before_or = copy_before_or(input);
-		//si ya un pipe dans command before or , alors check le path 
 		command_after_or = copy_after_or(input);
 		has_parentheses = (find_parenthesis(command_after_or) == 1);
         cumulate_token(command_before_or, ee);
@@ -427,6 +426,8 @@ void	its_just_a_parenthese(char *input, t_ee *ee)
         waitpid(pid, &status, 0);
         if (WIFEXITED(status))
             ee->signal = WEXITSTATUS(status);
+		//if (ee->signal == 127)
+		//	ee->check_and_validity = 1;
     }
     free(clean_input);
 }
@@ -440,8 +441,7 @@ int cumulate_token(char *input, t_ee *ee)
     char **changed_args;
     bool success = true;
 	char *reconstructed_input;
-
-	//printf("\tc t i = %s\n", input);
+	
     if (!input || input[i] == '\0')
         return (1);
     while (input[i] != '\0')
@@ -472,17 +472,15 @@ int cumulate_token(char *input, t_ee *ee)
         	    reconstructed_input = reconstruct_input(changed_args);
 				if (find_parenthesis(copy) == 1)
 				{
-					ft_printf("-  1  -\n");
+					//ft_printf("-  1  -\n");
 					its_just_a_parenthese(copy, ee);
-					printf("ee->signal = %d\n", ee->signal);
-					//if (ee->signal == 127)
-					//	ee->check_and_validity = 1;
-						//ee->command_with_or = 1;
+					//printf("ee->signal = %d\n", ee->signal);
 				}
 				else if (find_pipe(reconstructed_input) == 1 && find_or(reconstructed_input) == 0 && find_redirection(reconstructed_input) == 0)
 				{
 					//printf("-  2  -\n");
 					execute_pipeline(reconstructed_input, ee);
+					//printf("%d\n", ee->check_and_validity);
 				}
 				else if (find_pipe(reconstructed_input) == 1 && find_redirection(reconstructed_input) == 1)
 				{
@@ -491,7 +489,6 @@ int cumulate_token(char *input, t_ee *ee)
 				}
 				else
 				{
-					//printf("-  4  -\n");
         	    	success = interprete_commande(reconstructed_input, ee) == 0;
 				}
 				if (changed_args)
@@ -758,7 +755,7 @@ int execute_pipeline(char *input, t_ee *ee)
 	{
 		ft_printf("🍁_(`へ´*)_🍁: %s: command not found\n", check_path[0]);
 		//ee->signal = 127;
-		ee->confirmed_command = 1;
+
 	}
 	free_split(check_path);
 	free(path);
@@ -767,10 +764,12 @@ int execute_pipeline(char *input, t_ee *ee)
 	if (!path)
 	{
 		ee->signal = 127;
-		ee->confirmed_command = 1;
+		ee->confirmed_command = 0;
 	}
 	else
-		ee->signal = 0;
+		ee->confirmed_command = 1;
+	free_split(check_path);
+	free(path);
 	return (0);
 }
 
@@ -860,8 +859,15 @@ int execute_pipeline_heredoc(char *input, t_ee *ee)
 	if (!path)
 	{
 		ft_printf("🍁_(`へ´*)_🍁: %s: command not found\n", check_path[0]);
+	}
+	free_split(check_path);
+	free(path);
+	check_path = ft_split(input, ' ');
+	path = find_command_path(check_path[calcul_check_path(check_path)]);
+	if (!path)
+	{
 		ee->signal = 127;
-		ee->confirmed_command = 1;
+		ee->confirmed_command = 0;
 	}
     return 0;
 }
@@ -1679,19 +1685,33 @@ int	interprete_commande(char *input, t_ee *ee)
 	t_token	*token;
 	// pour ||
 	char *command_before_or;
-	char *command_after_or;
+	char *command_after_or = NULL;
+	//char *path;
 
 
-	//ft_printf("interpret_command_input > %s\n", input);
+	//ft_printf("\tinterpret_command_input > %s\n", input);
 	if (find_or(input) == 1)
 	{
 		if (check_after_or(input) == 0)
 		{
 			command_before_or = copy_before_or(input);
 			command_after_or = copy_after_or(input);
+			char *see_what_after = copy_after_or(command_after_or);
+			char *path = find_command_path(command_after_or);
+			if (see_what_after == NULL && !path)
+			{
+				ee->save_result = 1;
+			}
+			free(path);
+			//ft_printf("%s\n", command_after_or);
 			cumulate_token(command_before_or, ee);
+			//printf("confirmed_command = %d\n", ee->confirmed_command);
         	if (ee->confirmed_command == 0)
+			{
         	    cumulate_token(command_after_or, ee);
+				if (ee->save_result == 1)
+					ee->check_and_validity = 1;
+			}
 			if (command_before_or)
         		free(command_before_or);
 			if (command_after_or)
@@ -1701,6 +1721,7 @@ int	interprete_commande(char *input, t_ee *ee)
         	return (0);
 		}
     }
+	//printf("'%s'\n", command_after_or);
 	if (find_redirection(input) == 1)
 	{
 		handle_redirection(input, ee);
@@ -1852,6 +1873,7 @@ void loop(char *input, t_ee *ee)
 		free(tok);
 		return ;
 	}
+	printf("%s\n", input);
 	i = 0;
 	////////////////////////////////////////
 	while (input[i] && input[i] <= 32)
@@ -1985,6 +2007,7 @@ void loop(char *input, t_ee *ee)
                     return;
                 }
             }
+			printf("%s\n", input);
             if (find_pipe(input) == 0 && cumulate_token(input, ee) == 1)
             	execute_pipeline(input, ee);
 			else if (find_pipe(input) == 1 && cumulate_token(input, ee) == 1)
