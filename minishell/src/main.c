@@ -2,7 +2,6 @@
 
 static int g_status = 0;
 
-
 int	ft_strcmp(char *s1, char *s2)
 {
 	int	i;
@@ -17,7 +16,6 @@ int	ft_strcmp(char *s1, char *s2)
 	}
 	return (0);
 }
-//    utils.c    /////////////////////////////////////////
 
 int	is_number(char *str)
 {
@@ -163,11 +161,7 @@ int	token_found(char *input, t_token *tok)
 	return (0);
 }
 
-////////////////////////////////////////////////////////
-
 void	execute_external_command(char *command, t_ee *ee);
-
-
 char	*ft_strcat(char *dest, const char *src)
 {
 	int	i;
@@ -219,9 +213,6 @@ char	*find_command_path(char *command)
 	free_split(dirs);
 	return (full_path);
 }
-
-
-
 
 void	execute_external_command(char *command, t_ee *ee)
 {
@@ -288,23 +279,28 @@ int	find_parenthesis(char *input)
 	return (0);
 }
 
-
-char *remove_parentheses(char *input) {
+char *remove_parentheses(char *input) 
+{
     int i = 0, j = 0, level = 0;
-    char *tmp = malloc(sizeof(char) * (ft_strlen(input) + 1)); // +1 pour '\0'
+    char *tmp;
+	
+	tmp = malloc(sizeof(char) * (ft_strlen(input) + 1));
     if (!tmp)
-        return NULL; // Gestion d'erreur malloc
-
+        return NULL;
     while (input[i]) {
-        if (input[i] == '(') {
-            if (level > 0) // On garde seulement le contenu interne
+        if (input[i] == '(') 
+		{
+            if (level > 0)
                 tmp[j++] = input[i];
             level++;
-        } else if (input[i] == ')') {
+        } else if (input[i] == ')') 
+		{
             level--;
-            if (level > 0) // On garde seulement le contenu interne
+            if (level > 0)
                 tmp[j++] = input[i];
-        } else {
+        } 
+		else 
+		{
             if (level > 0 || (level == 0 && input[i] != ')'))
                 tmp[j++] = input[i];
         }
@@ -314,31 +310,6 @@ char *remove_parentheses(char *input) {
     return tmp;
 }
 
-
-
-/*char *remove_parentheses(char *input)
-{
-    int i = 0;
-	int j = 0;
-	char *tmp;
-
-	tmp = malloc(sizeof(char) * (ft_strlen(input) - 1));
-	while (input[i] && input[i] != '(')
-	{
-		tmp[j++] = input[i++];
-	}
-	// je suis sur la parenthese
-	i++;
-	while (input[i] && input[i] != ')')
-	{
-		if (input[i] == ')')
-			break;
-		tmp[j++] = input[i++];
-	}
-	tmp[j] = '\0';
-	return (tmp);
-
-}*/
 int	do_you_find_or_what(char *input)
 {
 	int i = 0;
@@ -356,7 +327,6 @@ int	do_you_find_or_what(char *input)
 	}
 	return (0);
 }
-
 
 void	its_just_a_parenthese(char *input, t_ee *ee)
 {
@@ -397,9 +367,7 @@ void	its_just_a_parenthese(char *input, t_ee *ee)
 				}
 			}
 			else
-			{
 				cumulate_token(command_after_or, ee);
-			}
 		}
 		free(command_before_or);
 		free(command_after_or);
@@ -480,10 +448,8 @@ int cumulate_token(char *input, t_ee *ee)
             		copy[j++] = input[i++];
 		}
         copy[j] = '\0';
-		//printf("\tcopy = %s\n", copy);
 		if (input[i] == '&' && input[i + 1] == '&')
 			ee->command_with_and = 1;
-		//printf("--copy = %s\n", copy);
         	if (success)
         	{
         	    changed_args = check_dollars(copy, ee);
@@ -491,31 +457,13 @@ int cumulate_token(char *input, t_ee *ee)
         	        return 1;
         	    reconstructed_input = reconstruct_input(changed_args);
 				if (find_parenthesis(copy) == 1)
-				{
-					//ft_printf("-  1  -\n");
-					//ft_printf("%s\n\n", reconstruted_input);
 					its_just_a_parenthese(copy, ee);
-					//printf("ee->signal = %d\n", ee->signal);
-				}
 				else if (find_pipe(reconstructed_input) == 1 && find_or(reconstructed_input) == 0 && find_redirection(reconstructed_input) == 0)
-				{
-					//printf("-  2  -\n");
-					//ft_printf("%s\n\n", reconstruted_input);
 					execute_pipeline(reconstructed_input, ee);
-					//printf("%d\n", ee->check_and_validity);
-				}
 				else if (find_pipe(reconstructed_input) == 1 && find_redirection(reconstructed_input) == 1)
-				{
-					//printf("-  3  -\n");
-					//ft_printf("%s\n\n", reconstruted_input);
 					execute_pipeline_heredoc(reconstructed_input, ee);
-				}
 				else
-				{
-					//printf("-  4  -\n");
-					//ft_printf("%s\n\n", reconstruted_input);
         	    	success = interprete_commande(reconstructed_input, ee) == 0;
-				}
 				if (changed_args)
         	    	free_split(changed_args);
 				if (reconstructed_input)
@@ -523,7 +471,6 @@ int cumulate_token(char *input, t_ee *ee)
         	}
         	if (ee->check_and_validity == 1)
         	{
-				//printf("qwer\n");
 				success = false;
 				ee->check_and_validity = 0;
         	}
@@ -541,20 +488,6 @@ int cumulate_token(char *input, t_ee *ee)
    		}
     return 0;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 void	handle_sigint(int sig)
 {
@@ -574,7 +507,6 @@ void	catch_signal(t_ee *ee)
 	signal(SIGINT, handle_sigint);
 	signal(SIGQUIT, SIG_IGN);
 }
-
 
 void	you_shall_not_path(void)
 {
@@ -709,6 +641,7 @@ char	*reconstruct_input(char **changed_args)
 	*current_pos = '\0';
 	return (new_input);
 }
+
 int calcul_check_path(char **check_path)
 {
 	int i = 0;
@@ -721,46 +654,38 @@ int calcul_check_path(char **check_path)
 	}
 	i++;
 	return (i);
-}	
-
-#include <stdlib.h>
+}
 
 char *parse_input_pipeline(char *input)
 {
 	int i = 0, j = 0, count = 0;
 	char *tmp;
 
-	if (!input) // Vérification de l'entrée NULL
+	if (!input)
 		return (NULL);
-
-	// Première boucle : compter le nombre d'espaces supplémentaires à ajouter
 	while (input[i])
 	{
 		if (input[i] == '|')
 		{
-			if (i > 0 && input[i - 1] > 32) // Vérifie si '|' est collé à un mot avant
+			if (i > 0 && input[i - 1] > 32)
 				count++;
-			if (input[i + 1] && input[i + 1] > 32) // Vérifie si '|' est collé à un mot après
+			if (input[i + 1] && input[i + 1] > 32)
 				count++;
 		}
 		i++;
 	}
-
-	// Allocation mémoire pour la nouvelle chaîne
 	tmp = malloc(sizeof(char) * (i + count + 1));
 	if (!tmp)
 		return (NULL);
-
-	// Deuxième boucle : construction de la nouvelle chaîne avec espaces
 	i = 0;
 	while (input[i])
 	{
 		if (input[i] == '|')
 		{
-			if (j > 0 && tmp[j - 1] > 32) // Ajoute un espace avant '|' si nécessaire
+			if (j > 0 && tmp[j - 1] > 32)
 				tmp[j++] = ' ';
 			tmp[j++] = '|';
-			if (input[i + 1] && input[i + 1] > 32) // Ajoute un espace après '|' si nécessaire
+			if (input[i + 1] && input[i + 1] > 32)
 				tmp[j++] = ' ';
 		}
 		else
@@ -768,10 +693,8 @@ char *parse_input_pipeline(char *input)
 		i++;
 	}
 	tmp[j] = '\0';
-
 	return (tmp);
 }
-
 
 int execute_pipeline(char *input, t_ee *ee) 
 {
@@ -828,14 +751,9 @@ int execute_pipeline(char *input, t_ee *ee)
     while (wait(NULL) > 0);
     free_split(commands);
 	char **check_path = ft_split(input, ' ');
-	//printf("%s\n", check_path[0]);
 	char *path = find_command_path(check_path[0]);
 	if (!path)
-	{
 		ft_printf("🍁_(`へ´*)_🍁: %s: command not found\n", check_path[0]);
-		//ee->signal = 127;
-
-	}
 	free_split(check_path);
 	free(path);
 	check_path = ft_split(input, ' ');
@@ -858,7 +776,6 @@ int execute_pipeline(char *input, t_ee *ee)
 	return (0);
 }
 
-
 int execute_pipeline_heredoc(char *input, t_ee *ee)
 {
     char **commands;
@@ -868,6 +785,7 @@ int execute_pipeline_heredoc(char *input, t_ee *ee)
     pid_t pid;
     int i = 0;
 
+    input = parse_input_pipeline(input);
     commands = ft_split(input, '|');
     while (commands[i])
     {
@@ -961,9 +879,9 @@ int execute_pipeline_heredoc(char *input, t_ee *ee)
 		ee->check_and_validity = 0;
 		ee->confirmed_command = 1;
 	}
+	free(input);
     return 0;
 }
-
 
 char *find_env_var(const char *var_name, t_ee *ee)
 {
@@ -978,7 +896,6 @@ char *find_env_var(const char *var_name, t_ee *ee)
     }
     return NULL;
 }
-
 
 char *expand_variable(char *input, t_ee *ee)
 {
@@ -999,7 +916,6 @@ char *expand_variable(char *input, t_ee *ee)
         return value;
     return ft_strdup("");
 }
-
 
 char *handle_quotes(char *input, t_ee *ee)
 {
@@ -1061,9 +977,6 @@ char *handle_quotes(char *input, t_ee *ee)
     return result;
 }
 
-
-
-
 int	check_string(char *input)
 {
 	int	i;
@@ -1113,9 +1026,6 @@ char	*save_initial_path(t_ee *ee)
 	return (tmp);
 }
 
-
-
-
 int	find_redirection(char *input)
 {
 	int i = 0;
@@ -1141,15 +1051,14 @@ int find_type_of_redirection(char *tmp_in)
             return (2);
         
         else if (tmp_in[i] == '<' && tmp_in[i + 1] != '<')
-            return (1);  // Redirection d'entrée simple "<"
+            return (1);
         else if (tmp_in[i] == '<' && tmp_in[i + 1] == '<')
             return (4); 
         
         i++;
     }
-    return (0);  // Pas de redirection trouvée
+    return (0);
 }
-
 
 char	*parse_exev_input(char *tmp_in)
 {
@@ -1234,33 +1143,6 @@ i = 0;
     return good_sep;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 int open_available(char **tmpfilename)
 {
     int fd;
@@ -1323,14 +1205,7 @@ int write_to_tmpfile(int fd, char *limit, t_ee *ee)
     return 0;
 }
 
-
 char *foud_delimiter(char **split_in);
-
-
-
-
-
-
 char *handle_redirection_with_pipe(char *input, t_ee *ee, int *heredoc_fd, int *input_fd, int *output_fd)
 {
     char **split_in = NULL;
@@ -1436,15 +1311,6 @@ char *handle_redirection_with_pipe(char *input, t_ee *ee, int *heredoc_fd, int *
     free(re);
     return final_command;
 }
-
-
-
-
-
-
-
-
-
 
 void handle_redirection(char *input, t_ee *ee)
 {
@@ -1620,23 +1486,6 @@ void handle_redirection(char *input, t_ee *ee)
     free(re);
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 char *foud_delimiter(char **split_in)
 {
 	char *tmp;
@@ -1652,7 +1501,6 @@ char *foud_delimiter(char **split_in)
 	tmp = ft_strdup(split_in[i]);
 	return (tmp);
 }
-
 
 int check_after_or(char *input)
 {
@@ -1670,9 +1518,6 @@ int check_after_or(char *input)
 	}
 	return (0);
 }
-
-
-///////////////////////////////////////////////////////////////////////////
 
 int	find_or(char *input)
 {
@@ -1723,7 +1568,6 @@ char *copy_after_or(char *src)
 
 	if (!src || src == NULL)
 		return (NULL);
-	//printf("\tsrc = %s\n", src);
 	while (src && src[i])
 	{
 		if (src[i] == '(')
@@ -1738,7 +1582,6 @@ char *copy_after_or(char *src)
 	if (src[i] == '\0')
 		return (NULL);
 	i += 2;
-	//printf("src[i] = %c\n", src[i]);
 	k = ft_strlen(src);
 	tmp = malloc(sizeof(char) * (k - i + 1));
 	if (!tmp)
@@ -1753,7 +1596,6 @@ char *copy_after_or(char *src)
 		j++;
 	}
 	tmp[j] = '\0';
-	//printf("tmp = %s\n", tmp);
 	if (tmp == NULL)
 		free(tmp);
 	return (tmp);
@@ -1764,9 +1606,7 @@ void check_path_in_or_with_pipe(char *input, t_ee *ee)
 	char **split_input;
 	char *path;
 
-	//ft_printf("% -- s\n", input);
 	split_input = ft_split(input, ' ');
-	//ft_printf(" // %s\n", split_input[0]);
 	path = find_command_path(split_input[0]);
 	if (path)
 		ee->confirmed_command = 1;
@@ -1775,7 +1615,6 @@ void check_path_in_or_with_pipe(char *input, t_ee *ee)
 	return ;
 }
 
-///////////////////////////////////////////////////////////////////////////
 int	interprete_commande(char *input, t_ee *ee)
 {
 	char	*trimmed_input;
@@ -1783,10 +1622,7 @@ int	interprete_commande(char *input, t_ee *ee)
 	// pour ||
 	char *command_before_or;
 	char *command_after_or = NULL;
-	//char *path;
 
-
-	//ft_printf("\tinterpret_command_input > %s\n", input);
 	if (find_or(input) == 1)
 	{
 		if (check_after_or(input) == 0)
@@ -1801,9 +1637,7 @@ int	interprete_commande(char *input, t_ee *ee)
 			}
 			free(see_what_after);
 			free(path);
-			//ft_printf("%s\n", command_after_or);
 			cumulate_token(command_before_or, ee);
-			//printf("confirmed_command = %d\n", ee->confirmed_command);
         	if (ee->confirmed_command == 0)
 			{
         	    cumulate_token(command_after_or, ee);
@@ -1822,7 +1656,6 @@ int	interprete_commande(char *input, t_ee *ee)
         	return (0);
 		}
     }
-	//printf("'%s'\n", command_after_or);
 	if (find_redirection(input) == 1)
 	{
 		handle_redirection(input, ee);
@@ -1925,10 +1758,6 @@ int	interprete_commande(char *input, t_ee *ee)
 	ee->signal = 0;
 	return (0);
 }
-/////////////////////////////////////////////////////////////////
-
-
-
 
 int	find_pipe(char *input)
 {
@@ -1944,8 +1773,6 @@ int	find_pipe(char *input)
     }
     return (0);
 }
-
-/////////////////////////////////////////////////////////////////
 
 int	check_the_end(char *input)
 {
@@ -2124,7 +1951,6 @@ void loop(char *input, t_ee *ee)
     }
     if (input && *input)
 	{
-        //add_history(input);
         cleaned_input = handle_quotes(input, ee);
         free(input);
         input = cleaned_input;
@@ -2149,19 +1975,7 @@ void loop(char *input, t_ee *ee)
                     return;
                 }
             }
-			//printf("%s\n", input);
 			cumulate_token(input, ee);
-            /*if (find_pipe(input) == 0 && cumulate_token(input, ee) == 1)
-            	execute_pipeline(input, ee);
-			else if (find_pipe(input) == 1 && cumulate_token(input, ee) == 1)
-			{
-                changed_args = check_dollars(input, ee);
-                if (!changed_args)
-                    return;
-                free(input);
-                input = reconstruct_input(changed_args);
-                interprete_commande(input, ee);
-            }*/
         }
     }
     free_split(changed_args);
