@@ -457,13 +457,25 @@ int cumulate_token(char *input, t_ee *ee)
         	        return 1;
         	    reconstructed_input = reconstruct_input(changed_args);
 				if (find_parenthesis(copy) == 1)
+				{
+					//printf("-1-\n");
 					its_just_a_parenthese(copy, ee);
+				}
 				else if (find_pipe(reconstructed_input) == 1 && find_or(reconstructed_input) == 0 && find_redirection(reconstructed_input) == 0)
+				{
+					//printf("-2-\n");
 					execute_pipeline(reconstructed_input, ee);
+				}
 				else if (find_pipe(reconstructed_input) == 1 && find_redirection(reconstructed_input) == 1)
+				{
+					//printf("-3-\n");
 					execute_pipeline_heredoc(reconstructed_input, ee);
+				}
 				else
+				{
+					//printf("-4-\n");
         	    	success = interprete_commande(reconstructed_input, ee) == 0;
+				}
 				if (changed_args)
         	    	free_split(changed_args);
 				if (reconstructed_input)
@@ -478,8 +490,11 @@ int cumulate_token(char *input, t_ee *ee)
         	if (input[i] == ';')
         	{
         	    success = true;
-				if (check_after_token(input, i) == 1)
+				if (check_after_token(input, i) == 0)
+				{
+					printf("%d\n", i);
 					break ;
+				}
 				else
         	    	i++;
         	}
@@ -705,6 +720,7 @@ int execute_pipeline(char *input, t_ee *ee)
     int i = 0;
 
 	input = parse_input_pipeline(input);
+	//printf("pipe input = %s\n", input);
     commands = ft_split(input, '|');
     while (commands[i])
 	{
@@ -770,6 +786,7 @@ int execute_pipeline(char *input, t_ee *ee)
 		ee->check_and_validity = 0;
 		ee->confirmed_command = 1;
 	}
+	//printf("ee->signal = %d  ee->check_and_validity = %d  ee->confirmed_command = %d\n", ee->signal, ee->check_and_validity, ee->confirmed_command);
 	free_split(check_path);
 	free(path);
 	free(input);
@@ -1811,11 +1828,43 @@ int	check_the_end(char *input)
 	return (0);
 }
 
-void loop(char *input, t_ee *ee)
+char *cut_for_no_leaks_at_the_end(char *input)
+{
+	int i;
+	int j;
+	int k;
+	char *tmp;
+
+	i = ft_strlen(input);
+	j = 0;
+	while (input[i] <= 32)
+		i--;
+	if (input[i] == ';')
+		j = 1;
+	i--;
+	if (j == 1)
+	{
+		while(input[i] <= 32)
+			i--;
+		tmp = malloc(sizeof(char) * (i + 2));
+		k = 0;
+		while (k <= i)
+		{
+			tmp[k] = input[k];
+			k++;
+		}
+		tmp[k] = '\0';
+		return (tmp);
+	}
+	return (input);
+}
+
+void loop(char *tmp, t_ee *ee)
 {
     t_token *tok;
     char **changed_args;
 	char *cleaned_input;
+	char *input;
 
 	//// Pour les quotes 
     int single_quotes = 0;
@@ -1830,7 +1879,11 @@ void loop(char *input, t_ee *ee)
         you_shall_not_path();
     tok = malloc(sizeof(t_token));
     tok->found = 0;
-    input = readline("🍀_(^o^)_🍀  > ");
+    tmp = readline("🍀_(^o^)_🍀  > ");
+	input = cut_for_no_leaks_at_the_end(tmp);
+	if (ft_strcmp(tmp, input) != 0)
+		free(tmp);
+	printf("'%s'\n", input);
     if (input == NULL)
 	{
         ee->minishell_check = 1;
@@ -1930,7 +1983,7 @@ void loop(char *input, t_ee *ee)
                 ee->minishell_check = 1;
                 return;
             }
-            temp = malloc(strlen(input) + strlen(next_line) + 1);
+            temp = malloc(ft_strlen(input) + ft_strlen(next_line) + 1);
             if (!temp)
             {
                 free(input);
