@@ -1,10 +1,11 @@
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
-# include "libft/libft.h"       // Bibliothèque personnelle
-# include <curses.h>            // tputs, tgoto, etc.
-# include <dirent.h>            // opendir, readdir, closedir, etc.
-# include <errno.h>             // errno, perror, etc.
+# include "libft/libft.h" // Bibliothèque personnelle
+# include <curses.h>      // tputs, tgoto, etc.
+# include <dirent.h>      // opendir, readdir, closedir, etc.
+# include <errno.h>       // errno, perror, etc.
+# include <fcntl.h>
 # include <readline/history.h>  // Historique des commandes
 # include <readline/readline.h> // readline, add_history, etc.
 # include <signal.h>            // signal, sigaction, kill, etc.
@@ -12,9 +13,8 @@
 # include <sys/types.h>         // pid_t, etc.
 # include <sys/wait.h>          // wait, waitpid, etc.
 # include <termios.h>           // tcsetattr, tcgetattr
-# include <fcntl.h>
 
-extern int	g_omg_le_plus_beau_du_tieks_ca_dit_koi_le_sang_trkl_la_bess_j_ai_vu_tu_connais_ici_c_est_la_debrouille;
+extern int	g_status;
 
 typedef struct s_token
 {
@@ -74,7 +74,7 @@ typedef struct s_envp_copy
 
 typedef struct s_redirection
 {
-	int command_fail;
+	int		command_fail;
 }			t_redir;
 
 // init_c
@@ -106,33 +106,69 @@ void		ft_wc(char *input);
 
 // ------------------------------ //
 
-// utils.c
+// str_utils.c
 int			ft_strcmp(char *s1, char *s2);
-void		free_split(char **array);
 int			is_number(char *str);
-int			check_token(char *input, t_token *token);
+void		free_split(char **array);
+char		*skip_isspace_for_fonctions(char *input, t_token *token);
+char		*ft_strcat(char *dest, const char *src);
 int			check_string(char *input);
-char	**copy_envp(char **envp);
+////////////////////////////////////////////////////
+
+// token_utils.c
+int			check_token_in_all_string(char *input, t_token *tok);
+int			check_token(char *input, t_token *token);
+int			token_found(char *input, t_token *tok);
+int			check_after_token(char *input, int i);
+///////////////////////////////////////////////////
+
+// path_utils.c
+char		*find_command_path(char *command);
+void		you_shall_not_path(void);
+int			calcul_check_path(char **check_path);
+void		check_path_in_or_with_pipe(char *input, t_ee *ee);
+char		*save_initial_path(t_ee *ee);
+///////////////////////////////////////////////////
+
+// loop.c
+void		loop(char *tmp, t_ee *ee);
+///////////////////////////////////////////////////
+
+// parse_token.c
+char		*cut_for_no_leaks_at_the_end(char *input);
+int			check_the_end(char *input);
+char		**check_dollars(char *input, t_ee *ee);
+int			do_you_find_or_what(char *input);
+int			find_parenthesis(char *input);
+char		**parse_dollars(char **args, t_ee *ee);
+///////////////////////////////////////////////////
+
+int			check_string(char *input);
+char		**copy_envp(char **envp);
 void		check_variable_pwd(t_ee *ee);
 void		check_variable_oldpwd(char **envp);
 char		*ft_strjoin_cd(char *s1, char *s2);
 int			ft_strcmpchar(char a, char b);
-char		*ft_strcat(char *dest, const char *src);
+
 void		check_if_path_is_set(t_ee *ee, char **args);
-int 		execute_pipeline(char *input, t_ee *ee);
+int			execute_pipeline(char *input, t_ee *ee);
 char		*reconstruct_input(char **changed_args);
 char		**check_dollars(char *input, t_ee *ee);
-int		interprete_commande(char *input, t_ee *ee);
-int	find_pipe(char *input);
-int	find_or(char *input);
-void handle_redirection(char *input, t_ee *ee);
-int	find_redirection(char *input);
-char *handle_redirection_with_pipe(char *input, t_ee *ee, int *heredoc_fd, int *input_fd, int *output_fd);
-int execute_pipeline_heredoc(char *input, t_ee *ee);
-int cumulate_token(char *input, t_ee *ee);
-char *copy_before_or(char *src);
-char *copy_after_or(char *src);
-void check_path_in_or_with_pipe(char *input, t_ee *ee);
-int check_after_or(char *input);
+int			interprete_commande(char *input, t_ee *ee);
+int			find_pipe(char *input);
+int			find_or(char *input);
+void		handle_redirection(char *input, t_ee *ee);
+int			find_redirection(char *input);
+char		*handle_redirection_with_pipe(char *input, t_ee *ee,
+				int *heredoc_fd, int *input_fd, int *output_fd);
+int			execute_pipeline_heredoc(char *input, t_ee *ee);
+int			cumulate_token(char *input, t_ee *ee);
+char		*copy_before_or(char *src);
+char		*copy_after_or(char *src);
+void		check_path_in_or_with_pipe(char *input, t_ee *ee);
+int			check_after_or(char *input);
+char		*handle_quotes(char *input, t_ee *ee);
+void		handle_sigint(int sig);
+void		catch_signal(t_ee *ee);
 
 #endif
