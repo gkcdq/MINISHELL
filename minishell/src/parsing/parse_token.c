@@ -68,21 +68,6 @@ int	check_the_end(char *input)
 	return (0);
 }
 
-char	**check_dollars(char *input, t_ee *ee)
-{
-	char	**args;
-	char	**changed_args;
-
-	args = ft_split(input, ' ');
-	if (!args)
-		return (NULL);
-	changed_args = parse_dollars(args, ee);
-	if (!changed_args)
-		return (NULL);
-	free_split(args);
-	return (changed_args);
-}
-
 int	do_you_find_or_what(char *input)
 {
 	int i = 0;

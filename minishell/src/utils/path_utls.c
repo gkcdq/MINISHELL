@@ -87,3 +87,19 @@ char	*save_initial_path(t_ee *ee)
 	}
 	return (tmp);
 }
+char	**copy_envp(char **envp)
+{
+	int		i;
+	char	**copy;
+
+	copy = malloc(sizeof(char *) * (ft_strlonglen(envp) + 1));
+	i = 0;
+	check_variable_oldpwd(envp);
+	while (envp[i])
+	{
+		copy[i] = ft_strdup(envp[i]);
+		i++;
+	}
+	copy[i] = NULL;
+	return (copy);
+}

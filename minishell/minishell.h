@@ -1,18 +1,18 @@
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
-# include "libft/libft.h" // Bibliothèque personnelle
-# include <curses.h>      // tputs, tgoto, etc.
-# include <dirent.h>      // opendir, readdir, closedir, etc.
-# include <errno.h>       // errno, perror, etc.
+# include "libft/libft.h"
+# include <curses.h>
+# include <dirent.h>
+# include <errno.h>
 # include <fcntl.h>
-# include <readline/history.h>  // Historique des commandes
-# include <readline/readline.h> // readline, add_history, etc.
-# include <signal.h>            // signal, sigaction, kill, etc.
-# include <sys/stat.h>          // stat, lstat, fstat
-# include <sys/types.h>         // pid_t, etc.
-# include <sys/wait.h>          // wait, waitpid, etc.
-# include <termios.h>           // tcsetattr, tcgetattr
+# include <readline/history.h>
+# include <readline/readline.h>
+# include <signal.h>
+# include <sys/stat.h>
+# include <sys/types.h>
+# include <sys/wait.h>
+# include <termios.h>
 
 extern int	g_status;
 
@@ -83,25 +83,15 @@ void		init_struct(t_ee *ee);
 
 // ---------- BUILTINS ----------- //
 
-// exit.c
 void		ft_exit(char *input, t_ee *ee);
-// pwd.c
 void		ft_pwd(void);
-// cd.c
 void		ft_cd(char *input, t_ee *ee);
-// ls.c
 void		ft_ls(char *input);
-// clear.c
 void		ft_clear(char *input);
-// env.c
 void		ft_env(t_ee *ee);
-// unset.c
 void		ft_unset(char *input, t_ee *ee);
-// export.c
 void		ft_export(char *input, t_ee *ee);
-// echo.c
 void		ft_echo(char *input, t_ee *ee);
-// wc.c
 void		ft_wc(char *input);
 
 // ------------------------------ //
@@ -113,14 +103,12 @@ void		free_split(char **array);
 char		*skip_isspace_for_fonctions(char *input, t_token *token);
 char		*ft_strcat(char *dest, const char *src);
 int			check_string(char *input);
-////////////////////////////////////////////////////
 
 // token_utils.c
 int			check_token_in_all_string(char *input, t_token *tok);
 int			check_token(char *input, t_token *token);
 int			token_found(char *input, t_token *tok);
 int			check_after_token(char *input, int i);
-///////////////////////////////////////////////////
 
 // path_utils.c
 char		*find_command_path(char *command);
@@ -128,47 +116,87 @@ void		you_shall_not_path(void);
 int			calcul_check_path(char **check_path);
 void		check_path_in_or_with_pipe(char *input, t_ee *ee);
 char		*save_initial_path(t_ee *ee);
-///////////////////////////////////////////////////
+char		**copy_envp(char **envp);
 
 // loop.c
 void		loop(char *tmp, t_ee *ee);
-///////////////////////////////////////////////////
 
 // parse_token.c
 char		*cut_for_no_leaks_at_the_end(char *input);
 int			check_the_end(char *input);
-char		**check_dollars(char *input, t_ee *ee);
 int			do_you_find_or_what(char *input);
 int			find_parenthesis(char *input);
 char		**parse_dollars(char **args, t_ee *ee);
-///////////////////////////////////////////////////
 
-int			check_string(char *input);
-char		**copy_envp(char **envp);
-void		check_variable_pwd(t_ee *ee);
-void		check_variable_oldpwd(char **envp);
-char		*ft_strjoin_cd(char *s1, char *s2);
-int			ft_strcmpchar(char a, char b);
-
-void		check_if_path_is_set(t_ee *ee, char **args);
-int			execute_pipeline(char *input, t_ee *ee);
+// parse_input.c
 char		*reconstruct_input(char **changed_args);
+char		*parse_input_pipeline(char *input);
 char		**check_dollars(char *input, t_ee *ee);
-int			interprete_commande(char *input, t_ee *ee);
+char		*remove_parentheses(char *input);
+char		*parse_exev_input(char *tmp_in);
+
+// pipe.c
 int			find_pipe(char *input);
-int			find_or(char *input);
-void		handle_redirection(char *input, t_ee *ee);
+int			execute_pipeline(char *input, t_ee *ee);
+int			execute_pipeline_heredoc(char *input, t_ee *ee);
+
+// redirection.c
 int			find_redirection(char *input);
+int			find_type_of_redirection(char *tmp_in);
+char		*unstick_to_re_stick(char *input);
+int			open_available(char **tmpfilename);
+void		handle_herdoc_sigint(int status);
+int			write_to_tmpfile(int fd, char *limit, t_ee *ee);
 char		*handle_redirection_with_pipe(char *input, t_ee *ee,
 				int *heredoc_fd, int *input_fd, int *output_fd);
-int			execute_pipeline_heredoc(char *input, t_ee *ee);
-int			cumulate_token(char *input, t_ee *ee);
+void		handle_redirection(char *input, t_ee *ee);
+char		*foud_delimiter(char **split_in);
+
+// or.c
+int			check_after_or(char *input);
+int			find_or(char *input);
 char		*copy_before_or(char *src);
 char		*copy_after_or(char *src);
-void		check_path_in_or_with_pipe(char *input, t_ee *ee);
-int			check_after_or(char *input);
+
+// command.c
+int			cumulate_token(char *input, t_ee *ee);
+int			interprete_commande(char *input, t_ee *ee);
+void		execute_external_command(char *command, t_ee *ee);
+
+// parenthese.c
+void		its_just_a_parenthese(char *input, t_ee *ee);
+
+// quote_utilis.c
+char		*find_env_var(const char *var_name, t_ee *ee);
+char		*expand_variable(char *input, t_ee *ee);
 char		*handle_quotes(char *input, t_ee *ee);
+
+// signal.c
 void		handle_sigint(int sig);
 void		catch_signal(t_ee *ee);
+
+////////////////////////////////////////////////////////////////////////
+
+// cd
+void		check_variable_pwd(t_ee *ee);
+char		*ft_strjoin_cd(char *s1, char *s2);
+int			ft_strcmpchar(char a, char b);
+// export
+void		check_if_path_is_set(t_ee *ee, char **args);
+char		*ft_strcat_export(char *s1, char *s2);
+void		sort_export(t_ee *ee, char **sorted);
+char		**remove_duplicates_with_priority(char **env);
+void		export_with_args(t_ee *ee, char **args);
+char		**copi_colle(t_ee *ee);
+void		handle_export_without_equals(char **args, char ***copy_export,
+				int *len_export);
+void		handle_env_with_equals(char **args, char ***copy_envp,
+				int *len_envp);
+int			ft_found_equal(char c);
+char		*parse_input_simple_export(char *input);
+int			ft_strcmp_dif(char *s1, char *s2);
+char		*ft_strndup(const char *s, size_t n);
+// env
+void		check_variable_oldpwd(char **envp);
 
 #endif

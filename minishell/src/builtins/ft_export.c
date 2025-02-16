@@ -52,9 +52,6 @@ char	*parse_input_simple_export(char *input)
 	return (copy);
 }
 
-void	sort_export(t_ee *ee, char **sorted);
-void	sort_export_plus(t_ee *ee);
-
 int	ft_found_equal(char c)
 {
 	if (c == '=')
@@ -420,9 +417,6 @@ void ft_export(char *input, t_ee *ee)
     free_split(args);
 }
 
-
-char	*ft_strcat_export(char *s1, char *s2);
-
 void	sort_export(t_ee *ee, char **sorted)
 {
 	char **sorted_env;
@@ -485,53 +479,6 @@ void	sort_export(t_ee *ee, char **sorted)
 	free(sorted_env);
 }
 
-/*void	sort_export_plus(t_ee *ee)
-{
-	char **sorted_env;
-	int len = 0;
-	int i, j;
-	char *tmp;
-
-	if (!ee->copy_export_env)
-		return ;
-	while (ee->copy_export_env[len])
-		len++;
-	sorted_env = malloc(sizeof(char *) * (len + 1));
-	if (!sorted_env)
-		return ;
-	i = 0;
-	while (i < len)
-	{
-		sorted_env[i] = ft_strdup(ee->copy_export_env[i]);
-		i++;
-	}
-	sorted_env[len] = NULL;
-	i = 0;
-	while (i < len - 1)
-	{
-		j = i + 1;
-		while (j < len)
-		{
-			if (ft_strcmp_dif(sorted_env[i], sorted_env[j]) > 0)
-			{
-				tmp = sorted_env[i];
-				sorted_env[i] = sorted_env[j];
-				sorted_env[j] = tmp;
-			}
-			j++;
-		}
-		i++;
-	}
-	i = 0;
-	while (i < len)
-	{
-		if (sorted_env[i])
-			ft_printf("🏗️ 🏡 %s\n", sorted_env[i]);
-		free(sorted_env[i]);
-		i++;
-	}
-	free(sorted_env);
-}*/
 
 char	*ft_strcat_export(char *s1, char *s2)
 {
