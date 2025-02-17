@@ -20,6 +20,7 @@ typedef struct s_token
 {
 	int		token;
 	int		found;
+	char	*trimmed_input;
 }			t_token;
 
 typedef struct s_env_fonction
@@ -159,6 +160,25 @@ char		*copy_before_or(char *src);
 char		*copy_after_or(char *src);
 
 // command.c
+char		*copy_pasta(char *input, int *i);
+void		copy_until_parenthesis(char *l, int *i, char *copy, int *j);
+int			process_segment(char *segment, t_ee *ee);
+bool		process_token(char *input, int *i, t_ee *ee, bool success);
+void		free_after_or(char *co, char *com, t_ee *ee);
+void		if_confirmed_command_equal_to_zero(char *c, t_ee *ee);
+void		after_find_or(char *input, t_ee *ee);
+int			handle_or_and_redirection(char *input, t_ee *ee);
+void		init_value_token(t_token *token, char *input);
+void		at_the_end(t_token *token, t_ee *ee);
+void		if_echo(char *input, t_ee *ee);
+void		if_exit(t_token *token, char *input, t_ee *ee);
+void		if_pwd(t_ee *ee);
+void		if_cd(char *input, t_ee *ee);
+void		if_env(t_ee *ee);
+void		if_unset(char *input, t_ee *ee);
+void		if_export(char *input, t_ee *ee);
+void		if_dq(t_ee *ee, t_token *token);
+void		if_else(t_token *token, char *input, t_ee *ee);
 int			cumulate_token(char *input, t_ee *ee);
 int			interprete_commande(char *input, t_ee *ee);
 void		execute_external_command(char *command, t_ee *ee);

@@ -40,7 +40,7 @@ char *unstick_to_re_stick(char *input)
     int count_how_many_sep = 0;
     char *good_sep;
 
-    while (input && input[i])
+    while (input[i])
     {
         if ((input[i] > 32 && (input[i + 1] == '<' || input[i + 1] == '>')) ||
             ((input[i] == '<' || input[i] == '>') && input[i + 1] > 32))
@@ -49,40 +49,42 @@ char *unstick_to_re_stick(char *input)
         }
         i++;
     }
-    good_sep = malloc(sizeof(char) * (i + count_how_many_sep + 1));
+    good_sep = malloc(sizeof(char) * (i + count_how_many_sep + 2));
     if (!good_sep)
         return NULL;
-i = 0;
+    i = 0;
     while (input[i])
     {
-		if (input[i - 1] > 32 && (input[i] == '<' || input[i] == '>'))
-			good_sep[j++] = ' ';
+        if (i > 0 && input[i - 1] > 32 && (input[i] == '<' || input[i] == '>'))
+            good_sep[j++] = ' ';
+
         if (input[i] == '<' && input[i + 1] == '<')
         {
-            good_sep[j++] = input[i];  
-            good_sep[j++] = input[i+1]; 
-            good_sep[j++] = ' ';      
-            i++;
+            good_sep[j++] = input[i++];
+            good_sep[j++] = input[i];
+            good_sep[j++] = ' ';
         }
         else if (input[i] == '>' && input[i + 1] == '>')
         {
-            good_sep[j++] = input[i];  
-            good_sep[j++] = input[i+1];
-            good_sep[j++] = ' ';    
-            i++;
+            good_sep[j++] = input[i++];
+            good_sep[j++] = input[i];
+            good_sep[j++] = ' ';
         }
         else if (input[i] == '<' || input[i] == '>')
         {
             good_sep[j++] = input[i];
-            good_sep[j++] = ' ';       
+            good_sep[j++] = ' ';
         }
         else
+        {
             good_sep[j++] = input[i];
+        }
         i++;
     }
     good_sep[j] = '\0';
     return good_sep;
 }
+
 
 int open_available(char **tmpfilename)
 {

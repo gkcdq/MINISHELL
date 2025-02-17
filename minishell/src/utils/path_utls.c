@@ -8,6 +8,9 @@ char	*find_command_path(char *command)
 	int		i;
 	char	temp_path[2024];
 
+	i = 0;
+	if (command[i] == '.' || command[i] == '/')
+		return(ft_strdup(command));
 	path_env = getenv("PATH");
 	if (!path_env)
 		return (NULL);
@@ -15,7 +18,6 @@ char	*find_command_path(char *command)
 	if (!dirs)
 		return (NULL);
 	full_path = NULL;
-	i = 0;
 	while (dirs[i])
 	{
 		temp_path[0] = '\0';
