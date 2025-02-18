@@ -57,12 +57,12 @@ char *copy_before_or(char *src)
 	return (tmp);
 }
 
-char *copy_after_or(char *src)
+/*char *copy_after_or(char *src)
 {
 	int i = 0;
 	int k = 0;
 	int j = 0;
-	char *tmp;
+	char *tmp = NULL;
 
 	if (!src || src == NULL)
 		return (NULL);
@@ -87,6 +87,59 @@ char *copy_after_or(char *src)
 		free (tmp);
 		return (NULL);
 	}
+	while (i < k)
+	{
+		tmp[j] = src[i];
+		i++;
+		j++;
+	}
+	tmp[j] = '\0';
+	if (tmp == NULL)
+		free(tmp);
+	return (tmp);
+}*/
+
+char *complete_tmp(char *src, int i);
+
+char *copy_after_or(char *src)
+{
+	int i = 0;
+	char *tmp = NULL;
+
+	if (!src || src == NULL)
+		return (NULL);
+	while (src && src[i])
+	{
+		if (src[i] == '(')
+		{
+			while (src[i] != ')')
+				i++;
+		}
+		if (src[i] == '|' && src[i + 1] == '|')
+			break;
+		i++;
+	}
+	if (src[i] == '\0')
+		return (NULL);
+	i += 2;
+	tmp = complete_tmp(src, i);
+	return (tmp);
+}
+
+char *complete_tmp(char *src, int i)
+{
+	int k;
+	int j;
+	char *tmp;
+
+	k = ft_strlen(src);
+	tmp = malloc(sizeof(char) * (k - i + 1));
+	if (!tmp)
+	{
+		free (tmp);
+		return (NULL);
+	}
+	j = 0;
 	while (i < k)
 	{
 		tmp[j] = src[i];

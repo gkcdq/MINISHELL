@@ -2,15 +2,36 @@
 
 void	if_confirmed_command_equal_to_zero(char *command_after_or, t_ee *ee)
 {
-	cumulate_token(command_after_or, ee);
-	if (ee->save_result == 1)
+	if (command_after_or != NULL)
+		cumulate_token(command_after_or, ee);
+	if (ee->confirmed_command == 1 || ee->save_result == 1)
+		ee->check_and_validity = 0;
+	else
 	{
 		ee->check_and_validity = 1;
-		ee->save_result = 0;
 	}
 }
 
-/////////////////////////PROBLEME A REGLER (LOL || ls && pwd) (pwd ; (cat Makefile | lol || cat Makefile | kek) && pwd)
+char *parse_command_after(char *command_after_or)
+{
+	int i;
+	int j;
+	int k;
+	char *tmp;
+
+	i = 0;
+	k = ft_strlen(command_after_or);
+	while(command_after_or[i] && command_after_or[i] <= 32)
+		i++;
+	j = 0;
+	tmp = malloc(sizeof(char) * (k - i + 1));
+	while (command_after_or[i])
+	{
+		tmp[j++] = command_after_or[i++];
+	}
+	tmp[j] = '\0';
+	return (tmp);
+}
 
 void	after_find_or(char *input, t_ee *ee)
 {
@@ -25,13 +46,18 @@ void	after_find_or(char *input, t_ee *ee)
 		command_before_or = copy_before_or(input);
 		command_after_or = copy_after_or(input);
 		see_what_after = copy_after_or(command_after_or);
-		path = find_command_path(command_after_or);
-		if (see_what_after == NULL && !path)
-			ee->save_result = 1;
-		else if (see_what_after == NULL && path)
-			ee->save_result = 0;
+		if (see_what_after == NULL)
+		{
+			char *tmp_after = parse_command_after(command_after_or);
+			path = find_command_path(tmp_after);
+			if (path)
+				ee->save_result = 1;
+			else
+				ee->save_result = 0;
+			free(tmp_after);
+			free(path);
+		}
 		free(see_what_after);
-		free(path);
 		cumulate_token(command_before_or, ee);
 		if (ee->confirmed_command == 0)
 			if_confirmed_command_equal_to_zero(command_after_or, ee);
@@ -45,6 +71,7 @@ int	handle_or_and_redirection(char *input, t_ee *ee)
 	if (find_or(input) == 1)
 	{
 		after_find_or(input, ee);
+		//ee->save_result = 0;
 		return (1);
 	}
 	if (find_redirection(input) == 1)

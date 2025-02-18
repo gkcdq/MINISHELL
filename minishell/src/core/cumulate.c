@@ -26,11 +26,12 @@ int	process_segment(char *segment, t_ee *ee)
 	return (result);
 }
 
-char	*copy_pasta(char *l, int *i)
+char	*copy_pasta(char *l, int *i, t_ee * ee)
 {
 	int		j;
 	char	*copy;
 
+	(void)ee;
 	j = 0;
 	copy = malloc(2048);
 	if (!copy)
@@ -53,14 +54,14 @@ bool	process_token(char *input, int *i, t_ee *ee, bool success)
 {
 	char	*copy;
 
-	copy = copy_pasta(input, i);
+	copy = copy_pasta(input, i, ee);
 	if (!copy)
 		return (false);
 	if (input[*i] == '&' && input[*i + 1] == '&')
 		ee->command_with_and = 1;
 	if (success)
 		success = (process_segment(copy, ee) == 0);
-	ee->command_with_and = 0;
+	//ee->command_with_and = 0;
 	free(copy);
 	if (ee->check_and_validity)
 	{

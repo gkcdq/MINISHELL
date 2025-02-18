@@ -160,7 +160,7 @@ char		*copy_before_or(char *src);
 char		*copy_after_or(char *src);
 
 // command.c
-char		*copy_pasta(char *input, int *i);
+char		*copy_pasta(char *l, int *i, t_ee * ee);
 void		copy_until_parenthesis(char *l, int *i, char *copy, int *j);
 int			process_segment(char *segment, t_ee *ee);
 bool		process_token(char *input, int *i, t_ee *ee, bool success);

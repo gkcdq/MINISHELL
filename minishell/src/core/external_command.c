@@ -53,7 +53,10 @@ void	execute_external_command(char *command, t_ee *ee)
 		return ;
 	}
 	else
+	{
+		printf("path = %s\n", path);
 		ee->confirmed_command = 1;
+	}
 	pid = fork();
 	if (pid == 0)
 		if_pid_is_equal_to_zero(path, args, ee);
