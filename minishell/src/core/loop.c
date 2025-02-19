@@ -1,5 +1,221 @@
 #include "../../minishell.h"
 
+void	init_quote_struct(t_quote *qt)
+{
+	qt->single_quotes = 0;
+	qt->double_quotes = 0;
+	qt->temp = NULL;
+	qt->next_line = NULL;
+}
+
+void count_quotes(const char *input, t_quote *qt)
+{
+    int i = 0;
+    qt->single_quotes = 0;
+    qt->double_quotes = 0;
+    while (input[i])
+    {
+        if (input[i] == '\'')
+            (qt->single_quotes)++;
+        else if (input[i] == '"')
+            (qt->double_quotes)++;
+        i++;
+    }
+}
+
+char *append_next_line(char *input, t_ee *ee)
+{
+    char *next_line;
+    char *new_input;
+
+	next_line = readline("> "); 
+    if (!next_line)
+    {
+        free(input);
+        ee->minishell_check = 1;
+        return NULL;
+    }
+    new_input = malloc(ft_strlen(input) + ft_strlen(next_line) + 2);
+    if (!new_input)
+    {
+        free(input);
+        free(next_line);
+        return NULL;
+    }
+    strcpy(new_input, input);
+    strcat(new_input, next_line);
+    strcat(new_input, "\n");
+    free(input);
+    free(next_line);
+    return new_input;
+}
+
+char *handle_unclosed_quotes(char *input, t_ee *ee)
+{
+    t_quote qt;
+
+    init_quote_struct(&qt);
+    while (input && *input)
+    {
+        count_quotes(input, &qt);
+        if (qt.single_quotes % 2 != 0 || qt.double_quotes % 2 != 0)
+        {
+            input = append_next_line(input, ee);
+            if (!input)
+                return NULL;
+        }
+        else
+            break;
+    }
+    return input;
+}
+//unclosed_quote
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+int skip_whitespace(const char *tmp)
+{
+    int i;
+
+	i = 0;
+    while (tmp[i] && tmp[i] <= 32)
+        i++;
+    return i;
+}
+
+int check_syntax_at_start(const char *tmp, t_ee *ee)
+{
+    int i = skip_whitespace(tmp);
+    
+    if (tmp[i] == '&')
+    {
+        if ((tmp[i + 1] == '&' && tmp[i + 2] == '&') || (tmp[i] == '&' && tmp[i + 1] != '&'))
+            printf("🛠️_(>_<;)_🛠️   : syntax error near unexpected token `&'\n");
+        else if (tmp[i + 1] == '&')
+            printf("🛠️_(>_<;)_🛠️   : syntax error near unexpected token `&&'\n");
+        ee->signal = 2;
+        return 1;
+    }
+    
+    if (tmp[i] == '|')
+    {
+        if ((tmp[i + 1] == '|' && tmp[i + 2] == '|') || (tmp[i] == '|' && tmp[i + 1] != '|'))
+            printf("🛠️_(>_<;)_🛠️   : syntax error near unexpected token `|'\n");
+        else if (tmp[i + 1] == '|')
+            printf("🛠️_(>_<;)_🛠️   : syntax error near unexpected token `||'\n");
+        ee->signal = 2;
+        return 1;
+    }
+    return 0;
+}
+
+int check_syntax_in_body(const char *tmp, t_ee *ee)
+{
+    int i = 0;
+    while (tmp[i])
+    {
+        if (tmp[i] == '&' && tmp[i + 1] == '&' && tmp[i + 2] == '&')
+        {
+            printf("🛠️_(>_<;)_🛠️   : syntax error near unexpected token `&'\n");
+            ee->signal = 2;
+            return 1;
+        }
+        if (tmp[i] == '|' && tmp[i + 1] == '|' && tmp[i + 2] == '|')
+        {
+            printf("🛠️_(>_<;)_🛠️   : syntax error near unexpected token `|'\n");
+            ee->signal = 2;
+            return 1;
+        }
+        if (tmp[i] == ';' && tmp[i + 1] == ';')
+        {
+            printf("🛠️_(>_<;)_🛠️   : syntax error near unexpected token `;;'\n");
+            ee->signal = 2;
+            return 1;
+        }
+        i++;
+    }
+    return 0;
+}
+
+int check_syntax_error(const char *tmp, t_ee *ee)
+{
+    if (check_syntax_at_start(tmp, ee))
+        return 1;
+    return check_syntax_in_body(tmp, ee);
+}
+
+int skip_whitespacee(const char *tmp, int i)
+{
+    while (tmp[i] && tmp[i] <= 32)
+        i++;
+    return i;
+}
+
+int check_unexpected_semicolon(char *tmp, t_ee *ee)
+{
+    int i = skip_whitespacee(tmp, 0);
+
+    if (tmp[i] == ';')
+    {
+        i++;
+        i = skip_whitespacee(tmp, i);
+        
+        if (tmp[i] == '\0')
+        {
+            printf("🛠️_(>_<;)_🛠️   : syntax error near unexpected token `;'\n");
+            ee->signal = 2;
+            return 1;
+        }
+    }
+    return 0;
+}
+
+int find_trap(char *input)
+{
+    int i = 0;
+
+    if (!input)
+        return (0);
+    while (input[i] && input[i] != ';')
+        i++;
+    if (input[i] == ';')
+    {
+        i++;
+        while (input[i] && input[i] <= 32)
+            i++;
+        if (input[i] == ';')
+        {
+            printf("🛠️_(>_<;)_🛠️   : syntax error near unexpected token `;'\n");
+            return (1);
+        }
+    }
+    return (0);
+}
+
+
+// (parsing)
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+
+int	check_tmp_not_null(char *tmp, t_token *tok, t_ee *ee)
+{
+	if (tmp == NULL)
+	{
+		ee->minishell_check = 1;
+		free(tmp);
+		free(tok);
+		return (1);
+	}
+	return (0);
+}
+
 void	loop(char *tmp, t_ee *ee)
 {
 	t_token *tok;
@@ -7,193 +223,50 @@ void	loop(char *tmp, t_ee *ee)
 	char *cleaned_input;
 	char *input = NULL;
 
-	//// Pour les quotes
-	int single_quotes = 0;
-	int double_quotes = 0;
-	int i;
-	char *temp;
-	char *next_line;
-	////
-
 	changed_args = NULL;
 	if ((!ee->envp || !ee->envp[0]) && ee->lock_path == 0)
 		you_shall_not_path();
 	tok = malloc(sizeof(t_token));
 	tok->found = 0;
 	tmp = readline("🍀_(^o^)_🍀  > ");
-	if (tmp == NULL)
-	{
-		ee->minishell_check = 1;
-		free(tmp);
-		free(tok);
+	if (check_tmp_not_null(tmp, tok, ee))
 		return ;
-	}
-	//
-	i = 0;
-	while (tmp[i] && tmp[i] <= 32)
-		i++;
-	if (tmp[i] == ';')
-	{
-		if (tmp[i + 1])
-			i++;
-		else
-		{
-			free(tmp);
-			free(tok);
-			return ;
-		}
-		while (tmp[i] && tmp[i] <= 32)
-			i++;
-		if (tmp[i] == '\0')
-		{
-			free(tmp);
-			free(tok);
-			return ;
-		}
-	}
-	//
+	add_history(tmp);
+	if (check_syntax_error(tmp, ee) || check_unexpected_semicolon(tmp, ee))
+    {
+        free(tmp);
+        free(tok);
+        return;
+    }
 	input = cut_for_no_leaks_at_the_end(tmp);
 	if (ft_strcmp(tmp, input) != 0)
 		free(tmp);
-	add_history(input);
-	int check = check_the_end(input);
-	if (check == 1)
+	if (check_the_end(input) == 1)
 	{
 		free(input);
 		free(tok);
 		return ;
-	}
-	i = 0;
-	while (input[i] && input[i] <= 32)
-		i++;
-	if (input[i] && input[i] == '&')
-	{
-		if (input[i + 1] == '&')
-			printf("🛠️_(>_<;)_🛠️   : syntax error near unexpected token `&&'\n");
-		else
-			printf("🛠️_(>_<;)_🛠️   : syntax error near unexpected token `&'\n");
-		ee->signal = 2;
-		free(input);
-		free(tok);
-		return ;
-	}
-	if (input[i] && input[i] == '|')
-	{
-		if (input[i + 1] == '|')
-			printf("🛠️_(>_<;)_🛠️   : syntax error near unexpected token `||'\n");
-		else
-			printf("🛠️_(>_<;)_🛠️   : syntax error near unexpected token `|'\n");
-		ee->signal = 2;
-		free(input);
-		free(tok);
-		return ;
-	}
-	if (input[i] && input[i] == ';')
-	{
-		if (input[i + 1] == ';')
-			printf("🛠️_(>_<;)_🛠️   : syntax error near unexpected token `;;'\n");
-		else
-			printf("🛠️_(>_<;)_🛠️   : syntax error near unexpected token `;'\n");
-		ee->signal = 2;
-		free(input);
-		free(tok);
-		return ;
-	}
-	i = 0;
-	while (input[i])
-	{
-		if (input[i] == '&' && input[i + 1] == '&' && input[i + 2] == '&')
-		{
-			printf("🛠️_(>_<;)_🛠️   : syntax error near unexpected token `&'\n");
-			ee->signal = 2;
-			free(input);
-			free(tok);
-			return ;
-		}
-		if (input[i] == '|' && input[i + 1] == '|' && input[i + 2] == '|')
-		{
-			printf("🛠️_(>_<;)_🛠️   : syntax error near unexpected token `|'\n");
-			ee->signal = 2;
-			free(input);
-			free(tok);
-			return ;
-		}
-		i++;
 	}
 	if (g_status == 130)
 	{
 		ee->signal = 130;
 		g_status = 0;
 	}
-	while (input && *input)
-	{
-		single_quotes = 0;
-		double_quotes = 0;
-		i = 0;
-		while (input[i])
-		{
-			if (input[i] == '\'')
-				single_quotes++;
-			else if (input[i] == '"')
-				double_quotes++;
-			i++;
-		}
-		if (single_quotes % 2 != 0 || double_quotes % 2 != 0)
-		{
-			next_line = readline("> ");
-			if (next_line == NULL)
-			{
-				free(input);
-				ee->minishell_check = 1;
-				return ;
-			}
-			temp = malloc(ft_strlen(input) + ft_strlen(next_line) + 1);
-			if (!temp)
-			{
-				free(input);
-				free(next_line);
-				return ;
-			}
-			strcpy(temp, input);
-			strcat(temp, next_line);
-			strcat(temp, "\n");
-			free(input);
-			free(next_line);
-			input = temp;
-		}
-		else
-		{
-			break ;
-		}
-	}
+	input = handle_unclosed_quotes(input, ee);
 	if (input && *input)
 	{
 		cleaned_input = handle_quotes(input, ee);
 		free(input);
 		input = cleaned_input;
-		if (check_string(input) == 0)
+		if (find_trap(input))
 		{
-			if (token_found(input, tok) == 1)
-			{
-				if (check_token_in_all_string(input, tok) == 1)
-				{
-					if (tok->token == 2)
-					{
-						printf("🛠️_(>_<;)_🛠️   : syntax error near unexpected token `;'\n");
-						tok->token = 0;
-					}
-					else if (tok->token == 3)
-					{
-						printf("🛠️_(>_<;)_🛠️   : syntax error near unexpected token `;;'\n");
-					}
-					ee->signal = 2;
-					free(input);
-					free(tok);
-					return ;
-				}
-			}
-			cumulate_token(input, ee);
+			free_split(changed_args);
+			free(tmp);
+			free(input);
+			free(tok);
+			return ;
 		}
+		cumulate_token(input, ee);
 	}
 	free_split(changed_args);
 	free(input);

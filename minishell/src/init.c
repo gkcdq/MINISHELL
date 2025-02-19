@@ -2,14 +2,18 @@
 
 int g_status = 0;
 
-int	ft_strlonglen(char **s)
+void	init_value_token(t_token *token, char *input)
 {
-	int	i;
-
-	i = 0;
-	while (s[i])
-		i++;
-	return (i);
+	token->token = 0;
+	token->trimmed_input = NULL;
+	token->trimmed_input = skip_isspace_for_fonctions(input, token);
+	if (!token->trimmed_input)
+	{
+		if (token)
+			free(token);
+		return ;
+	}
+	return ;
 }
 
 void	init_struct(t_ee *ee)

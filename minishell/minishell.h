@@ -35,6 +35,22 @@ typedef struct s_cd_fonction
 	char	*home;
 }			t_cd;
 
+typedef struct s_quote
+{
+	int 	single_quotes;
+	int 	double_quotes;
+	char 	*temp;
+	char 	*next_line;
+}			t_quote;
+
+typedef struct s_loop
+{
+	char 	**changed_args;
+	char 	*cleaned_input;
+	char 	*input;
+}			t_loop;
+
+
 typedef struct s_wc_fonction
 {
 	int		lines;
@@ -165,7 +181,9 @@ void		copy_until_parenthesis(char *l, int *i, char *copy, int *j);
 int			process_segment(char *segment, t_ee *ee);
 bool		process_token(char *input, int *i, t_ee *ee, bool success);
 void		free_after_or(char *co, char *com, t_ee *ee);
+char 		*parse_command_after(char *command_after_or);
 void		if_confirmed_command_equal_to_zero(char *c, t_ee *ee);
+void		check_valid_after(char *command_after_or, t_ee *ee);
 void		after_find_or(char *input, t_ee *ee);
 int			handle_or_and_redirection(char *input, t_ee *ee);
 void		init_value_token(t_token *token, char *input);

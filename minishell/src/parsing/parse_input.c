@@ -72,6 +72,7 @@ char *parse_input_pipeline(char *input)
 	tmp[j] = '\0';
 	return (tmp);
 }
+
 char	**check_dollars(char *input, t_ee *ee)
 {
 	char	**args;

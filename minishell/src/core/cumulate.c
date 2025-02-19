@@ -61,7 +61,7 @@ bool	process_token(char *input, int *i, t_ee *ee, bool success)
 		ee->command_with_and = 1;
 	if (success)
 		success = (process_segment(copy, ee) == 0);
-	//ee->command_with_and = 0;
+	ee->command_with_and = 0;
 	free(copy);
 	if (ee->check_and_validity)
 	{

@@ -13,7 +13,6 @@ char *cut_for_no_leaks_at_the_end(char *input)
 		i--;
 	if (input[i] == ';')
 		j = 1;
-	i--;
 	if (j == 1)
 	{
 		while(input[i] <= 32)

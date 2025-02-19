@@ -87,16 +87,12 @@ char	*ft_strcat(char *dest, const char *src)
 	return (dest);
 }
 
-int	check_string(char *input)
+int	ft_strlonglen(char **s)
 {
 	int	i;
 
 	i = 0;
-	while (input[i])
-	{
-		if (input[i] > 32)
-			return (0);
+	while (s[i])
 		i++;
-	}
-	return (1);
+	return (i);
 }
