@@ -204,13 +204,12 @@ int find_trap(char *input)
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 
-int	check_tmp_not_null(char *tmp, t_token *tok, t_ee *ee)
+int	check_tmp_not_null(char *tmp, t_ee *ee)
 {
 	if (tmp == NULL)
 	{
 		ee->minishell_check = 1;
 		free(tmp);
-		free(tok);
 		return (1);
 	}
 	return (0);
@@ -218,24 +217,22 @@ int	check_tmp_not_null(char *tmp, t_token *tok, t_ee *ee)
 
 void	loop(char *tmp, t_ee *ee)
 {
-	t_token *tok;
-	char **changed_args;
-	char *cleaned_input;
-	char *input = NULL;
+	//t_loop	*loop;
+	char 	**changed_args;
+	char 	*cleaned_input;
+	char 	*input = NULL;
 
 	changed_args = NULL;
 	if ((!ee->envp || !ee->envp[0]) && ee->lock_path == 0)
 		you_shall_not_path();
-	tok = malloc(sizeof(t_token));
-	tok->found = 0;
+	//loop = malloc(sizeof(t_loop));
 	tmp = readline("🍀_(^o^)_🍀  > ");
-	if (check_tmp_not_null(tmp, tok, ee))
+	if (check_tmp_not_null(tmp, ee))
 		return ;
 	add_history(tmp);
 	if (check_syntax_error(tmp, ee) || check_unexpected_semicolon(tmp, ee))
     {
         free(tmp);
-        free(tok);
         return;
     }
 	input = cut_for_no_leaks_at_the_end(tmp);
@@ -244,7 +241,6 @@ void	loop(char *tmp, t_ee *ee)
 	if (check_the_end(input) == 1)
 	{
 		free(input);
-		free(tok);
 		return ;
 	}
 	if (g_status == 130)
@@ -263,12 +259,12 @@ void	loop(char *tmp, t_ee *ee)
 			free_split(changed_args);
 			free(tmp);
 			free(input);
-			free(tok);
 			return ;
 		}
 		cumulate_token(input, ee);
 	}
 	free_split(changed_args);
 	free(input);
-	free(tok);
 }
+
+
