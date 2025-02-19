@@ -215,56 +215,95 @@ int	check_tmp_not_null(char *tmp, t_ee *ee)
 	return (0);
 }
 
-void	loop(char *tmp, t_ee *ee)
+void cleanup_loop(t_loop *loop)
 {
-	//t_loop	*loop;
-	char 	**changed_args;
-	char 	*cleaned_input;
-	char 	*input = NULL;
-
-	changed_args = NULL;
-	if ((!ee->envp || !ee->envp[0]) && ee->lock_path == 0)
-		you_shall_not_path();
-	//loop = malloc(sizeof(t_loop));
-	tmp = readline("🍀_(^o^)_🍀  > ");
-	if (check_tmp_not_null(tmp, ee))
-		return ;
-	add_history(tmp);
-	if (check_syntax_error(tmp, ee) || check_unexpected_semicolon(tmp, ee))
+    if (loop)
     {
-        free(tmp);
+        if (loop->changed_args)
+            free_split(loop->changed_args);
+        if (loop->input)
+            free(loop->input);
+        free(loop);
+    }
+}
+
+void loop(char *tmp, t_ee *ee)
+{
+    t_loop *loop;
+
+    if ((!ee->envp || !ee->envp[0]) && ee->lock_path == 0)
+        you_shall_not_path();
+
+    loop = malloc(sizeof(t_loop));
+    if (!loop)
+        return;
+    init_struct_loop(loop);
+
+    tmp = readline("🍀_(^o^)_🍀  > ");
+    if (check_tmp_not_null(tmp, ee))
+    {
+        free(loop);
         return;
     }
-	input = cut_for_no_leaks_at_the_end(tmp);
-	if (ft_strcmp(tmp, input) != 0)
-		free(tmp);
-	if (check_the_end(input) == 1)
-	{
-		free(input);
-		return ;
-	}
-	if (g_status == 130)
-	{
-		ee->signal = 130;
-		g_status = 0;
-	}
-	input = handle_unclosed_quotes(input, ee);
-	if (input && *input)
-	{
-		cleaned_input = handle_quotes(input, ee);
-		free(input);
-		input = cleaned_input;
-		if (find_trap(input))
-		{
-			free_split(changed_args);
-			free(tmp);
-			free(input);
-			return ;
-		}
-		cumulate_token(input, ee);
-	}
-	free_split(changed_args);
-	free(input);
+    
+    add_history(tmp);
+
+    if (check_syntax_error(tmp, ee) || check_unexpected_semicolon(tmp, ee))
+    {
+        free(tmp);
+        cleanup_loop(loop);
+        return;
+    }
+
+    loop->input = cut_for_no_leaks_at_the_end(tmp);
+    if (!loop->input)
+    {
+        free(tmp);
+        cleanup_loop(loop);
+        return;
+    }
+
+    if (ft_strcmp(tmp, loop->input) != 0)
+        free(tmp);
+
+    if (check_the_end(loop->input) == 1)
+    {
+        cleanup_loop(loop);
+        return;
+    }
+
+    if (g_status == 130)
+    {
+        ee->signal = 130;
+        g_status = 0;
+    }
+
+    loop->input = handle_unclosed_quotes(loop->input, ee);
+    if (!loop->input || !*loop->input)
+    {
+        cleanup_loop(loop);
+        return;
+    }
+
+    loop->cleaned_input = handle_quotes(loop->input, ee);
+    free(loop->input);
+    loop->input = loop->cleaned_input;
+
+    if (!loop->input)
+    {
+        cleanup_loop(loop);
+        return;
+    }
+
+    if (find_trap(loop->input))
+    {
+        cleanup_loop(loop);
+        return;
+    }
+
+    cumulate_token(loop->input, ee);
+    cleanup_loop(loop);
 }
+
 
 

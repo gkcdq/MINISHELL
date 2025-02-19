@@ -136,6 +136,7 @@ char		*save_initial_path(t_ee *ee);
 char		**copy_envp(char **envp);
 
 // loop.c
+void		init_struct_loop(t_loop *loop);
 void		loop(char *tmp, t_ee *ee);
 
 // parse_token.c

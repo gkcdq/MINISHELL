@@ -16,6 +16,13 @@ void	init_value_token(t_token *token, char *input)
 	return ;
 }
 
+void	init_struct_loop(t_loop *loop)
+{
+	loop->changed_args = NULL;
+	loop->cleaned_input = NULL;
+	loop->input = NULL;
+}
+
 void	init_struct(t_ee *ee)
 {
 	ee->minishell_check = 0;

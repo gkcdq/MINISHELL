@@ -119,6 +119,7 @@ int open_available(char **tmpfilename)
     return (-1);
 }
 
+
 void handle_herdoc_sigint(int status)
 {
 	rl_replace_line("", 0);
@@ -170,7 +171,9 @@ char *handle_redirection_with_pipe(char *input, t_ee *ee, int *heredoc_fd, int *
         return NULL;
     re->command_fail = 0;
     input_execv = parse_exev_input(input);
-    split_in = ft_split(unstick_to_re_stick(input), ' ');
+    char *tmp = unstick_to_re_stick(input);
+    split_in = ft_split(tmp, ' ');
+    free(tmp);
     if (!split_in || !split_in[0])
     {
         free_split(split_in);
@@ -188,6 +191,11 @@ char *handle_redirection_with_pipe(char *input, t_ee *ee, int *heredoc_fd, int *
             if (fd < 0)
             {
                 perror("🔒 Erreur création fichier here-doc");
+                free_split(split_in);
+                free(re);
+                free(input_execv);
+                free(path);
+                free(heredoc_tmpfile);
                 return NULL;
             }
 
@@ -198,14 +206,23 @@ char *handle_redirection_with_pipe(char *input, t_ee *ee, int *heredoc_fd, int *
             {
                 perror("🔒 Erreur écriture here-doc");
                 unlink(heredoc_tmpfile);
+                free_split(split_in);
+                free(re);
+                free(input_execv);
+                free(path);
+                free(heredoc_tmpfile);
                 return NULL;
             }
-
             *heredoc_fd = open(heredoc_tmpfile, O_RDONLY);
             if (*heredoc_fd < 0)
             {
                 perror("🔒 Erreur ouverture fichier here-doc");
                 unlink(heredoc_tmpfile);
+                free_split(split_in);
+                free(re);
+                free(input_execv);
+                free(path);
+                free(heredoc_tmpfile);
                 return NULL;
             }
             i++;
@@ -216,6 +233,11 @@ char *handle_redirection_with_pipe(char *input, t_ee *ee, int *heredoc_fd, int *
             if (*input_fd < 0)
             {
                 perror("🔒 Erreur ouverture fichier '<'");
+                free_split(split_in);
+                free(re);
+                free(input_execv);
+                free(path);
+                free(heredoc_tmpfile);
                 return NULL;
             }
             i++;
@@ -226,6 +248,11 @@ char *handle_redirection_with_pipe(char *input, t_ee *ee, int *heredoc_fd, int *
             if (*output_fd < 0)
             {
                 perror("🔒 Erreur ouverture fichier '>'");
+                free_split(split_in);
+                free(re);
+                free(input_execv);
+                free(path);
+                free(heredoc_tmpfile);
                 return NULL;
             }
             i++;
@@ -236,23 +263,42 @@ char *handle_redirection_with_pipe(char *input, t_ee *ee, int *heredoc_fd, int *
             if (*output_fd < 0)
             {
                 perror("🔒 Erreur ouverture fichier '>>'");
+                free_split(split_in);
+                free(re);
+                free(input_execv);
+                free(path);
+                free(heredoc_tmpfile);
                 return NULL;
             }
             i++;
         }
     }
-    final_command = strdup(input_execv);
+    final_command = ft_strdup(input_execv);
     if (!final_command)
     {
-        perror("🔒 Erreur allocation mémoire");
+        free_split(split_in);
+        free(re);
+        free(input_execv);
+        free(path);
+        free(heredoc_tmpfile);
         return NULL;
     }
     free_split(split_in);
     free(input_execv);
     free(path);
     free(re);
+    if (heredoc_tmpfile)
+    {
+        unlink(heredoc_tmpfile);
+        free(heredoc_tmpfile);
+    }
+
     return final_command;
 }
+
+
+
+
 
 void handle_redirection(char *input, t_ee *ee)
 {

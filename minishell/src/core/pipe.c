@@ -99,7 +99,7 @@ int execute_pipeline(char *input, t_ee *ee)
 int execute_pipeline_heredoc(char *input, t_ee *ee)
 {
     char **commands;
-	char **check_path;
+    char **check_path;
     int pipe_fd[2];
     int prev_fd = -1;
     pid_t pid;
@@ -115,17 +115,24 @@ int execute_pipeline_heredoc(char *input, t_ee *ee)
         {
             perror("🔒 Erreur lors du traitement des redirections");
             free_split(commands);
+            free(input); // Libération de l'input modifié
             return -1;
         }
         if (pipe(pipe_fd) == -1)
         {
             perror("pipe");
+            free(final_command);
+            free_split(commands);
+            free(input); // Libération de l'input modifié
             exit(EXIT_FAILURE);
         }
         pid = fork();
         if (pid == -1)
         {
             perror("fork");
+            free(final_command);
+            free_split(commands);
+            free(input); // Libération de l'input modifié
             exit(EXIT_FAILURE);
         }
         if (pid == 0)
@@ -177,28 +184,32 @@ int execute_pipeline_heredoc(char *input, t_ee *ee)
         close(prev_fd);
     while (wait(NULL) > 0);
     free_split(commands);
-	check_path = ft_split(input, ' ');
-	char *path = find_command_path(check_path[0]);
-	if (!path)
-	{
-		ft_printf("🍁_(`へ´*)_🍁: %s: command not found\n", check_path[0]);
-	}
-	free_split(check_path);
-	free(path);
-	check_path = ft_split(input, ' ');
-	path = find_command_path(check_path[calcul_check_path(check_path)]);
-	if (!path)
-	{
-		ee->signal = 127;
-		ee->check_and_validity = 1;
-		ee->confirmed_command = 0;
-	}
-	else
-	{
-		ee->signal = 0;
-		ee->check_and_validity = 0;
-		ee->confirmed_command = 1;
-	}
-	free(input);
+
+    check_path = ft_split(input, ' ');
+    char *path = find_command_path(check_path[0]);
+    if (!path)
+    {
+        ft_printf("🍁_(`へ´*)_🍁: %s: command not found\n", check_path[0]);
+    }
+    free_split(check_path);
+    free(path); 
+    check_path = ft_split(input, ' ');
+    path = find_command_path(check_path[calcul_check_path(check_path)]);
+    if (!path)
+    {
+        ee->signal = 127;
+        ee->check_and_validity = 1;
+        ee->confirmed_command = 0;
+    }
+    else
+    {
+        ee->signal = 0;
+        ee->check_and_validity = 0;
+        ee->confirmed_command = 1;
+    }
+    free_split(check_path);
+    free(path);
+    free(input);
     return 0;
 }
+
