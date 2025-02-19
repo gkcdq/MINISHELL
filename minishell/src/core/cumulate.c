@@ -26,7 +26,7 @@ int	process_segment(char *segment, t_ee *ee)
 	return (result);
 }
 
-char	*copy_pasta(char *l, int *i, t_ee * ee)
+char	*copy_pasta(char *l, int *i, t_ee *ee)
 {
 	int		j;
 	char	*copy;

@@ -17,7 +17,7 @@ int	command_part_one(t_token *token, char *input, t_ee *ee)
 	}
 	else if (ft_strcmp(token->trimmed_input, "pwd") == 0)
 	{
-		if_pwd(ee);                                      
+		if_pwd(ee);
 		res = 1;
 	}
 	else if ((ft_strcmp(token->trimmed_input, "cd") == 0)

@@ -1,5 +1,42 @@
 #include "../../minishell.h"
 
+void    path_confirm(char *input)
+{
+    char    **check_path;
+    char    *path;
+
+    check_path = ft_split(input, ' ');
+	path = find_command_path(check_path[0]);
+	if (!path)
+		ft_printf("🍁_(`へ´*)_🍁: %s: command not found\n", check_path[0]);
+	free_split(check_path);
+	free(path);
+}
+
+void    path_checker(char *input, t_ee *ee)
+{
+    char **check_path;
+    char *path;
+
+    check_path = ft_split(input, ' ');
+	path = find_command_path(check_path[calcul_check_path(check_path)]);
+	if (!path)
+	{
+		ee->signal = 127;
+		ee->check_and_validity = 1;
+		ee->confirmed_command = 0;
+	}
+	else
+	{
+		ee->signal = 0;
+		ee->check_and_validity = 0;
+		ee->confirmed_command = 1;
+	}
+	free_split(check_path);
+	free(path);
+	free(input);
+}
+
 char	*find_command_path(char *command)
 {
 	char	*path_env;

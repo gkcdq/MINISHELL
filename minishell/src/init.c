@@ -16,6 +16,22 @@ void	init_value_token(t_token *token, char *input)
 	return ;
 }
 
+void	init_quote_struct(t_quote *qt)
+{
+	qt->single_quotes = 0;
+	qt->double_quotes = 0;
+	qt->temp = NULL;
+	qt->next_line = NULL;
+}
+
+void	init_pipe_struct(t_pipe *pipe)
+{
+	pipe->commands = NULL;
+	pipe->prev_fd = -1;
+	pipe->i = 0;
+	pipe->pid = 0;
+}
+
 void	init_struct_loop(t_loop *loop)
 {
 	loop->changed_args = NULL;

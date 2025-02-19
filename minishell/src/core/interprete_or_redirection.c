@@ -12,16 +12,16 @@ void	if_confirmed_command_equal_to_zero(char *command_after_or, t_ee *ee)
 	}
 }
 
-char *parse_command_after(char *command_after_or)
+char	*parse_command_after(char *command_after_or)
 {
-	int i;
-	int j;
-	int k;
-	char *tmp;
+	int		i;
+	int		j;
+	int		k;
+	char	*tmp;
 
 	i = 0;
 	k = ft_strlen(command_after_or);
-	while(command_after_or[i] && command_after_or[i] <= 32)
+	while (command_after_or[i] && command_after_or[i] <= 32)
 		i++;
 	j = 0;
 	tmp = malloc(sizeof(char) * (k - i + 1));
@@ -35,8 +35,8 @@ char *parse_command_after(char *command_after_or)
 
 void	check_valid_after(char *command_after_or, t_ee *ee)
 {
-	char *path;
-	char *tmp_after;
+	char	*path;
+	char	*tmp_after;
 
 	tmp_after = parse_command_after(command_after_or);
 	path = find_command_path(tmp_after);

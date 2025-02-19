@@ -48,4 +48,3 @@ void	if_env(t_ee *ee)
 	}
 	return ;
 }
-
