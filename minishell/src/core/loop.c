@@ -15,8 +15,6 @@ int	parse_tmp(char *tmp, t_loop *loop, t_ee *ee)
 		cleanup_loop(loop);
 		return (1);
 	}
-	if (ft_strcmp(tmp, loop->input) != 0)
-		free(tmp);
 	if (check_the_end(loop->input) == 1)
 	{
 		cleanup_loop(loop);
@@ -85,6 +83,7 @@ int	all_what_is_need(char *tmp, t_loop *loop, t_ee *ee)
 		return (1);
 	if (processe_and_do_input(loop, ee))
 		return (1);
+	free(tmp);
 	return (0);
 }
 
@@ -101,4 +100,5 @@ void	loop(char *tmp, t_ee *ee)
 	tmp = readline("🍀_(^o^)_🍀  > ");
 	if (all_what_is_need(tmp, loop, ee))
 		return ;
+	return ;
 }

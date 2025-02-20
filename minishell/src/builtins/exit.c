@@ -1,24 +1,5 @@
 #include "../../minishell.h"
 
-char	*parse_input_exit(char *input, t_token *exit)
-{
-	int	i;
-
-	i = 0;
-	while (input[i])
-	{
-		if (input[i] == ';' && input[i + 1] == ';')
-			exit->token = 1;
-		if (input[i] == ';' && (input[i - 1] != ' '))
-		{
-			input[i] = '\0';
-			break ;
-		}
-		i++;
-	}
-	return (input);
-}
-
 int	check_simple_exit(char *input)
 {
 	int	i;

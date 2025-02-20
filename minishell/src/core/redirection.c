@@ -36,7 +36,7 @@ int	find_type_of_redirection(char *tmp_in)
 
 char	*unstick_to_re_stick(char *input)
 {
-	int		i = 0, j;
+	int		i, j;
 	int		count_how_many_sep;
 	char	*good_sep;
 
@@ -77,46 +77,50 @@ char	*unstick_to_re_stick(char *input)
 			good_sep[j++] = ' ';
 		}
 		else
-		{
 			good_sep[j++] = input[i];
-		}
 		i++;
 	}
 	good_sep[j] = '\0';
 	return (good_sep);
 }
 
-int	open_available(char **tmpfilename)
+typedef struct s_open
 {
-	int		fd;
 	char	*tmp_dir;
 	char	*idxstr;
 	char	*final_filename;
 	int		i;
+	int		fd;
+}			t_open;
 
-	tmp_dir = "/tmp/tmp_for_heredoc_";
-	i = 0;
-	while (i < 65535)
+
+
+int	open_available(char **tmpfilename)
+{
+	t_open openn;
+
+	openn.tmp_dir = "/tmp/tmp_for_heredoc_";
+	openn.i = 0;
+	while (openn.i < 65535)
 	{
-		idxstr = ft_itoa(i);
-		final_filename = (char *)malloc(ft_strlen(tmp_dir) + ft_strlen(idxstr)
-				+ 1);
-		if (!final_filename)
+		openn.idxstr = ft_itoa(openn.i);
+		openn.final_filename = (char *)malloc(ft_strlen(openn.tmp_dir) + ft_strlen(openn.idxstr)+ 1);
+		if (!openn.final_filename)
 		{
-			free(idxstr);
+			free(openn.idxstr);
 			return (-1);
 		}
-		strcpy(final_filename, tmp_dir);
-		ft_strcat(final_filename, idxstr);
-		free(idxstr);
-		fd = open(final_filename, O_WRONLY | O_CREAT | O_EXCL, 0644);
-		if (fd >= 0)
+		strcpy(openn.final_filename, openn.tmp_dir);
+		ft_strcat(openn.final_filename, openn.idxstr);
+		free(openn.idxstr);
+		openn.fd = open(openn.final_filename, O_WRONLY | O_CREAT | O_EXCL, 0644);
+		if (openn.fd >= 0)
 		{
-			*tmpfilename = final_filename;
-			return (fd);
+			*tmpfilename = openn.final_filename;
+			return (openn.fd);
 		}
-		free(final_filename);
-		i++;
+		free(openn.final_filename);
+		openn.i++;
 	}
 	return (-1);
 }

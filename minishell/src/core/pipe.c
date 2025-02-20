@@ -47,9 +47,7 @@ void	do_what_pipe_need(int pipe_fd[2], t_pipe *piipe, t_ee *ee)
 		exit(EXIT_FAILURE);
 	}
 	else
-	{
 		nm_pid_not_equal_to_zero(pipe_fd, piipe);
-	}
 	piipe->i++;
 }
 

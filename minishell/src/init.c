@@ -16,6 +16,14 @@ void	init_value_token(t_token *token, char *input)
 	return ;
 }
 
+void init_remover(t_parentheses_remover *r, char *input)
+{
+	r->i = 0;
+	r->j = 0;
+	r->level = 0;
+	r->tmp = malloc(sizeof(char) * (strlen(input) + 1));
+}
+
 void	init_quote_struct(t_quote *qt)
 {
 	qt->single_quotes = 0;

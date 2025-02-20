@@ -6,7 +6,7 @@
 		-c : Compte le nombre de caractères
 		-m : Compte le nombre de caractères
 		-L : Affiche la longueur de la ligne la plus longue
-*/
+
 
 int	ft_isspace(int c)
 {
@@ -175,3 +175,4 @@ void	ft_wc(char *input)
 	free_split(args);
 	free(wc);
 }
+*/

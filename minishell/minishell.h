@@ -72,6 +72,31 @@ typedef struct s_pipeline
 	int		output_fd;
 }			t_pipeline;
 
+typedef struct s_reconstruct
+{
+	int		i;
+	size_t	total_len;
+	char	*new_input;
+	char	*current_pos;
+	size_t	len;
+}			t_reconstruct;
+
+typedef struct s_pipeline_parser
+{
+	int		i;
+	int		j;
+	int		extra_spaces;
+	char	*tmp;
+}			t_pipeline_parser;
+
+typedef struct s_parentheses_remover
+{
+	int		i;
+	int		j;
+	int		level;
+	char	*tmp;
+}			t_parentheses_remover;
+
 typedef struct s_wc_fonction
 {
 	int		lines;
@@ -242,5 +267,7 @@ void		close_fds(t_pipeline *p);
 void		pid_sup_to_zero_pipe_redi(t_pipeline *p);
 int			handle_error_piperedi(const char *msg, t_pipeline *p, char *input);
 int			handle_error(const char *msg, t_pipeline *p, char *input);
+void 		init_remover(t_parentheses_remover *r, char *input);
+char		*parse_input_exit(char *input, t_token *exit);
 
 #endif

@@ -1,33 +1,51 @@
 #include "../../minishell.h"
 
+int count_extra_spaces(char *input)
+{
+    int i;
+	int count;
+
+	i = 0; 
+	count = 0;
+    while (input[i])
+    {
+        if (input[i] > 32 && input[i] != '<' && input[i] != '>' && (input[i + 1] == '<' || input[i + 1] == '>'))
+            count++;
+        i++;
+    }
+    return count;
+}
+
+char *parse_redirection_at_start(char *input)
+{
+    int i = 0, j = 0;
+    int extra_spaces;
+    char *tmp;
+
+    extra_spaces = count_extra_spaces(input);
+    tmp = malloc(sizeof(char) * (strlen(input) + extra_spaces + 1));
+    if (!tmp)
+        return (NULL);
+    while (input[i])
+    {
+        if (input[i] > 32 && input[i] != '<' && input[i] != '>' && (input[i + 1] == '<' || input[i + 1] == '>'))
+        {
+            tmp[j++] = input[i]; 
+            tmp[j++] = ' ';
+        }
+        else
+            tmp[j++] = input[i];
+        i++;
+    }
+    tmp[j] = '\0';
+    printf("tmp = %s\n", tmp);
+    return (tmp);
+}
+
 char *cut_for_no_leaks_at_the_end(char *input)
 {
-	int i;
-	int j;
-	int k;
-	char *tmp;
-
-	i = ft_strlen(input);
-	j = 0;
-	while (input[i] <= 32)
-		i--;
-	if (input[i] == ';')
-		j = 1;
-	if (j == 1)
-	{
-		while(input[i] <= 32)
-			i--;
-		tmp = malloc(sizeof(char) * (i + 2));
-		k = 0;
-		while (k <= i)
-		{
-			tmp[k] = input[k];
-			k++;
-		}
-		tmp[k] = '\0';
-		return (tmp);
-	}
-	return (input);
+    char *tmp = parse_redirection_at_start(input);
+    return (tmp);
 }
 
 int	check_the_end(char *input)

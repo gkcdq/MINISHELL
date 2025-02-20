@@ -364,13 +364,6 @@ char **remove_duplicates_with_priority(char **env)
     return result;
 }
 
-
-
-
-
-
-
-
 void ft_export(char *input, t_ee *ee)
 {
     char **args;
