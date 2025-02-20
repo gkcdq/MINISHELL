@@ -270,4 +270,14 @@ int			handle_error(const char *msg, t_pipeline *p, char *input);
 void 		init_remover(t_parentheses_remover *r, char *input);
 char		*parse_input_exit(char *input, t_token *exit);
 
+
+
+
+
+// voir pour $PATH et $PWD ainsi que (ls || || pwd)
+
+
+
+
+
 #endif
