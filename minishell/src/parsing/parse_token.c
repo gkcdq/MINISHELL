@@ -1,80 +1,29 @@
 #include "../../minishell.h"
 
-int count_extra_spaces(char *input)
+void	norminette_tricks(void)
 {
-    int i;
-	int count;
-
-	i = 0; 
-	count = 0;
-    while (input[i])
-    {
-        if (input[i] > 32 && input[i] != '<' && input[i] != '>' && (input[i + 1] == '<' || input[i + 1] == '>'))
-            count++;
-        i++;
-    }
-    return count;
-}
-
-char *parse_redirection_at_start(char *input)
-{
-    int i = 0, j = 0;
-    int extra_spaces;
-    char *tmp;
-
-    extra_spaces = count_extra_spaces(input);
-    tmp = malloc(sizeof(char) * (strlen(input) + extra_spaces + 1));
-    if (!tmp)
-        return (NULL);
-    while (input[i])
-    {
-        if (input[i] > 32 && input[i] != '<' && input[i] != '>' && (input[i + 1] == '<' || input[i + 1] == '>'))
-        {
-            tmp[j++] = input[i]; 
-            tmp[j++] = ' ';
-        }
-        else
-            tmp[j++] = input[i];
-        i++;
-    }
-    tmp[j] = '\0';
-    printf("tmp = %s\n", tmp);
-    return (tmp);
-}
-
-char *cut_for_no_leaks_at_the_end(char *input)
-{
-    char *tmp = parse_redirection_at_start(input);
-    return (tmp);
+	ft_printf("🛠️_(>_<;)_🛠️   : syntax error near unexpected token `newline'\n");
 }
 
 int	check_the_end(char *input)
 {
-	int i = 0;
-	int count_first = 0;
-	int count_last = 0;
+	int	i;
+	int	count_first;
+	int	count_last;
 
-	while (input && input[i])
-		i++;
+	count_first = count_first_or_last(input, 'f');
+	count_last = count_first_or_last(input, 'l');
+	i = ft_strlen(input);
 	while (input[i - 1] <= 32)
 		i--;
 	i--;
 	if (input[i] == '(')
 	{
-		ft_printf("🛠️_(>_<;)_🛠️   : syntax error near unexpected token `newline'\n");
+		norminette_tricks();
 		return (1);
 	}
 	if ((input[i] == '|' || input[i] == '&'))
 		return (1);
-	i = 0;
-	while (input[i])
-	{
-		if (input[i] == '(')
-			count_first++;
-		if (input[i] == ')')
-			count_last++;
-		i++;
-	}
 	if (count_last > count_first)
 	{
 		ft_printf("🛠️_(>_<;)_🛠️   : syntax error near unexpected token `)'\n");
@@ -87,8 +36,9 @@ int	check_the_end(char *input)
 
 int	do_you_find_or_what(char *input)
 {
-	int i = 0;
+	int	i;
 
+	i = 0;
 	while (input[i])
 	{
 		if (input[i] == '(')
@@ -105,8 +55,9 @@ int	do_you_find_or_what(char *input)
 
 int	find_parenthesis(char *input)
 {
-	int i = 0;
+	int	i;
 
+	i = 0;
 	while (input[i])
 	{
 		if (input[i] == ')')
@@ -116,15 +67,15 @@ int	find_parenthesis(char *input)
 	return (0);
 }
 
-char	**parse_dollars(char **args, t_ee *ee)
+/*char	**parse_dollars(char **args, t_ee *ee)
 {
 	char	*copy;
 	char	**changed_args;
 	char	*after_equal;
 	char	*before_equal;
 	int		lock;
+
 	int i, j, k, x, y, m;
-	
 	changed_args = malloc(sizeof(char *) * (ft_strlonglen(args) + 1));
 	if (!changed_args)
 		return (NULL);
@@ -191,4 +142,4 @@ char	**parse_dollars(char **args, t_ee *ee)
 	}
 	changed_args[i] = NULL;
 	return (changed_args);
-}
+}*/

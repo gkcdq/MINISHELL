@@ -77,83 +77,100 @@ int	execute_pipeline(char *input, t_ee *ee)
 	return (0);
 }
 
-/*int execute_pipeline(char *input, t_ee *ee) 
+/*int execute_pipeline(char *input, t_ee *ee)
 {
-    char **commands;
-    int pipe_fd[2];
-    int prev_fd = -1;
-    pid_t pid;
-    int i = 0;
+	char **commands;
+	int pipe_fd[2];
+	int prev_fd = -1;
+	pid_t pid;
+	int i = 0;
 
 	input = parse_input_pipeline(input);
-	//printf("pipe input = %s\n", input);
-    commands = ft_split(input, '|');
-    while (commands[i])
+	commands = ft_split(input, '|');
+	if (!commands) {
+		perror("ft_split");
+		free(input);
+		return (-1);
+	}
+	while (commands[i])
 	{
-        if (pipe(pipe_fd) == -1)
+		if (pipe(pipe_fd) == -1)
 		{
-            perror("pipe");
-            exit(EXIT_FAILURE);
-        }
-        pid = fork();
-        if (pid == -1)
+			perror("pipe");
+			free_split(commands);
+			free(input);
+			exit(EXIT_FAILURE);
+		}
+
+		pid = fork();
+		if (pid == -1)
 		{
-            perror("fork");
-            exit(EXIT_FAILURE);
-        }
-        if (pid == 0)
+			perror("fork");
+			free_split(commands);
+			free(input);
+			exit(EXIT_FAILURE);
+		}
+
+		if (pid == 0)
 		{
-            if (prev_fd != -1) 
+			if (prev_fd != -1)
 			{
-                dup2(prev_fd, STDIN_FILENO);
-                close(prev_fd);
-            }
-            if (commands[i + 1])
+				dup2(prev_fd, STDIN_FILENO);
+				close(prev_fd);
+			}
+			if (commands[i + 1])
 			{
-                dup2(pipe_fd[1], STDOUT_FILENO);
-            }
-            close(pipe_fd[0]);
-            close(pipe_fd[1]);
-            interprete_commande(commands[i], ee);
-            exit(EXIT_FAILURE);
-        }
+				dup2(pipe_fd[1], STDOUT_FILENO);
+			}
+			close(pipe_fd[0]);
+			close(pipe_fd[1]);
+			interprete_commande(commands[i], ee);
+			exit(EXIT_FAILURE);
+		}
 		else
 		{
-            close(pipe_fd[1]);
-            if (prev_fd != -1)
+			close(pipe_fd[1]);
+			if (prev_fd != -1)
 			{
-                close(prev_fd);
-            }
-            prev_fd = pipe_fd[0];
-        }
-        i++;
-    }
-    if (prev_fd != -1) 
-        close(prev_fd);
-    while (wait(NULL) > 0);
-    free_split(commands);
+				close(prev_fd);
+			}
+			prev_fd = pipe_fd[0];
+		}
+		i++;
+	}
+	if (prev_fd != -1)
+		close(prev_fd);
+	while (wait(NULL) > 0);
+	free_split(commands);
 	char **check_path = ft_split(input, ' ');
-	char *path = find_command_path(check_path[0]);
-	if (!path)
-		ft_printf("🍁_(`へ´*)_🍁: %s: command not found\n", check_path[0]);
-	free_split(check_path);
-	free(path);
+	if (check_path)
+	{
+		char *path = find_command_path(check_path[0]);
+		if (!path)
+			ft_printf("🍁_(`へ´*)_🍁: %s: command not found\n", check_path[0]);
+
+		free_split(check_path);
+		free(path);
+	}
 	check_path = ft_split(input, ' ');
-	path = find_command_path(check_path[calcul_check_path(check_path)]);
-	if (!path)
+	if (check_path)
 	{
-		ee->signal = 127;
-		ee->check_and_validity = 1;
-		ee->confirmed_command = 0;
+		char *path = find_command_path(check_path[calcul_check_path(check_path)]);
+		if (!path)
+		{
+			ee->signal = 127;
+			ee->check_and_validity = 1;
+			ee->confirmed_command = 0;
+		}
+		else
+		{
+			ee->signal = 0;
+			ee->check_and_validity = 0;
+			ee->confirmed_command = 1;
+		}
+		free_split(check_path);
+		free(path);
 	}
-	else
-	{
-		ee->signal = 0;
-		ee->check_and_validity = 0;
-		ee->confirmed_command = 1;
-	}
-	free_split(check_path);
-	free(path);
 	free(input);
 	return (0);
 }*/

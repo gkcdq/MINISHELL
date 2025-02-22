@@ -15,10 +15,9 @@ int	check_token(char *input, t_token *token)
 	return (0);
 }
 
-
 int	check_after_token(char *input, int i)
 {
-	int confirme;
+	int	confirme;
 
 	confirme = 0;
 	if (input[i] && input[i + 1])
@@ -36,4 +35,29 @@ int	check_after_token(char *input, int i)
 		return (0);
 	else
 		return (1);
+}
+
+int	check_for_no_double(char *input)
+{
+	int	i;
+
+	i = 0;
+	while (input[i])
+	{
+		if ((input[i] == '|' && input[i + 1] == '|') || (input[i] == '&'
+				&& input[i + 1] == '&'))
+		{
+			i += 2;
+			while (input[i] && input[i] <= 32)
+				i++;
+			if (input[i] == '|' || input[i] == '&' || input[i] == ';')
+			{
+				printf("🛠️_(>_<;)_🛠️   : syntax error\n");
+				return (1);
+			}
+		}
+		else
+			i++;
+	}
+	return (0);
 }

@@ -2,7 +2,8 @@
 
 int	parse_tmp(char *tmp, t_loop *loop, t_ee *ee)
 {
-	if (check_syntax_error(tmp, ee) || check_unexpected_semicolon(tmp, ee))
+	if (check_syntax_error(tmp, ee) || check_unexpected_semicolon(tmp, ee)
+		|| check_for_no_double(tmp))
 	{
 		free(tmp);
 		cleanup_loop(loop);
@@ -66,17 +67,19 @@ int	processe_and_do_input(t_loop *loop, t_ee *ee)
 
 int	all_what_is_need(char *tmp, t_loop *loop, t_ee *ee)
 {
-    if (ft_strcmp(tmp, "echo$?") == 0)
-	{
-		ft_printf("🍁_(`へ´*)_🍁: echo%d: command not found\n", ee->signal);
-		return (1);
-	}
 	if (check_tmp_not_null(tmp, ee))
 	{
 		free(loop);
 		return (1);
 	}
 	add_history(tmp);
+	if (ft_strcmp(tmp, "echo$?") == 0)
+	{
+		ft_printf("🍁_(`へ´*)_🍁: echo%d: command not found\n", ee->signal);
+		free(loop);
+		free(tmp);
+		return (1);
+	}
 	if (parse_tmp(tmp, loop, ee))
 		return (1);
 	if (more_parse_and_assign(loop, ee))

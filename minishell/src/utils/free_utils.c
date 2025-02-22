@@ -1,12 +1,14 @@
 #include "../../minishell.h"
 
-void	at_the_end(t_token *token, t_ee *ee)
+int	norminette_backflip(char *final_command, t_redir_handler *hr)
 {
-	if (token->trimmed_input)
-		free(token->trimmed_input);
-	if (token)
-		free(token);
-	ee->signal = 0;
+	if (!final_command)
+	{
+		redi_pipe_free(hr);
+		return (1);
+	}
+	redi_last_free(hr);
+	return (0);
 }
 
 void	cleanup_loop(t_loop *loop)
@@ -20,6 +22,7 @@ void	cleanup_loop(t_loop *loop)
 		free(loop);
 	}
 }
+
 void	close_fds(t_pipeline *p)
 {
 	if (p->heredoc_fd != -1)

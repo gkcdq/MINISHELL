@@ -16,8 +16,7 @@ int	process_segment(char *segment, t_ee *ee)
 	else if (find_pipe(reconstructed_input) && !find_or(reconstructed_input)
 		&& !find_redirection(reconstructed_input))
 		execute_pipeline(reconstructed_input, ee);
-	else if (find_pipe(reconstructed_input)
-		&& find_redirection(reconstructed_input))
+	else if (find_redirection_and_pipe(reconstructed_input))
 		execute_pipeline_heredoc(reconstructed_input, ee);
 	else
 		result = interprete_commande(reconstructed_input, ee);

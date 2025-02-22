@@ -35,52 +35,52 @@ int	execute_child(t_pipeline *p, t_ee *ee)
 	exit(EXIT_FAILURE);
 }
 
-
-void main_core(t_pipeline *p, char *input, t_ee *ee)
+void	main_core(t_pipeline *p, char *input, t_ee *ee)
 {
-    p->final_command = handle_redi_with_pipe(p->commands[p->i], ee, p);
-    if (!p->final_command)
-    {
-        handle_error_piperedi("🔒 Erreur lors du traitement des redirections", p, input);
-        return;
-    }
-    if (pipe(p->pipe_fd) == -1)
-    {
-        handle_error_piperedi("pipe", p, input);
-        return;
-    }
-    p->pid = fork();
-    if (p->pid == -1)
-    {
-        handle_error_piperedi("fork", p, input);
-        return;
-    }
-    if (p->pid == 0)
-        execute_child(p, ee);
-    close_fds_and_update(p);
-    free(p->final_command);
+	p->final_command = handle_redi_with_pipe(p->commands[p->i], ee, p);
+	if (!p->final_command)
+	{
+		handle_error_piperedi("🔒 Erreur lors du traitement des redirections", p,
+			input);
+		return ;
+	}
+	if (pipe(p->pipe_fd) == -1)
+	{
+		handle_error_piperedi("pipe", p, input);
+		return ;
+	}
+	p->pid = fork();
+	if (p->pid == -1)
+	{
+		handle_error_piperedi("fork", p, input);
+		return ;
+	}
+	if (p->pid == 0)
+		execute_child(p, ee);
+	close_fds_and_update(p);
+	free(p->final_command);
 }
 
-
-int execute_pipeline_heredoc(char *input, t_ee *ee)
+int	execute_pipeline_heredoc(char *input, t_ee *ee)
 {
-    t_pipeline *p = malloc(sizeof(t_pipeline));
-    if (!p)
-        return (handle_error("malloc", p, input));
+	t_pipeline	*p;
 
-    p->prev_fd = -1;
-    p->i = 0;
-    input = parse_input_pipeline(input);
-    p->commands = ft_split(input, '|');
-    if (!p->commands)
-        return handle_error("Failed to split commands", p, input);
-    while (p->commands[p->i])
-    {
-        main_core(p, input, ee);
-        p->i++;
-    }
-    path_and_free_piperedi(p, input, ee);
-    return 0;
+	p = malloc(sizeof(t_pipeline));
+	if (!p)
+		return (handle_error("malloc", p, input));
+	p->prev_fd = -1;
+	p->i = 0;
+	input = parse_input_pipeline(input);
+	p->commands = ft_split(input, '|');
+	if (!p->commands)
+		return (handle_error("Failed to split commands", p, input));
+	while (p->commands[p->i])
+	{
+		main_core(p, input, ee);
+		p->i++;
+	}
+	path_and_free_piperedi(p, input, ee);
+	return (0);
 }
 
 /*int execute_pipeline_heredoc(char *input, t_ee *ee)

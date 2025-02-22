@@ -8,7 +8,7 @@ int	check_syntax_at_start(const char *t, t_ee *ee)
 	if (t[i] == '&')
 	{
 		if ((t[i + 1] == '&' && t[i + 2] == '&') || (t[i] == '&' && t[i
-				+ 1] != '&'))
+					+ 1] != '&'))
 			printf("🛠️_(>_<;)_🛠️   : syntax error near unexpected token `&'\n");
 		else if (t[i + 1] == '&')
 			printf("🛠️_(>_<;)_🛠️   : syntax error near unexpected token `&&'\n");
@@ -18,7 +18,7 @@ int	check_syntax_at_start(const char *t, t_ee *ee)
 	if (t[i] == '|')
 	{
 		if ((t[i + 1] == '|' && t[i + 2] == '|') || (t[i] == '|' && t[i
-				+ 1] != '|'))
+					+ 1] != '|'))
 			printf("🛠️_(>_<;)_🛠️   : syntax error near unexpected token `|'\n");
 		else if (t[i + 1] == '|')
 			printf("🛠️_(>_<;)_🛠️   : syntax error near unexpected token `||'\n");
