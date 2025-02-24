@@ -58,6 +58,26 @@ void	path_checker(char *input, t_ee *ee)
 	free(input);
 }
 
+void	check_if_path_is_set(t_ee *ee, char **args)
+{
+	int	i;
+
+	i = 0;
+	while (args[i])
+	{
+		if (ft_strcmp(args[i], "PATH=/bin:/usr/bin") == 0
+			|| (ee->save_initial_path && ft_strcmp(args[i],
+					ee->save_initial_path) == 0))
+		{
+			setenv("PATH", "/bin:/usr/bin", 1);
+			ee->lock_path = 0;
+			ee->path_is_not_able = 0;
+			break ;
+		}
+		i++;
+	}
+}
+
 /*char	*find_command_path(char *command)
 {
 	char	*path_env;

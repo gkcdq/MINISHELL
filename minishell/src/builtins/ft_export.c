@@ -1,64 +1,5 @@
 #include "../../minishell.h"
 
-char	*ft_strndup(const char *s, size_t n)
-{
-	char *dup;
-	size_t len = strnlen(s, n);
-
-	dup = malloc(len + 1);
-	if (!dup)
-		return (NULL);
-	memcpy(dup, s, len);
-	dup[len] = '\0';
-	return (dup);
-}
-
-int	ft_strcmp_dif(char *s1, char *s2)
-{
-	int i;
-
-	i = 0;
-	while (s1[i] || s2[i])
-	{
-		if (s1[i] != s2[i])
-			return (s1[i] - s2[i]);
-		else
-			i++;
-	}
-	return (0);
-}
-
-char	*parse_input_simple_export(char *input)
-{
-	int i = 0;
-	int j = 0;
-	char *copy;
-
-	while (input[i] && input[i] <= 32)
-		i++;
-	int start = i;
-	while (input[i] && input[i] > 32)
-		i++;
-	copy = malloc(sizeof(char) * (i - start + 1));
-	if (!copy)
-		return (NULL);
-	while (start < i)
-	{
-		copy[j] = input[start];
-		start++;
-		j++;
-	}
-	copy[j] = '\0';
-	return (copy);
-}
-
-int	ft_found_equal(char c)
-{
-	if (c == '=')
-		return (1);
-	return (0);
-}
-
 void handle_env_with_equals(char **args, char ***copy_envp, int *len_envp)
 {
     int i = 1;
@@ -99,12 +40,6 @@ void handle_env_with_equals(char **args, char ***copy_envp, int *len_envp)
         }
         i++;
     }
-}
-
-
-int ft_check_equal(const char *s)
-{
-    return (ft_strchr(s, '=') != NULL);
 }
 
 void handle_export_without_equals(char **args, char ***copy_export, int *len_export)
@@ -405,8 +340,10 @@ void ft_export(char *input, t_ee *ee)
     else
     {
         export_with_args(ee, args);
+        check_if_path_is_not_modified(ee, args);
         check_if_path_is_set(ee, args);
         check_if_home_is_set(ee, args);
+        check_if_home_is_not_modified(ee, args);
     }
     free_split(args);
 }
@@ -471,90 +408,4 @@ void	sort_export(t_ee *ee, char **sorted)
 		i++;
 	}
 	free(sorted_env);
-}
-
-
-char	*ft_strcat_export(char *s1, char *s2)
-{
-	int len1 = ft_strlen(s1);
-	int len2 = ft_strlen(s2);
-	int i;
-	int j;
-	char *result;
-
-	result = malloc(sizeof(char) * (len1 + len2 + 1));
-	if (!result)
-		return (NULL);
-	i = 0;
-	j = 0;
-	while (s1[i])
-	{
-		result[i] = s1[i];
-		i++;
-	}
-	while (s2[j])
-	{
-		result[i] = s2[j];
-		i++;
-		j++;
-	}
-	result[i] = '\0';
-	return (result);
-}
-
-void	check_if_path_is_set(t_ee *ee, char **args)
-{
-	int i;
-
-	i = 0;
-	while (args[i])
-	{
-		if (ft_strcmp(args[i], "PATH=/bin:/usr/bin") == 0
-			|| (ee->save_initial_path && ft_strcmp(args[i],
-					ee->save_initial_path) == 0))
-		{
-			setenv("PATH", "/bin:/usr/bin", 1);
-			ee->path_is_not_able = 0;
-			break ;
-		}
-		i++;
-	}
-}
-
-char    *parse_home(char *home)
-{
-    int i;
-    int j;
-    char *tmp;
-
-    i = 0;
-    while(home[i] && home[i] != '=')
-        i++;
-    tmp = malloc(sizeof(char) * (ft_strlen(home) - i + 1));
-    j = 0;
-    while (home[i])
-    {
-        tmp[j++] = home[i++];
-    }
-    tmp[j] = '\0';
-    return (tmp);    
-}
-
-void	check_if_home_is_set(t_ee *ee, char **args)
-{
-	int i;
-    char *tmp;
-
-	i = 0;
-    tmp = parse_home(ee->copy_home);
-	while (args[i])
-	{
-		if (ee->copy_home && ft_strcmp(args[i], ee->copy_home) == 0)
-		{ 
-			ee->block_home = 0;
-			break ;
-		}
-		i++;
-	}
-    free(tmp);
 }

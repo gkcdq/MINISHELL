@@ -1,17 +1,22 @@
 #include "../../minishell.h"
 
-void	ft_ls(char *input)
+void	ft_ls(char *input, t_ee *ee)
 {
 	t_ls	ls;
 
-	init_ls(&ls, input);
-	if (!open_directory(&ls))
+	if (ee->lock_path == 0)
 	{
+		init_ls(&ls, input);
+		if (!open_directory(&ls))
+		{
+			clean_up_ls(&ls);
+			return ;
+		}
+		print_files(&ls);
 		clean_up_ls(&ls);
-		return ;
 	}
-	print_files(&ls);
-	clean_up_ls(&ls);
+	else
+		ft_printf("🍁_(`へ´*)_🍁: ls: command not found\n");
 }
 
 int	open_directory(t_ls *ls)

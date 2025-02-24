@@ -52,7 +52,7 @@ int	command_part_two(t_token *token, char *input, t_ee *ee)
 	}
 	else if (ft_strcmp(token->trimmed_input, "ls") == 0)
 	{
-		ft_ls(input);
+		ft_ls(input, ee);
 		res = 1;
 	}
 	return (res);

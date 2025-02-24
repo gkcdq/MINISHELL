@@ -243,7 +243,7 @@ typedef struct s_envp_copy
 void				ft_exit(char *input, t_ee *ee);
 void				ft_pwd(void);
 void				ft_cd(char *input, t_ee *ee);
-void				ft_ls(char *input);
+void				ft_ls(char *input, t_ee *ee);
 void				ft_clear(char *input);
 void				ft_env(t_ee *ee);
 void				ft_unset(char *input, t_ee *ee);
@@ -432,9 +432,14 @@ int					open_directory(t_ls *ls);
 void				init_ls(t_ls *ls, char *input);
 char				*parse_input_ls(char *input);
 void				clean_up_ls(t_ls *ls);
+char				*parse_input_simple_export(char *input);
+int					ft_strcmp_dif(char *s1, char *s2);
+int					ft_check_equal(const char *s);
+void				check_if_home_is_not_modified(t_ee *ee, char **args);
+void				check_if_path_is_not_modified(t_ee *ee, char **args);
 int					handle_error_piperedi(const char *m, t_pipeline *p,
 						char *t);
 
-// voir (ls || || pwd) et check les status (echo $OLDPWD) (unset home && cd)
+// voir (ls || || pwd) et check les status (echo $OLDPWD) (export PATH=NULL && ls)
 
 #endif

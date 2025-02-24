@@ -33,3 +33,32 @@ char	*ft_strjoin_cd(char *s1, char *s2)
 	res[i + j] = '\0';
 	return (res);
 }
+
+char	*ft_strndup(const char *s, size_t n)
+{
+	char	*dup;
+	size_t	len;
+
+	len = strnlen(s, n);
+	dup = malloc(len + 1);
+	if (!dup)
+		return (NULL);
+	memcpy(dup, s, len);
+	dup[len] = '\0';
+	return (dup);
+}
+
+int	ft_strcmp_dif(char *s1, char *s2)
+{
+	int	i;
+
+	i = 0;
+	while (s1[i] || s2[i])
+	{
+		if (s1[i] != s2[i])
+			return (s1[i] - s2[i]);
+		else
+			i++;
+	}
+	return (0);
+}
