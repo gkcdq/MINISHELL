@@ -1,33 +1,50 @@
 #include "../../minishell.h"
 
-char	*parse_input_ls(char *input)
+void	ft_ls(char *input)
 {
-	int	i;
+	t_ls	ls;
 
-	i = 0;
-	while (input[i])
+	init_ls(&ls, input);
+	if (!open_directory(&ls))
 	{
-		if (input[i] == ';' && input[i + 1] == '\0')
-		{
-			input[i] = '\0';
-			break ;
-		}
-		if (input[i] == ';' && input[i + 1] != '\0')
-		{
-			input[i] = '\0';
-			break ;
-		}
-		if (input[i] == ';' && (input[i - 1] != ' '))
-		{
-			input[i] = '\0';
-			break ;
-		}
-		i++;
+		clean_up_ls(&ls);
+		return ;
 	}
-	return (input);
+	print_files(&ls);
+	clean_up_ls(&ls);
 }
 
-void	ft_ls(char *input)
+int	open_directory(t_ls *ls)
+{
+	ls->dir = opendir(ls->path);
+	if (!ls->dir)
+	{
+		printf("💔_(ಥ﹏ಥ)_💔: cannot access '%s': No such file or directory\n",
+			ls->path);
+		return (0);
+	}
+	return (1);
+}
+
+void	print_files(t_ls *ls)
+{
+	ls->file_found = 0;
+	while (1)
+	{
+		ls->entry = readdir(ls->dir);
+		if (ls->entry == NULL)
+			break ;
+		if (ls->entry->d_name[0] != '.')
+		{
+			printf("%s ", ls->entry->d_name);
+			ls->file_found = 1;
+		}
+	}
+	if (ls->file_found)
+		printf("\n");
+}
+
+/*void	ft_ls(char *input)
 {
 	char			**args;
 	char			*path;
@@ -63,4 +80,4 @@ void	ft_ls(char *input)
 		printf("\n");
 	free_split(args);
 	closedir(dir);
-}
+}*/

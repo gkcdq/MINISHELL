@@ -406,6 +406,7 @@ void ft_export(char *input, t_ee *ee)
     {
         export_with_args(ee, args);
         check_if_path_is_set(ee, args);
+        check_if_home_is_set(ee, args);
     }
     free_split(args);
 }
@@ -518,4 +519,42 @@ void	check_if_path_is_set(t_ee *ee, char **args)
 		}
 		i++;
 	}
+}
+
+char    *parse_home(char *home)
+{
+    int i;
+    int j;
+    char *tmp;
+
+    i = 0;
+    while(home[i] && home[i] != '=')
+        i++;
+    tmp = malloc(sizeof(char) * (ft_strlen(home) - i + 1));
+    j = 0;
+    while (home[i])
+    {
+        tmp[j++] = home[i++];
+    }
+    tmp[j] = '\0';
+    return (tmp);    
+}
+
+void	check_if_home_is_set(t_ee *ee, char **args)
+{
+	int i;
+    char *tmp;
+
+	i = 0;
+    tmp = parse_home(ee->copy_home);
+	while (args[i])
+	{
+		if (ee->copy_home && ft_strcmp(args[i], ee->copy_home) == 0)
+		{ 
+			ee->block_home = 0;
+			break ;
+		}
+		i++;
+	}
+    free(tmp);
 }

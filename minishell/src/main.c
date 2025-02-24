@@ -12,6 +12,7 @@ int	main(int ac, char **av, char **envp)
 	init_struct(ee);
 	ee->envp = copy_envp(envp);
 	ee->save_initial_path = save_initial_path(ee);
+	ee->copy_home = save_initial_home(ee);
 	catch_signal(ee);
 	while (ee->minishell_check == 0)
 		loop(input, ee);

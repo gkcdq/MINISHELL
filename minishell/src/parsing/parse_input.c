@@ -100,6 +100,25 @@ char	*parse_input_exit(char *input, t_token *exit)
 	return (input);
 }
 
+char	*parse_input_cd(char *input)
+{
+	int	i;
+
+	i = 0;
+	if (!input)
+		return (NULL);
+	while (input[i])
+	{
+		if (input[i] == ';' && i > 0 && input[i - 1] != ' ')
+		{
+			input[i] = '\0';
+			break ;
+		}
+		i++;
+	}
+	return (input);
+}
+
 /*char	*reconstruct_input(char **changed_args)
 {
 	int		i;

@@ -1,18 +1,33 @@
 #include "../../minishell.h"
 
-int	check_simple_exit(char *input)
+void	ft_exit(char *input, t_ee *ee)
 {
-	int	i;
+	t_token	*exit;
+	char	**args;
 
-	i = 0;
-	while (input[i] <= 32)
-		i++;
-	while (input[i] > 32)
-		i++;
-	return (0);
+	exit = malloc(sizeof(t_token));
+	exit->token = 0;
+	input = parse_input_exit(input, exit);
+	args = ft_split(input, ' ');
+	if (check_simple_exit(input) == 0 && args[1] == NULL)
+	{
+		handle_exit_no_args(args, ee, exit);
+		return ;
+	}
+	if (exit->token == 1)
+	{
+		handle_exit_syntax_error();
+		return ;
+	}
+	if (args[1] && !is_number(args[1]) && args[1][0] != ';')
+		handle_exit_numeric_error(args, ee, exit);
+	else if (args[2] != NULL && args[1][0] != ';' && args[2][0] != ';')
+		handle_exit_too_many_args(exit, args);
+	else
+		handle_exit_no_args(args, ee, exit);
 }
 
-void	ft_exit(char *input, t_ee *ee)
+/*void	ft_exit(char *input, t_ee *ee)
 {
 	t_token	*exit;
 	char	**args;
@@ -56,4 +71,4 @@ void	ft_exit(char *input, t_ee *ee)
 		free(exit);
 		ee->minishell_check = 1;
 	}
-}
+}*/

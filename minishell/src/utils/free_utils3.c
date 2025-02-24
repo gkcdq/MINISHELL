@@ -44,5 +44,7 @@ void	all_is__freed(t_ee *ee)
 		free_split(ee->copy_export_env);
 	if (ee->save_initial_path)
 		free(ee->save_initial_path);
+	if (ee->copy_home)
+		free(ee->copy_home);
 	free(ee);
 }
