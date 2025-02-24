@@ -342,8 +342,8 @@ void ft_export(char *input, t_ee *ee)
         export_with_args(ee, args);
         check_if_path_is_not_modified(ee, args);
         check_if_path_is_set(ee, args);
-        check_if_home_is_set(ee, args);
         check_if_home_is_not_modified(ee, args);
+        check_if_home_is_set(ee, args);
     }
     free_split(args);
 }

@@ -2,13 +2,16 @@
 
 char	*parse_input_simple_export(char *input)
 {
-	int i = 0;
-	int j = 0;
-	char *copy;
+	int		i;
+	int		j;
+	char	*copy;
+	int		start;
 
+	i = 0;
+	j = 0;
 	while (input[i] && input[i] <= 32)
 		i++;
-	int start = i;
+	start = i;
 	while (input[i] && input[i] > 32)
 		i++;
 	copy = malloc(sizeof(char) * (i - start + 1));
@@ -31,7 +34,7 @@ int	ft_found_equal(char c)
 	return (0);
 }
 
-int ft_check_equal(const char *s)
+int	ft_check_equal(const char *s)
 {
-    return (ft_strchr(s, '=') != NULL);
+	return (ft_strchr(s, '=') != NULL);
 }
