@@ -440,6 +440,6 @@ void				check_if_path_is_not_modified(t_ee *ee, char **args);
 int					handle_error_piperedi(const char *m, t_pipeline *p,
 						char *t);
 
-// voir (ls || || pwd) et check les status (echo $OLDPWD) (export PATH=NULL && ls)
+//(ls || || pwd) et check les status(echo $OLDPWD)(export PATH=NULL && ls)
 
 #endif

@@ -299,16 +299,9 @@ char **remove_duplicates_with_priority(char **env)
     return result;
 }
 
-void ft_export(char *input, t_ee *ee)
+void    bilbon_saquet(t_ee *ee, char **args)
 {
-    char **args;
-	char **sorted_env;
-	char **concatene_both_tab = NULL;
-	
-	args = ft_split(input, ' ');
-    if (!ee->envp || !ee->envp[0])
-    {
-        if (!ee->copy_oldpwd && ee->if_unset__oldpwd == 0)
+    if (!ee->copy_oldpwd && ee->if_unset__oldpwd == 0)
             printf("🏗️ 🏡 OLDPWD\n");
         else if (ee->copy_oldpwd && ft_strcmp(ee->copy_oldpwd, ee->copy_pwd) != 0 && ee->if_unset__oldpwd == 0)
             printf("🏗️ 🏡 OLDPWD=%s\n", ee->copy_oldpwd);
@@ -319,6 +312,27 @@ void ft_export(char *input, t_ee *ee)
         if (ee->if_unset__shlvl == 0)
             printf("🏗️ 🏡 SHLVL=1\n");
         free_split(args);
+}
+
+void    norminette_backstab(t_ee *ee, char **args)
+{
+    export_with_args(ee, args);
+    check_if_path_is_not_modified(ee, args);
+    check_if_path_is_set(ee, args);
+    check_if_home_is_not_modified(ee, args);
+    check_if_home_is_set(ee, args);
+}
+
+void ft_export(char *input, t_ee *ee)
+{
+    char **args;
+	char **sorted_env;
+	char **concatene_both_tab = NULL;
+	
+	args = ft_split(input, ' ');
+    if (!ee->envp || !ee->envp[0])
+    {
+        bilbon_saquet(ee, args);
         return;
     }
     if (ft_strcmp(args[0], "export=") == 0)
@@ -338,13 +352,7 @@ void ft_export(char *input, t_ee *ee)
 		free(input);
 	}
     else
-    {
-        export_with_args(ee, args);
-        check_if_path_is_not_modified(ee, args);
-        check_if_path_is_set(ee, args);
-        check_if_home_is_not_modified(ee, args);
-        check_if_home_is_set(ee, args);
-    }
+        norminette_backstab(ee, args);
     free_split(args);
 }
 
