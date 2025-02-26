@@ -31,8 +31,8 @@ void	if_pid_is_sup_to_zero(t_ee *ee, pid_t pid)
 		if (!g_status)
 		{
 			ee->signal = WEXITSTATUS(status);
-			if (ee->signal != 0 && ee->signal != 1 && ee->signal != 2)
-				ee->signal = 128 + ee->signal;
+			//if (ee->signal != 0 && ee->signal != 1 && ee->signal != 2)
+			//	ee->signal = 128 + ee->signal;
 		}
 		else
 			ee->signal = 0;

@@ -242,7 +242,6 @@ char **remove_duplicates_with_priority(char **env)
                 name_j_len++;
             name_i = ft_strndup(env[i], name_i_len);
             name_j = ft_strndup(env[j], name_j_len);
-
             if (ft_strcmp(name_i, name_j) == 0)
             {
                 if (ft_strchr(env[j], '='))
@@ -253,9 +252,7 @@ char **remove_duplicates_with_priority(char **env)
                     break;
                 }
                 else
-                {
                     to_keep[j] = 0;
-                }
             }
             free(name_i);
             free(name_j);

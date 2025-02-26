@@ -3,8 +3,10 @@
 int	main(int ac, char **av, char **envp)
 {
 	t_ee	*ee;
+	int		status;
 	char	*input;
 
+	status = 0;
 	ee = malloc(sizeof(t_ee));
 	input = NULL;
 	(void)ac;
@@ -16,7 +18,10 @@ int	main(int ac, char **av, char **envp)
 	catch_signal(ee);
 	while (ee->minishell_check == 0)
 		loop(input, ee);
+	if (ee->code_exit != 0)
+		status = ee->code_exit;
 	all_is__freed(ee);
 	clear_history();
+	exit(status);
 	return (0);
 }

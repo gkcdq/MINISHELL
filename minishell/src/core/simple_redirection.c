@@ -39,7 +39,6 @@ int	read_and_write_heredoc(t_redir_simple *hr, char *buffer)
 int	process_heredoc_entries(t_redir_simple *hr, t_ee *ee)
 {
 	char	buffer[1024];
-	int		ret;
 	int		i;
 
 	i = 1;
@@ -52,7 +51,7 @@ int	process_heredoc_entries(t_redir_simple *hr, t_ee *ee)
 				return (perror("🔒 Erreur création fichier here-doc"),
 					EXIT_FAILURE);
 			hr->delimiter = hr->split_in[i + 1];
-			ret = write_to_tmpfile(hr->fd, hr->delimiter, ee);
+			write_to_tmpfile(hr->fd, hr->delimiter, ee);
 			close(hr->fd);
 			if (read_and_write_heredoc(hr, buffer) == EXIT_FAILURE)
 				return (EXIT_FAILURE);

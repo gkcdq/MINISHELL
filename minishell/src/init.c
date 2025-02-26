@@ -4,6 +4,7 @@ int		g_status = 0;
 
 void	init_struct(t_ee *ee)
 {
+	ee->code_exit = 0;
 	ee->minishell_check = 0;
 	ee->change_confirmed = 0;
 	ee->copy_pwd = NULL;

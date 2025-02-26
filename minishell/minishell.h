@@ -216,6 +216,7 @@ typedef struct s_ls
 
 typedef struct s_envp_copy
 {
+	int				code_exit;
 	int				minishell_check;
 	int				change_confirmed;
 	int				if_unset__pwd;
@@ -437,6 +438,7 @@ int					ft_strcmp_dif(char *s1, char *s2);
 int					ft_check_equal(const char *s);
 void				check_if_home_is_not_modified(t_ee *ee, char **args);
 void				check_if_path_is_not_modified(t_ee *ee, char **args);
+void				handle_exit_with_numeric_value(char **args, t_ee *ee, t_token  *exit);
 int					handle_error_piperedi(const char *m, t_pipeline *p,
 						char *t);
 
