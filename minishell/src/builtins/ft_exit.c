@@ -19,7 +19,14 @@ void	ft_exit(char *input, t_ee *ee)
 		handle_exit_syntax_error();
 		return ;
 	}
-	if (args[1] && !is_number(args[1]) && args[1][0] != ';')
+	process_exit(args, ee, exit);
+}
+
+void	process_exit(char **args, t_ee *ee, t_token *exit)
+{
+	if ((args[1] && (ft_strcmp(args[1], "$?") == 0) && args[1][0] != ';'))
+		handle_exit_with_status_value(args, ee, exit);
+	else if (args[1] && !is_number(args[1]) && args[1][0] != ';')
 		handle_exit_numeric_error(args, ee, exit);
 	else if (args[2] != NULL && args[1][0] != ';' && args[2][0] != ';')
 		handle_exit_too_many_args(exit, args);

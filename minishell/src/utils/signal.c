@@ -27,3 +27,9 @@ void	handle_herdoc_sigint(int status)
 	unlink("/tmp/heredoc_tmp");
 	exit(status);
 }
+
+void	handle_sigquit(int sig)
+{
+	(void)sig;
+	printf("Quit signal received (Ctrl+\\)\n");
+}

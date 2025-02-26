@@ -216,6 +216,7 @@ typedef struct s_ls
 
 typedef struct s_envp_copy
 {
+	int				reset_sigint;
 	int				code_exit;
 	int				minishell_check;
 	int				change_confirmed;
@@ -319,6 +320,7 @@ void				if_unset(char *input, t_ee *ee);
 void				if_export(char *input, t_ee *ee);
 void				if_dq(t_ee *ee, t_token *token);
 void				if_else(t_token *token, char *input, t_ee *ee);
+void				if_ls(char *input, t_ee *ee);
 int					cumulate_token(char *input, t_ee *ee);
 int					interprete_commande(char *input, t_ee *ee);
 void				execute_external_command(char *command, t_ee *ee);
@@ -438,10 +440,17 @@ int					ft_strcmp_dif(char *s1, char *s2);
 int					ft_check_equal(const char *s);
 void				check_if_home_is_not_modified(t_ee *ee, char **args);
 void				check_if_path_is_not_modified(t_ee *ee, char **args);
-void				handle_exit_with_numeric_value(char **args, t_ee *ee, t_token  *exit);
+void				handle_sigquit(int sig);
+void				process_exit(char **args, t_ee *ee, t_token *exit);
+char				*ft_strstr(char *to_find, char *str);
+int					check_atoi_overflow(char *str);
+void				handle_exit_with_status_value(char **a, t_ee *e,
+						t_token *x);
+void				handle_exit_with_numeric_value(char **a, t_ee *e,
+						t_token *x);
 int					handle_error_piperedi(const char *m, t_pipeline *p,
 						char *t);
 
-//(ls || || pwd) et check les status(echo $OLDPWD)(export PATH=NULL && ls)
+//(echo $OLDPWD)
 
 #endif

@@ -4,6 +4,7 @@ int		g_status = 0;
 
 void	init_struct(t_ee *ee)
 {
+	ee->reset_sigint = 0;
 	ee->code_exit = 0;
 	ee->minishell_check = 0;
 	ee->change_confirmed = 0;

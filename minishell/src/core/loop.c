@@ -84,6 +84,7 @@ int	all_what_is_need(char *tmp, t_loop *loop, t_ee *ee)
 		return (1);
 	if (more_parse_and_assign(loop, ee))
 		return (1);
+	signal(SIGQUIT, handle_sigquit);
 	if (processe_and_do_input(loop, ee))
 		return (1);
 	free(tmp);
@@ -100,6 +101,7 @@ void	loop(char *tmp, t_ee *ee)
 	if (!loop)
 		return ;
 	init_struct_loop(loop);
+	signal(SIGQUIT, SIG_IGN);
 	tmp = readline("🍀_(^o^)_🍀  > ");
 	if (all_what_is_need(tmp, loop, ee))
 		return ;
