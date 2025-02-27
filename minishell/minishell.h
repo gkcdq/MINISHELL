@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   minishell.h                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: tmilin <marvin@42.fr>                      +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/02/27 19:39:37 by tmilin            #+#    #+#             */
+/*   Updated: 2025/02/27 19:39:39 by tmilin           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
@@ -213,6 +225,39 @@ typedef struct s_ls
 	int				file_found;
 	struct dirent	*entry;
 }					t_ls;
+
+typedef struct s_env
+{
+	char			**envp;
+	char			**copy_export_env;
+	int				len_envp;
+	int				len_export;
+}					t_envv;
+
+typedef struct s_ewa
+{
+	char			**copy_envp;
+	char			**copy_export;
+	int				len_envp;
+	int				len_export;
+	int				count_equal;
+	int				count_args_without_equal;
+}					t_ewa;
+
+typedef struct s_rdp
+{
+	int				i;
+	int				j;
+	int				k;
+	int				len_env;
+	int				*to_keep;
+	char			**result;
+	size_t			name_i_len;
+	size_t			name_j_len;
+	char			*name_i;
+	char			*name_j;
+	int				new_len;
+}					t_rdp;
 
 typedef struct s_envp_copy
 {
@@ -435,6 +480,7 @@ int					open_directory(t_ls *ls);
 void				init_ls(t_ls *ls, char *input);
 char				*parse_input_ls(char *input);
 void				clean_up_ls(t_ls *ls);
+void				assign_rdp_name(t_rdp *rdp, char **env);
 char				*parse_input_simple_export(char *input);
 int					ft_strcmp_dif(char *s1, char *s2);
 int					ft_check_equal(const char *s);
@@ -444,6 +490,40 @@ void				handle_sigquit(int sig);
 void				process_exit(char **args, t_ee *ee, t_token *exit);
 char				*ft_strstr(char *to_find, char *str);
 int					check_atoi_overflow(char *str);
+void				print_invalid_identifier(const char *arg);
+size_t				get_key_length(const char *arg);
+void				initialize_ewa(t_ewa *ewa);
+void				initialize_rdp(t_rdp *rdp);
+void				allocate_result(t_rdp *rdp);
+void				calculate_lengths(t_envv *env, t_ee *ee);
+char				**allocate_memory(t_envv *env);
+void				allocate_and_copy_export(t_ewa *ewa, t_ee *ee);
+void				allocate_and_copy_envp(t_ewa *ewa, t_ee *ee);
+void				count_arguments(t_ewa *ewa, char **args);
+void				count_env_length(t_rdp *rdp, char **env);
+void				allocate_to_keep(t_rdp *rdp);
+size_t				ft_strcspn(const char *str, const char *reject);
+void				remove_duplicates(t_rdp *rdp, char **env);
+char				**copy_filtered_env(t_rdp *rdp, char **env);
+void				print_and_free_sorted_env(char **sorted_env, int len);
+void				sort_sorted_env(char **sorted_env, int len);
+void				add_oldpwd(t_ee *ee, char **sorted_env, int *len);
+void				bilbon_saquet(t_ee *ee, char **args);
+void				norminette_backstab(t_ee *ee, char **args);
+void				process_simple_export(char *input, t_ee *ee);
+void				copy_sorted_elements(char **sorted, char **sorted_env,
+						int len);
+int					calculate_sorted_len(char **sorted, t_ee *ee);
+bool				copy_env_variables(char **tmp, t_ee *ee, int len_envp);
+bool				copy_export_variables(char **tmp, t_ee *ee, int len_envp,
+						int len_export);
+int					find_export_var(char **export_list, int len_export,
+						const char *arg);
+void				add_export_var(char ***export_list, int *len_export,
+						const char *arg);
+void				add_env_var(char ***envp, int *len_envp, const char *arg);
+void				update_env_var(char **envp, int index, const char *arg);
+int					find_env_varrrr(char **envp, int len_envp, const char *arg);
 void				handle_exit_with_status_value(char **a, t_ee *e,
 						t_token *x);
 void				handle_exit_with_numeric_value(char **a, t_ee *e,

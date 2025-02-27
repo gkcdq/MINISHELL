@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   str_utils5.c                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: tmilin <marvin@42.fr>                      +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/02/27 19:38:35 by tmilin            #+#    #+#             */
+/*   Updated: 2025/02/27 19:38:36 by tmilin           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../minishell.h"
 
 char	*ft_strstr(char *str, char *to_find)
@@ -6,6 +18,8 @@ char	*ft_strstr(char *str, char *to_find)
 	int	j;
 
 	i = 0;
+	if (!to_find)
+		return (str);
 	while (str[i])
 	{
 		j = 0;
@@ -17,7 +31,7 @@ char	*ft_strstr(char *str, char *to_find)
 		}
 		i++;
 	}
-	return (NULL);
+	return (str);
 }
 
 int	check_atoi_overflow(char *str)
@@ -45,4 +59,37 @@ int	check_atoi_overflow(char *str)
 		str++;
 	}
 	return (0);
+}
+
+void	copy_until_parenthesis(char *l, int *i, char *copy, int *j)
+{
+	(*i)++;
+	while (l[*i] != '\0' && l[*i] != ')')
+	{
+		copy[*j] = l[*i];
+		(*j)++;
+		(*i)++;
+	}
+	if (l[*i] == ')')
+		(*i)++;
+}
+
+size_t	ft_strcspn(const char *str, const char *reject)
+{
+	size_t	i;
+	size_t	j;
+
+	i = 0;
+	while (str[i] != '\0')
+	{
+		j = 0;
+		while (reject[j] != '\0')
+		{
+			if (str[i] == reject[j])
+				return (i);
+			j++;
+		}
+		i++;
+	}
+	return (i);
 }

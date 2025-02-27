@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   external_command.c                                 :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: tmilin <marvin@42.fr>                      +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/02/27 19:27:56 by tmilin            #+#    #+#             */
+/*   Updated: 2025/02/27 19:27:58 by tmilin           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../minishell.h"
 
 void	if_path_is_incorrect(char **args, t_ee *ee)
@@ -12,13 +24,22 @@ void	if_path_is_incorrect(char **args, t_ee *ee)
 	return ;
 }
 
-void	if_pid_is_equal_to_zero(char *path, char **args, t_ee *ee, char *command)
+void	if_pid_is_equal_to_zero(char *path, char **args, t_ee *ee,
+		char *command)
 {
-	if (strstr(command, "./") != NULL)
+	int		i;
+
+	i = 0;
+	if (command[i] == '.' && command [i + 1] == '/')
 	{
+		if (command[i + 2] <= 32)
+		{
+			ft_printf("🚧_(⊙_⊙;)_🚧 : ./: Is a directory\n");
+			exit(126);
+		}
 		if (access(command, X_OK) == -1)
 		{
-			fprintf(stderr, "%s: Permission denied\n", command);
+			ft_printf("%s: Permission denied\n", command);
 			exit(126);
 		}
 	}
@@ -86,17 +107,4 @@ void	execute_external_command(char *command, t_ee *ee)
 		perror("fork");
 	free(path);
 	free_split(args);
-}
-
-void	copy_until_parenthesis(char *l, int *i, char *copy, int *j)
-{
-	(*i)++;
-	while (l[*i] != '\0' && l[*i] != ')')
-	{
-		copy[*j] = l[*i];
-		(*j)++;
-		(*i)++;
-	}
-	if (l[*i] == ')')
-		(*i)++;
 }

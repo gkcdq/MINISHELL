@@ -1,42 +1,28 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_echo.c                                          :+:      :+:    :+:   */
+/*   exit_utils2.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tmilin <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/02/27 19:25:36 by tmilin            #+#    #+#             */
-/*   Updated: 2025/02/27 19:25:37 by tmilin           ###   ########.fr       */
+/*   Created: 2025/02/27 19:32:27 by tmilin            #+#    #+#             */
+/*   Updated: 2025/02/27 19:32:29 by tmilin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
 
-void	ft_echo(char *input, t_ee *ee)
+void	handle_exit_syntax_error(void)
 {
-	char	**args;
-	bool	no_newline;
-	int		i;
+	printf("🛠️_(>_<;)_🛠️   : syntax error near unexpected token `;;'\n");
+}
 
-	no_newline = false;
-	i = 1;
-	args = ft_split(input, ' ');
-	if (args[i] && ft_strcmp(args[i], "-n") == 0)
-	{
-		no_newline = true;
-		i++;
-	}
-	while (args[i])
-	{
-		if (ft_strcmp(args[i], "$?") == 0)
-			ft_printf("%d", ee->signal);
-		else
-			ft_printf("%s", args[i]);
-		if (args[i + 1])
-			ft_printf(" ");
-		i++;
-	}
-	if (!no_newline)
-		ft_printf("\n");
+void	handle_exit_numeric_error(char **args, t_ee *ee, t_token *exit)
+{
+	ft_printf("🏃 exit\n");
+	ft_printf("🚧_(⊙_⊙;)_🚧 : exit: %s: numeric argument required\n", args[1]);
 	free_split(args);
+	free(exit);
+	ee->code_exit = 2;
+	ee->minishell_check = 1;
 }
