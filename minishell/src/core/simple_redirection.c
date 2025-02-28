@@ -53,29 +53,47 @@ int	process_heredoc_entries(t_redir_simple *hr, t_ee *ee)
 	char	buffer[1024];
 	int		i;
 
-	i = 1;
-	while (i < hr->last_name)
+	if (hr->help == 1)
 	{
-		if (strcmp(hr->split_in[i], "<<") == 0)
+		hr->delimiter = hr->split_in[1];
+		hr->fd = open_available(&hr->tmpfilenames[hr->heredoc_count]);
+		if (hr->fd < 0)
+			return (perror("🔒 Erreur création fichier here-doc"), EXIT_FAILURE);
+		write_to_tmpfile(hr->fd, hr->delimiter, ee);
+		close(hr->fd);
+		if (read_and_write_heredoc(hr, buffer) == EXIT_FAILURE)
+			return (EXIT_FAILURE);
+		hr->heredoc_count++;
+		return (EXIT_SUCCESS);
+	}
+	else
+	{
+		i = 1;
+		while (i < hr->last_name)
 		{
-			hr->fd = open_available(&hr->tmpfilenames[hr->heredoc_count]);
-			if (hr->fd < 0)
-				return (perror("🔒 Erreur création fichier here-doc"),
-					EXIT_FAILURE);
-			hr->delimiter = hr->split_in[i + 1];
-			write_to_tmpfile(hr->fd, hr->delimiter, ee);
-			close(hr->fd);
-			if (read_and_write_heredoc(hr, buffer) == EXIT_FAILURE)
-				return (EXIT_FAILURE);
-			hr->heredoc_count++;
+			if (strcmp(hr->split_in[i], "<<") == 0)
+			{
+				hr->fd = open_available(&hr->tmpfilenames[hr->heredoc_count]);
+				if (hr->fd < 0)
+					return (perror("🔒 Erreur création fichier here-doc"),
+						EXIT_FAILURE);
+				hr->delimiter = hr->split_in[i + 1];
+				write_to_tmpfile(hr->fd, hr->delimiter, ee);
+				close(hr->fd);
+				if (read_and_write_heredoc(hr, buffer) == EXIT_FAILURE)
+					return (EXIT_FAILURE);
+				hr->heredoc_count++;
+				i++;
+			}
 			i++;
 		}
-		i++;
+		close(hr->heredoc_fd);
 	}
-	close(hr->heredoc_fd);
 	return (EXIT_SUCCESS);
 }
 
+////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////
 /*void	handle_redirection(char *input, t_ee *ee)
 {

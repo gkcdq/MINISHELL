@@ -38,12 +38,14 @@ void	path_confirm(char *input)
 	char	**check_path;
 	char	*path;
 
+	printf("path_confirm input = '%s'", input);
 	check_path = ft_split(input, ' ');
 	path = find_command_path(check_path[0]);
 	if (!path)
 		ft_printf("🍁_(`へ´*)_🍁: %s: command not found\n", check_path[0]);
 	free_split(check_path);
-	free(path);
+	if (path)
+		free(path);
 }
 
 void	path_checker(char *input, t_ee *ee)
@@ -51,8 +53,16 @@ void	path_checker(char *input, t_ee *ee)
 	char	**check_path;
 	char	*path;
 
+	if (!input)
+		return ;
+	printf("'%s\n' ", input);
 	check_path = ft_split(input, ' ');
+	for(int i = 0; i< ft_strlonglen(check_path); i++)
+		printf("'%s' ", check_path[i]);
+	printf("\n");
+	// gere ici si c'est 
 	path = find_command_path(check_path[calcul_check_path(check_path)]);
+	printf("'%s\n' ", path);
 	if (!path)
 	{
 		ee->signal = 127;
@@ -66,8 +76,10 @@ void	path_checker(char *input, t_ee *ee)
 		ee->confirmed_command = 1;
 	}
 	free_split(check_path);
-	free(path);
-	free(input);
+	if (path)
+		free(path);
+	if (input)
+		free(input);
 }
 
 void	check_if_path_is_set(t_ee *ee, char **args)

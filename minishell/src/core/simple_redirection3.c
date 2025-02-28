@@ -46,6 +46,18 @@ void	open_output_file(t_redir_simple *hr, char *filename, int flags)
 	close(hr->file);
 }
 
+void	open_input_file(t_redir_simple *hr, char *filename)
+{
+    hr->file = open(filename, O_RDONLY);
+    if (hr->file == -1)
+    {
+        perror("🔒 Erreur ouverture fichier de redirection");
+        exit(EXIT_FAILURE);
+    }
+    dup2(hr->file, STDIN_FILENO);
+    close(hr->file);
+}
+
 void	redirect_output(t_redir_simple *hr)
 {
 	int	i;
@@ -53,13 +65,18 @@ void	redirect_output(t_redir_simple *hr)
 	i = 1;
 	while (i < hr->last_name)
 	{
-		if (strcmp(hr->split_in[i], ">") == 0)
+		if (ft_strcmp(hr->split_in[i], ">") == 0)
 		{
 			open_output_file(hr, hr->split_in[i + 1],
 				O_WRONLY | O_CREAT | O_TRUNC);
 			i++;
 		}
-		else if (strcmp(hr->split_in[i], ">>") == 0)
+		else if (ft_strcmp(hr->split_in[i], "<") == 0) 
+		{
+            open_input_file(hr, hr->split_in[i + 1]);
+			i++;
+		}
+		else if (ft_strcmp(hr->split_in[i], ">>") == 0)
 		{
 			open_output_file(hr, hr->split_in[i + 1],
 				O_WRONLY | O_CREAT | O_APPEND);

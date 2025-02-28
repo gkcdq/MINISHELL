@@ -82,7 +82,7 @@ void	handle_append_redirection(t_redir_handler *hr, t_pipeline *p)
 char	*handle_redi_with_pipe(char *input, t_ee *ee, t_pipeline *p)
 {
 	t_redir_handler	*hr;
-	char			*final_command;
+	char			*final_command =NULL;
 
 	hr = malloc(sizeof(t_redir_handler));
 	if (!hr)
@@ -91,18 +91,22 @@ char	*handle_redi_with_pipe(char *input, t_ee *ee, t_pipeline *p)
 	init_redir_handler(hr, input);
 	while (hr->i < hr->last_name)
 	{
-		if (strcmp(hr->split_in[hr->i], "<<") == 0)
-			handle_heredoc_redirection(hr, ee, p);
-		else if (strcmp(hr->split_in[hr->i], "<") == 0)
+		if (ft_strcmp(hr->split_in[hr->i], "<") == 0)
 			handle_input_redirection(hr, p);
-		else if (strcmp(hr->split_in[hr->i], ">") == 0)
+		else if (ft_strcmp(hr->split_in[hr->i], ">") == 0)
 			handle_output_redirection(hr, p);
-		else if (strcmp(hr->split_in[hr->i], ">>") == 0)
+		else if (ft_strcmp(hr->split_in[hr->i], ">>") == 0)
 			handle_append_redirection(hr, p);
+		else if (ft_strcmp(hr->split_in[hr->i], "<<") == 0)
+			handle_heredoc_redirection(hr, ee, p);
 		else
 			hr->i++;
 	}
-	final_command = ft_strdup(hr->input_execv);
+	if (hr->input_execv)
+	{
+		printf("%s\n", hr->input_execv);
+		final_command = ft_strdup(hr->input_execv);
+	}
 	norminette_backflip(final_command, hr);
 	return (final_command);
 }

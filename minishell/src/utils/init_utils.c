@@ -12,29 +12,63 @@
 
 #include "../minishell.h"
 
+void	init_when_heredoc_at_start(t_redir_simple *hr, char *input)
+{
+	printf("j'arrive ici\n");
+
+	hr->input_execv = parse_exev_input(input);
+	printf("i_e '%s'\n", hr->input_execv);
+
+	hr->if_need_sep = unstick_to_re_stick(input);
+
+	hr->split_execv = ft_split(hr->input_execv, ' ');
+	printf("s_e '%s'\n", hr->split_execv[0]);
+
+	hr->split_in = ft_split(hr->if_need_sep, ' ');
+	if (!hr->split_in || !hr->split_in[0])
+	{
+		free_if_simple_redir_fail(hr);
+		return ;
+	}
+	hr->last_name = ft_strlonglen(hr->split_in);
+	hr->path = find_command_path(hr->input_execv);
+	printf("path '%s'\n", hr->path);
+	hr->heredoc_tmpfile = NULL;
+	hr->heredoc_fd = -1;
+	hr->heredoc_count = 0;
+	hr->help = 1;
+	hr->delimiter = NULL;
+}
+
 t_redir_simple	*init_redirr_handler(char *input)
 {
 	t_redir_simple	*hr;
 
 	hr = malloc(sizeof(t_redir_simple));
 	if (!hr)
-		return (NULL);
-	hr->input_execv = parse_exev_input(input);
-	hr->if_need_sep = unstick_to_re_stick(input);
-	hr->split_execv = ft_split(hr->input_execv, ' ');
-	hr->split_in = ft_split(hr->if_need_sep, ' ');
-	if (!hr->split_execv || !hr->split_execv[0] || !hr->split_in
-		|| !hr->split_in[0])
+				return (NULL);
+	if (input[0] == '<' && input[1] == '<')
+		init_when_heredoc_at_start(hr, input);
+	else
 	{
-		free_if_simple_redir_fail(hr);
-		return (NULL);
+		hr->input_execv = parse_exev_input(input);
+		hr->if_need_sep = unstick_to_re_stick(input);
+		hr->split_execv = ft_split(hr->input_execv, ' ');
+		hr->split_in = ft_split(hr->if_need_sep, ' ');
+		if (!hr->split_execv || !hr->split_execv[0] || !hr->split_in
+			|| !hr->split_in[0])
+		{
+			free_if_simple_redir_fail(hr);
+			return (NULL);
+		}
+		hr->last_name = ft_strlonglen(hr->split_in);
+		hr->path = find_command_path(hr->split_in[0]);
+		hr->heredoc_tmpfile = NULL;
+		hr->heredoc_fd = -1;
+		hr->heredoc_count = 0;
+		hr->help = 0;
+		hr->delimiter = NULL;
 	}
-	hr->last_name = ft_strlonglen(hr->split_in);
-	hr->path = find_command_path(hr->split_in[0]);
-	hr->heredoc_tmpfile = NULL;
-	hr->heredoc_fd = -1;
-	hr->heredoc_count = 0;
-	hr->delimiter = NULL;
 	return (hr);
 }
 

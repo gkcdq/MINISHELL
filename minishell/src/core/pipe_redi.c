@@ -26,7 +26,7 @@ void	handle_child_process(t_pipeline *p, t_ee *ee)
 		dup2(p->output_fd, STDOUT_FILENO);
 	close(p->pipe_fd[0]);
 	close(p->pipe_fd[1]);
-	interprete_commande(p->final_command, ee);
+	cumulate_token(p->final_command, ee);
 }
 
 void	path_and_free_piperedi(t_pipeline *p, char *input, t_ee *ee)
@@ -35,10 +35,15 @@ void	path_and_free_piperedi(t_pipeline *p, char *input, t_ee *ee)
 		close(p->prev_fd);
 	while (wait(NULL) > 0)
 		;
-	free_split(p->commands);
+	if (p->commands)
+		free_split(p->commands);
 	path_confirm(input);
 	path_checker(input, ee);
-	free(p);
+	if (p)
+	{
+		free(p);
+		p = NULL;
+	}
 }
 
 int	execute_child(t_pipeline *p, t_ee *ee)
@@ -46,6 +51,30 @@ int	execute_child(t_pipeline *p, t_ee *ee)
 	handle_child_process(p, ee);
 	exit(EXIT_FAILURE);
 }
+
+char *parse_final_command(char *input)
+{
+    int i = 0;
+    int j = 0;
+    char *tmp;
+
+    while (input[i] && input[i] <= 32)
+        i++;
+    if (input[i] == '\0')
+    {
+		free(input);
+        return NULL;
+    }
+    tmp = malloc(sizeof(char) * (ft_strlen(input + i) + 1));
+    if (!tmp)
+        return NULL;
+    while (input[i])
+        tmp[j++] = input[i++];
+    tmp[j] = '\0';
+    free(input);
+    return tmp;
+}
+
 
 void	main_core(t_pipeline *p, char *input, t_ee *ee)
 {
@@ -56,6 +85,7 @@ void	main_core(t_pipeline *p, char *input, t_ee *ee)
 			input);
 		return ;
 	}
+	p->final_command = parse_final_command(p->final_command);
 	if (pipe(p->pipe_fd) == -1)
 	{
 		handle_error_piperedi("pipe", p, input);

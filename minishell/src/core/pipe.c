@@ -25,7 +25,7 @@ void	nm_pid_equal_to_zero(int pipe_fd[2], t_pipe *piipe, t_ee *ee)
 	}
 	close(pipe_fd[0]);
 	close(pipe_fd[1]);
-	interprete_commande(piipe->commands[piipe->i], ee);
+	cumulate_token(piipe->commands[piipe->i], ee);
 	return ;
 }
 

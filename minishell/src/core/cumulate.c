@@ -24,14 +24,26 @@ int	process_segment(char *segment, t_ee *ee)
 	reconstructed_input = reconstruct_input(changed_args);
 	result = 0;
 	if (find_parenthesis(segment))
+	{
+		printf("-1\n");
 		its_just_a_parenthese(segment, ee);
+	}
 	else if (find_pipe(reconstructed_input) && !find_or(reconstructed_input)
 		&& !find_redirection(reconstructed_input))
+		{
+			printf("-2\n");
 		execute_pipeline(reconstructed_input, ee);
+		}
 	else if (find_redirection_and_pipe(reconstructed_input))
+	{
+		printf("-3\n");
 		execute_pipeline_heredoc(reconstructed_input, ee);
+	}
 	else
+	{
+		printf("-4\n");
 		result = interprete_commande(reconstructed_input, ee);
+	}
 	free_split(changed_args);
 	free(reconstructed_input);
 	return (result);

@@ -196,6 +196,7 @@ typedef struct s_redir_simple
 	int				heredoc_count;
 	int				fd;
 	int				status;
+	int				help;
 	pid_t			pid;
 }					t_redir_simple;
 
