@@ -47,7 +47,7 @@ int	check_atoi_overflow(char *str)
 	if (*str == '-' || *str == '+')
 	{
 		if (*str == '-')
-			return (1);
+			sign *= -1;
 		str++;
 	}
 	while (*str >= '0' && *str <= '9')

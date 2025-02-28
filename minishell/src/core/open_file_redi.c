@@ -51,12 +51,66 @@ int	open_available(char **tmpfilename)
 	return (-1);
 }
 
+char *get_env_valueee(char *key, t_ee *ee)
+{
+    int i = 0;
+    int key_len = strlen(key);
+
+    while (ee->envp[i])
+    {
+        if (strncmp(ee->envp[i], key, key_len) == 0 && ee->envp[i][key_len] == '=')
+            return (ft_strdup(ee->envp[i] + key_len + 1));
+        i++;
+    }
+    return (ft_strdup(""));
+}
+
+void set_value_dollars(char **input, t_ee *ee)
+{
+    char *str = *input;
+    char *new_str = malloc(1);
+    new_str[0] = '\0';
+    int i = 0, j;
+    while (str[i])
+    {
+        if (str[i] == '$' && str[i + 1] && (isalnum(str[i + 1]) || str[i + 1] == '_'))
+        {
+            i++;
+            j = i;
+            while (str[j] && (isalnum(str[j]) || str[j] == '_'))
+                j++;
+            char *var_name = strndup(&str[i], j - i);
+            char *value = get_env_valueee(var_name, ee);
+            free(var_name);
+            char *temp = malloc(strlen(new_str) + strlen(value) + 1);
+            strcpy(temp, new_str);
+            strcat(temp, value);
+            free(new_str);
+            free(value);
+            new_str = temp;
+            i = j;
+        }
+        else
+        {
+            char *temp = malloc(strlen(new_str) + 2);
+            strcpy(temp, new_str);
+            temp[strlen(new_str)] = str[i];
+            temp[strlen(new_str) + 1] = '\0';
+            free(new_str);
+            new_str = temp;
+            i++;
+        }
+    }
+    free(*input);
+    *input = new_str;
+}
+
 int	write_to_tmpfile(int fd, char *limit, t_ee *ee)
 {
 	char	*input;
+	int i;
 
 	input = NULL;
-	(void)ee;
 	signal(SIGINT, handle_herdoc_sigint);
 	while (1)
 	{
@@ -65,6 +119,13 @@ int	write_to_tmpfile(int fd, char *limit, t_ee *ee)
 		{
 			free(input);
 			break ;
+		}
+		i = 0;
+		while (input[i])
+		{
+			if (input[i] == '$')
+				set_value_dollars(&input, ee);
+			i++;
 		}
 		ft_putendl_fd(input, fd);
 		free(input);
