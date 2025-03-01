@@ -12,11 +12,19 @@
 
 #include "../../minishell.h"
 
+int	verif_what_after_redirection(char *input, t_ee *ee)
+{
+	(void)input;
+	(void)ee;
+	return (0);
+}
+
 int	parse_tmp(char *tmp, t_loop *loop, t_ee *ee)
 {
 	if (check_syntax_error(tmp, ee) || check_unexpected_semicolon(tmp, ee)
-		|| check_for_no_double(tmp))
+		|| check_for_no_double(tmp, ee) || verif_what_after_redirection(tmp, ee))
 	{
+		printf("1\n");
 		free(tmp);
 		cleanup_loop(loop);
 		return (1);

@@ -12,6 +12,22 @@
 
 #include "../../minishell.h"
 
+
+int	has_no_or(char *input)
+{
+	int i;
+
+	i = 0;
+	while (input[i])
+	{
+		if (input[i] == '|' && input[i + 1] == '|')
+			return (1);
+		i++;
+	}
+	return (0);
+}
+
+
 int	find_redirection_and_pipe(char *input)
 {
 	int	i;
@@ -28,11 +44,11 @@ int	find_redirection_and_pipe(char *input)
 		}
 		i++;
 	}
-	if (found_re != 0)
+	if (found_re != 0 && has_no_or(input) == 0)
 	{
 		while (input[i])
 		{
-			if (input[i] == '|' && input[i + 1] != '|')
+			if (input[i] == '|' && input[i + 1] != '|' && input[i - 1] != '|')
 				return (1);
 			i++;
 		}

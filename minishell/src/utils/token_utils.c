@@ -49,7 +49,7 @@ int	check_after_token(char *input, int i)
 		return (1);
 }
 
-int	check_for_no_double(char *input)
+int	check_for_no_double(char *input, t_ee *ee)
 {
 	int	i;
 
@@ -65,6 +65,7 @@ int	check_for_no_double(char *input)
 			if (input[i] == '|' || input[i] == '&' || input[i] == ';')
 			{
 				printf("🛠️_(>_<;)_🛠️   : syntax error\n");
+				ee->signal = 2;
 				return (1);
 			}
 		}

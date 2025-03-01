@@ -68,6 +68,9 @@ void	handle_parent_process(t_redir_simple *hr, t_ee *ee)
 	if (!hr->path)
 		norminette_frontflip(ee, hr);
 	else
-		ee->confirmed_command = 1;
+	{
+		if (ee->signal != 1)
+			ee->confirmed_command = 1;
+	}
 	signal(SIGINT, handle_sigint);
 }

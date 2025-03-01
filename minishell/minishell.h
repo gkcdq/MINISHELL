@@ -455,7 +455,7 @@ int					finalize_heredoc(t_redir_simple *hr);
 int					process_heredoc_entries(t_redir_simple *hr, t_ee *ee);
 int					read_and_write_heredoc(t_redir_simple *hr, char *buffer);
 char				*complete_tmp(char *src, int i);
-int					check_for_no_double(char *input);
+int					check_for_no_double(char *input, t_ee *ee);
 void				home_is_cooked(t_cd *cd);
 char				*parse_input_cd(char *input);
 void				careful_fire_burns(t_ee *ee, t_cd *cd);
