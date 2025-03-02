@@ -144,6 +144,25 @@ int printf_expand_var(char *input, t_ee *ee)
 
 //
 
+void	remoov_quote__(char **args)
+{
+	int		i;
+	int		j;
+
+	i = 0;
+	while (args[i])
+	{
+		j = 0;
+		while(args[i][j])
+		{
+			if (args[i][j] == '"')
+				args[i][j] = '\0';
+			j++;
+		}
+		i++;
+	}
+}
+
 void	execute_external_command(char *command, t_ee *ee)
 {
 	char	**args;
@@ -154,7 +173,8 @@ void	execute_external_command(char *command, t_ee *ee)
 		return ;
 	check_signal(command, ee);
 	args = ft_splittt(command, ' ');
-	for_quote_at_start(&args);
+	remoov_quote__(args);
+	//for_quote_at_start(&args);
 	path = find_command_path(args[0]);
 	if (!path)
 	{
