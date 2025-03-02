@@ -83,6 +83,7 @@ typedef struct s_pipeline
 	int				heredoc_fd;
 	int				input_fd;
 	int				output_fd;
+	int				breakk;
 }					t_pipeline;
 
 typedef struct s_reconstruct
@@ -262,6 +263,7 @@ typedef struct s_rdp
 
 typedef struct s_envp_copy
 {
+	int				error_exit;
 	int				reset_sigint;
 	int				code_exit;
 	int				minishell_check;
@@ -366,7 +368,6 @@ void				if_unset(char *input, t_ee *ee);
 void				if_export(char *input, t_ee *ee);
 void				if_dq(t_ee *ee, t_token *token);
 void				if_else(t_token *token, char *input, t_ee *ee);
-void				if_ls(char *input, t_ee *ee);
 int					cumulate_token(char *input, t_ee *ee);
 int					interprete_commande(char *input, t_ee *ee);
 void				execute_external_command(char *command, t_ee *ee);
@@ -468,7 +469,7 @@ int					check_simple_exit(char *input);
 void				handle_exit_no_args(char **args, t_ee *ee, t_token *exit);
 void				handle_exit_syntax_error(void);
 void				handle_exit_numeric_error(char **a, t_ee *ee, t_token *e);
-void				handle_exit_too_many_args(t_token *exit, char **args);
+void				handle_exit_too_many_args(t_token *exit, char **args, t_ee *ee);
 int					find_oldpwd_index(char **envp);
 void				remove_oldpwd_from_env(char **envp, int index);
 void				norminette_heelflip(t_ee *ee);
@@ -512,6 +513,8 @@ void				add_oldpwd(t_ee *ee, char **sorted_env, int *len);
 void				bilbon_saquet(t_ee *ee, char **args);
 void				norminette_backstab(t_ee *ee, char **args);
 void				process_simple_export(char *input, t_ee *ee);
+int printf_expand_var(char *input, t_ee *ee);
+void set_value_dollars(char **input, t_ee *ee);
 void				copy_sorted_elements(char **sorted, char **sorted_env,
 						int len);
 int					calculate_sorted_len(char **sorted, t_ee *ee);

@@ -67,13 +67,10 @@ void	after_find_or(char *input, t_ee *ee)
 	char	*see_what_after;
 
 	command_after_or = NULL;
-	printf("ip ado = %s\n", input);
 	if (check_after_or(input) == 0)
 	{
 		command_before_or = copy_before_or(input);
-		printf("before = '%s'\n", command_before_or);
 		command_after_or = copy_after_or(input);
-		printf("after = '%s'\n", command_after_or);
 		see_what_after = copy_after_or(command_after_or);
 		if (see_what_after == NULL)
 			check_valid_after(command_after_or, ee);

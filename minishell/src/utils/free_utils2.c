@@ -14,28 +14,44 @@
 
 void	redi_pipe_free(t_redir_handler *hr)
 {
-	free_split(hr->split_in);
-	free(hr->re);
-	free(hr->input_execv);
-	free(hr->path);
-	free(hr->heredoc_tmpfile);
-	free(hr->tmp);
-	free(hr);
+	if (hr->split_in)
+		free_split(hr->split_in);
+	if (hr->re)
+		free(hr->re);
+	if (hr->input_execv)
+		free(hr->input_execv);
+	if (hr->path)
+		free(hr->path);
+	if (hr->heredoc_tmpfile)
+	{
+		unlink(hr->heredoc_tmpfile);
+		free(hr->heredoc_tmpfile);
+	}
+	if (hr->tmp)
+		free(hr->tmp);
+	if (hr)
+		free(hr);
 	return ;
 }
 
 void	redi_last_free(t_redir_handler *hr)
 {
+	if (hr->split_in)
 	free_split(hr->split_in);
+	if (hr->input_execv)
 	free(hr->input_execv);
+	if (hr->path)
 	free(hr->path);
+	if (hr->re)
 	free(hr->re);
 	if (hr->heredoc_tmpfile)
 	{
 		unlink(hr->heredoc_tmpfile);
 		free(hr->heredoc_tmpfile);
 	}
+	if (hr->tmp)
 	free(hr->tmp);
+	if (hr)
 	free(hr);
 }
 

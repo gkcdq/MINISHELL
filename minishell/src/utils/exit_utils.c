@@ -54,10 +54,12 @@ void	handle_exit_with_status_value(char **args, t_ee *ee, t_token *exit)
 	ee->minishell_check = 1;
 }
 
-void	handle_exit_too_many_args(t_token *exit, char **args)
+void	handle_exit_too_many_args(t_token *exit, char **args, t_ee *ee)
 {
 	ft_printf("🏃 exit\n");
 	ft_printf("💥_(╬ಠ益ಠ)_💥: exit: too many arguments\n");
+	ee->signal = 2;
+	ee->error_exit = 1;
 	free_split(args);
 	free(exit);
 }

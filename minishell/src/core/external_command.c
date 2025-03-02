@@ -14,12 +14,32 @@
 
 void	if_path_is_incorrect(char **args, t_ee *ee)
 {
-	ft_printf("🍁_(`へ´*)_🍁: %s: command not found\n", args[0]);
-	ee->signal = 127;
-	if (ee->command_with_and == 1)
-		ee->check_and_validity = 1;
-	ee->command_with_or = 1;
-	ee->confirmed_command = 0;
+	if (args[0][0] != '$')
+	{
+		ft_printf("🍁_(`へ´*)_🍁: %s: command not found\n", args[0]);
+		ee->signal = 127;
+		if (ee->command_with_and == 1)
+			ee->check_and_validity = 1;
+		ee->command_with_or = 1;
+		ee->confirmed_command = 0;
+	}
+	else if (args[0][0] == '$' && args[0][1] <= 32)
+	{
+		ft_printf("🍁_(`へ´*)_🍁: %s: command not found\n", args[0]);
+		ee->signal = 127;
+		if (ee->command_with_and == 1)
+			ee->check_and_validity = 1;
+		ee->command_with_or = 1;
+		ee->confirmed_command = 0;
+	}
+	else if (args[0][0] == '$' && args[0][1] > 32)
+	{
+		printf("ee->siganel = %d\n", ee->signal);
+		if (ee->signal == 127)
+			ee->confirmed_command = 0;
+		else
+			ee->confirmed_command = 1;
+	}
 	free_split(args);
 	return ;
 }
@@ -46,9 +66,14 @@ void	if_pid_is_equal_to_zero(char *path, char **args, t_ee *ee,
 	if (ee->reset_sigint == 1)
 		signal(SIGINT, handle_sigint);
 	ee->reset_sigint = 0;
+	printf_expand_var(command, ee);
 	if (execve(path, args, ee->envp) == -1)
 	{
 		perror("execve");
+		if (access(path, F_OK) == -1)
+			exit(127);
+		if (errno == EACCES)
+			exit(126);
 		exit(EXIT_FAILURE);
 	}
 }
@@ -67,6 +92,8 @@ void	if_pid_is_sup_to_zero(t_ee *ee, pid_t pid)
 		else
 			ee->signal = 0;
 	}
+	if (ee->signal == 127 || ee->signal == 126)
+		ee->confirmed_command = 0;
 	if (ee->reset_sigint == 1)
 		signal(SIGINT, handle_sigint);
 	ee->reset_sigint = 0;
@@ -81,6 +108,39 @@ void	check_signal(char *command, t_ee *ee)
 		ee->reset_sigint = 1;
 	}
 }
+//
+
+int printf_expand_var(char *input, t_ee *ee)
+{
+    char tmp[5000];
+    int i = 0, j, k;
+
+    while (ee->envp[i])
+    {
+        j = 0;
+        while (ee->envp[i][j] && ee->envp[i][j] != '=')
+            j++;
+        if (ee->envp[i][j] == '=')
+        {
+            j++;
+            k = 0;
+            while (ee->envp[i][j])
+                tmp[k++] = ee->envp[i][j++];
+            tmp[k] = '\0';
+            
+            if (strcmp(tmp, input) == 0)
+            {
+                printf("💲%s\n", input);
+                return (1);
+            }
+        }
+        i++;
+    }
+    return (0);
+}
+
+
+//
 
 void	execute_external_command(char *command, t_ee *ee)
 {
@@ -88,6 +148,8 @@ void	execute_external_command(char *command, t_ee *ee)
 	char	*path;
 	pid_t	pid;
 
+	if (command[0] == '\0')
+		return ;
 	check_signal(command, ee);
 	args = ft_split(command, ' ');
 	path = find_command_path(args[0]);

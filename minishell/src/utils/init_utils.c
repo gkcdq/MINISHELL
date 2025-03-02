@@ -74,6 +74,7 @@ t_redir_simple	*init_redirr_handler(char *input)
 
 void	init_p_fd(t_pipeline *p)
 {
+	p->breakk = 0;
 	p->heredoc_fd = -1;
 	p->input_fd = -1;
 	p->output_fd = -1;
@@ -92,7 +93,9 @@ int	i_want_to_sing_a_song_hiihi(t_redir_handler *hr)
 
 void	init_redir_handler(t_redir_handler *handler, char *input)
 {
+	printf("init_redit_handler input = %s\n", input);
 	handler->tmp = unstick_to_re_stick(input);
+	printf("tmp = %s\n", handler->tmp);
 	if (!handler->tmp)
 		return ;
 	handler->split_in = ft_split(handler->tmp, ' ');
@@ -103,6 +106,7 @@ void	init_redir_handler(t_redir_handler *handler, char *input)
 	handler->file = -1;
 	handler->pid = 0;
 	handler->input_execv = parse_exev_input(input);
+	printf("input_execv = %s\n", input);
 	handler->path = find_command_path(handler->split_in[0]);
 	handler->heredoc_tmpfile = NULL;
 	handler->heredoc_fd = -1;

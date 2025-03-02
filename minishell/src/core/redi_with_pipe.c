@@ -43,11 +43,13 @@ void	handle_heredoc_redirection(t_redir_handler *hr, t_ee *ee, t_pipeline *p)
 
 void	handle_input_redirection(t_redir_handler *hr, t_pipeline *p)
 {
-	p->input_fd = open(hr->split_in[hr->i + 1], O_RDONLY);
+	if (p->input_fd != -1)
+		close(p->input_fd);
+	p->input_fd = open(hr->split_in[hr->i + 1], O_RDONLY, 0644);
 	if (p->input_fd < 0)
 	{
 		perror("🔒 Erreur ouverture fichier '<'");
-		redi_pipe_free(hr);
+		p->breakk = 1;
 		return ;
 	}
 	hr->i++;
@@ -55,12 +57,14 @@ void	handle_input_redirection(t_redir_handler *hr, t_pipeline *p)
 
 void	handle_output_redirection(t_redir_handler *hr, t_pipeline *p)
 {
+	if (p->output_fd != -1)
+    	close(p->output_fd);
 	p->output_fd = open(hr->split_in[hr->i + 1], O_WRONLY | O_CREAT | O_TRUNC,
-			0777);
+			0644);
 	if (p->output_fd < 0)
 	{
 		perror("🔒 Erreur ouverture fichier '>'");
-		redi_pipe_free(hr);
+		p->breakk = 1;
 		return ;
 	}
 	hr->i++;
@@ -68,12 +72,14 @@ void	handle_output_redirection(t_redir_handler *hr, t_pipeline *p)
 
 void	handle_append_redirection(t_redir_handler *hr, t_pipeline *p)
 {
+	if (p->output_fd != -1)
+    	close(p->output_fd);
 	p->output_fd = open(hr->split_in[hr->i + 1], O_WRONLY | O_CREAT | O_APPEND,
-			0777);
+			0644);
 	if (p->output_fd < 0)
 	{
 		perror("🔒 Erreur ouverture fichier '>>'");
-		redi_pipe_free(hr);
+		p->breakk = 1;
 		return ;
 	}
 	hr->i++;
@@ -82,14 +88,14 @@ void	handle_append_redirection(t_redir_handler *hr, t_pipeline *p)
 char	*handle_redi_with_pipe(char *input, t_ee *ee, t_pipeline *p)
 {
 	t_redir_handler	*hr;
-	char			*final_command =NULL;
+	char			*final_command;
 
 	hr = malloc(sizeof(t_redir_handler));
 	if (!hr)
 		return (NULL);
 	init_p_fd(p);
 	init_redir_handler(hr, input);
-	while (hr->i < hr->last_name)
+	while (hr->i < hr->last_name && p->breakk == 0)
 	{
 		if (ft_strcmp(hr->split_in[hr->i], "<") == 0)
 			handle_input_redirection(hr, p);
@@ -103,16 +109,11 @@ char	*handle_redi_with_pipe(char *input, t_ee *ee, t_pipeline *p)
 			hr->i++;
 	}
 	if (hr->input_execv)
-	{
-		printf("%s\n", hr->input_execv);
 		final_command = ft_strdup(hr->input_execv);
-	}
 	norminette_backflip(final_command, hr);
 	return (final_command);
 }
 
-//
-//
 /*char *handle_redi_with_pipe(char *input, t_ee *ee, t_pipeline *p)
 {
 	char **split_in = NULL;

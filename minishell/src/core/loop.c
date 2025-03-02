@@ -14,8 +14,30 @@
 
 int	verif_what_after_redirection(char *input, t_ee *ee)
 {
-	(void)input;
-	(void)ee;
+	int i;
+
+	i = 0;
+	while (input[i])
+	{
+		if ((input[i] == '<' || input[i] == '>') && (input[i + 1] == '<' || input[i + 1] == '>'))
+		{
+			i += 2;
+			break ;
+		}
+		else if (input[i] == '<' || input[i] == '>')
+		{
+			i += 1;
+			break ;
+		}
+		i++;
+	}
+	while (input [i] && input[i] <= 32)
+		i++;
+	if (input[i] == '<' || input[i] == '>' || input[i] == '|' || input[i] == ';' || input[i] == '&')
+	{
+		ee->signal = 2;
+		return (1);
+	}
 	return (0);
 }
 
@@ -24,7 +46,6 @@ int	parse_tmp(char *tmp, t_loop *loop, t_ee *ee)
 	if (check_syntax_error(tmp, ee) || check_unexpected_semicolon(tmp, ee)
 		|| check_for_no_double(tmp, ee) || verif_what_after_redirection(tmp, ee))
 	{
-		printf("1\n");
 		free(tmp);
 		cleanup_loop(loop);
 		return (1);

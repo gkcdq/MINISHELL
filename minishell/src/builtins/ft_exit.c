@@ -41,7 +41,7 @@ void	process_exit(char **args, t_ee *ee, t_token *exit)
 	else if (args[1] && !is_number(args[1]) && args[1][0] != ';')
 		handle_exit_numeric_error(args, ee, exit);
 	else if (args[2] != NULL && args[1][0] != ';' && args[2][0] != ';')
-		handle_exit_too_many_args(exit, args);
+		handle_exit_too_many_args(exit, args, ee);
 	else if ((args[1] && is_number(args[1]) && args[1][0] != ';'))
 		handle_exit_with_numeric_value(args, ee, exit);
 	else

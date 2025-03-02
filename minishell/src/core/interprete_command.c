@@ -12,13 +12,6 @@
 
 #include "../../minishell.h"
 
-void	if_ls(char *input, t_ee *ee)
-{
-	ft_ls(input, ee);
-	ee->confirmed_command = 1;
-	return ;
-}
-
 int	command_part_one(t_token *token, char *input, t_ee *ee)
 {
 	int	res;
@@ -67,11 +60,6 @@ int	command_part_two(t_token *token, char *input, t_ee *ee)
 		|| (ft_strcmp(token->trimmed_input, "export=") == 0))
 	{
 		if_export(input, ee);
-		res = 1;
-	}
-	else if (ft_strcmp(token->trimmed_input, "ls") == 0)
-	{
-		if_ls(input, ee);
 		res = 1;
 	}
 	return (res);

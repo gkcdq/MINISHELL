@@ -20,6 +20,24 @@ char	**check_dollars(char *input, t_ee *ee)
 	args = ft_split(input, ' ');
 	if (!args)
 		return (NULL);
+	int i = 0;
+	while (args[i])
+	{
+		if (ft_strcmp(args[i], "$OLDPWD") == 0)
+		{
+			free(args[i]);
+			if (ee->copy_oldpwd)
+				args[i] = ft_strdup(ee->copy_oldpwd);
+			else
+				args[i] = ft_strdup("");
+			if (!args[i])
+			{
+				free_split(args);
+				return (NULL);
+			}
+		}
+		i++;
+	}
 	changed_args = parse_dollars(args, ee);
 	if (!changed_args)
 		return (NULL);

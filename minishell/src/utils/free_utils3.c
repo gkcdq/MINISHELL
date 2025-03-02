@@ -33,7 +33,9 @@ void	at_the_end(t_token *token, t_ee *ee)
 		free(token->trimmed_input);
 	if (token)
 		free(token);
-	ee->signal = 0;
+	if (ee->error_exit != 1)
+		ee->signal = 0;
+	ee->error_exit = 0;
 }
 
 void	all_is__freed(t_ee *ee)
