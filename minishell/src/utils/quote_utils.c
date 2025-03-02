@@ -75,7 +75,7 @@ char	*handle_quotes(char *input, t_ee *ee)
 		return (NULL);
 	while (input[qh.i])
 	{
-		if ((input[qh.i] == '\'' || input[qh.i] == '"') && qh.quote == '\0')
+		if ((input[qh.i] == '\'') && qh.quote == '\0')
 			qh.quote = input[qh.i++];
 		else if (input[qh.i] == qh.quote)
 		{

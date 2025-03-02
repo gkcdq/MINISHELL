@@ -69,7 +69,7 @@ int	interprete_commande(char *input, t_ee *ee)
 {
 	t_token	*token;
 
-	//printf("iter_command = '%s'\n", input);
+	printf("iter_command = '%s'\n", input);
 	if (handle_or_and_redirection(input, ee) == 1)
 		return (0);
 	token = malloc(sizeof(t_token));

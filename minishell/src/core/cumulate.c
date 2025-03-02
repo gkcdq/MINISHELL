@@ -23,18 +23,18 @@ int	process_segment(char *segment, t_ee *ee)
 		return (1);
 	reconstructed_input = reconstruct_input(changed_args);
 	result = 0;
-	if (find_parenthesis(segment))
+	if (find_parenthesis(segment) && f_q(reconstructed_input) == 0)
 	{
 		printf("-1\n");
 		its_just_a_parenthese(segment, ee);
 	}
 	else if (find_pipe(reconstructed_input) && !find_or(reconstructed_input)
-		&& !find_redirection(reconstructed_input))
+		&& !find_redirection(reconstructed_input) && f_q(reconstructed_input) == 0)
 		{
 			printf("-2\n");
 		execute_pipeline(reconstructed_input, ee);
 		}
-	else if (find_redirection_and_pipe(reconstructed_input))
+	else if (find_redirection_and_pipe(reconstructed_input) && f_q(reconstructed_input) == 0)
 	{
 		printf("-3\n");
 		execute_pipeline_heredoc(reconstructed_input, ee);

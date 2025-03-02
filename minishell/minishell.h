@@ -303,6 +303,9 @@ void				ft_echo(char *input, t_ee *ee);
 
 // ------------------------------ //
 
+int	f_q(char *input);
+void for_quote_at_start(char ***args);
+char **ft_splittt(const char *st, char sep);
 int					ft_strcmp(char *s1, char *s2);
 int					is_number(char *str);
 int					ft_strlonglen(char **s);
@@ -535,6 +538,6 @@ void				handle_exit_with_numeric_value(char **a, t_ee *e,
 int					handle_error_piperedi(const char *m, t_pipeline *p,
 						char *t);
 
-//(echo $OLDPWD)
+//cat "$PATH"
 
 #endif

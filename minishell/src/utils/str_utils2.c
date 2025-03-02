@@ -12,14 +12,154 @@
 
 #include "../../minishell.h"
 
+static int count_wordstt(const char *str, char sep)
+{
+    int i = 0;
+    int count = 0;
+    int in_quotes = 0;  // Variable pour vérifier si on est dans des guillemets
+
+    while (str[i] != '\0')
+    {
+        if (str[i] == '"')  // On change l'état si on trouve un guillemet
+            in_quotes = !in_quotes;
+        
+        while (!in_quotes && str[i] == sep && str[i] != '\0')  // On saute les séparateurs, sauf si on est dans des guillemets
+            i++;
+        
+        if (!in_quotes && str[i] != sep && str[i] != '\0')  // Si on est hors des guillemets et qu'on trouve un mot
+            count++;
+        
+        while (!in_quotes && str[i] != sep && str[i] != '\0')  // On saute les caractères du mot, sauf si on est dans des guillemets
+            i++;
+        
+        if (in_quotes)  // Si on est dans les guillemets, on avance normalement
+            i++;
+    }
+    return count;
+}
+
+static void ft_freetableautt(char **tab, int len)
+{
+    int i = 0;
+    while (i < len)
+    {
+        free(tab[i]);
+        i++;
+    }
+    free(tab);
+}
+
+static void tableautt(char **tab, const char *str, char sep, int leng)
+{
+    int i = 0;
+    int j = 0;
+    int k;
+    int m;
+    int in_quotes = 0;  // Vérifie si on est dans des guillemets
+
+    while (str[i] != '\0' && j < leng)
+    {
+        while (str[i] != '\0' && str[i] == sep && !in_quotes)  // Ne saute les séparateurs que si on est hors des guillemets
+            i++;
+
+        if (str[i] == '"')  // Si on trouve un guillemet, on entre ou sort des guillemets
+        {
+            in_quotes = !in_quotes;
+            i++;
+        }
+
+        k = i;
+        while (str[k] != '\0' && (str[k] != sep || in_quotes))  // On s'arrête à un séparateur, sauf si on est dans les guillemets
+            k++;
+
+        tab[j] = malloc(sizeof(char) * (k - i + 1));
+        if (!tab)
+            return (ft_freetableautt(tab, leng));
+        
+        m = 0;
+        while (i < k)
+            tab[j][m++] = str[i++];
+
+        tab[j++][m] = '\0';
+    }
+    tab[j] = NULL;
+}
+
+char **ft_splittt(const char *st, char sep)
+{
+    char **dest;
+    int leng;
+
+    if (!st)
+        return (NULL);
+
+    leng = count_wordstt(st, sep);
+    dest = malloc(sizeof(char *) * (leng + 1));
+    if (!dest)
+        return (NULL);
+
+    tableautt(dest, st, sep, leng);
+    return (dest);
+}
+
+
+
+//////////////////////////////////////////////////////////////////////
+char *ft_stcatt(char c, const char *str)
+{
+    int len = strlen(str);
+    char *new_str = malloc(len + 2);  // +1 pour le caractère, +1 pour le '\0'
+    if (!new_str)
+        return NULL;
+
+    new_str[0] = c;  // Ajoute le guillemet au début
+    strcpy(new_str + 1, str);  // Copie la chaîne existante après le guillemet
+    return new_str;
+}
+
+///
+int	f_q(char *input)
+{
+	int i = 0;
+
+	while (input[i])
+	{
+		if (input[i] == '"')
+			return (1);
+		i++;
+	}
+	return (0);
+} 
+///
+void for_quote_at_start(char ***args)
+{
+    int i = 0;
+	int j = 0;
+
+    while (args[i][j])
+    {
+        if (f_q(args[i][j]) == 1)
+        {
+            char *new_str = ft_stcatt('"', args[i][j]);
+            free(args[i][j]); 
+            args[i][j] = new_str;
+        }
+        j++;
+    }
+    return;
+}
+	
+
+///
 char	**check_dollars(char *input, t_ee *ee)
 {
 	char	**args;
 	char	**changed_args;
 
-	args = ft_split(input, ' ');
+	args = ft_splittt(input, ' ');
 	if (!args)
 		return (NULL);
+	for_quote_at_start(&args);
 	int i = 0;
 	while (args[i])
 	{

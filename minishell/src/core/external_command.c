@@ -92,6 +92,8 @@ void	if_pid_is_sup_to_zero(t_ee *ee, pid_t pid)
 		else
 			ee->signal = 0;
 	}
+	else if (WIFSIGNALED(status))
+        ee->signal = WTERMSIG(status) + 128;
 	if (ee->signal == 127 || ee->signal == 126)
 		ee->confirmed_command = 0;
 	if (ee->reset_sigint == 1)
@@ -151,7 +153,8 @@ void	execute_external_command(char *command, t_ee *ee)
 	if (command[0] == '\0')
 		return ;
 	check_signal(command, ee);
-	args = ft_split(command, ' ');
+	args = ft_splittt(command, ' ');
+	for_quote_at_start(&args);
 	path = find_command_path(args[0]);
 	if (!path)
 	{
