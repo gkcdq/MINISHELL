@@ -29,20 +29,48 @@ char	*extract_var_name(char *arg)
 	return (copy);
 }
 
+char *parse_env_value(char *value)
+{
+    int i = 0;
+    int j = 0;
+    char *tmp;
+
+	j = 0;
+	i = ft_strlen(value) - 1;
+	while(value[i] <= 32)
+		i--;
+	tmp = malloc(sizeof(char) * (i + 2));
+	while (j <= i)
+	{
+		tmp[j] = value[j];
+		j++;
+	}
+	tmp[j] = '\0';
+    return tmp;
+}
+
+
 char	*get_env_value(char *var_name, t_ee *ee)
 {
 	int	x;
 	int	len;
 
 	x = 0;
+	printf("'%s'\n", var_name);
+	var_name = parse_env_value(var_name);
+	printf("'%s'\n", var_name);
 	len = ft_strlen(var_name);
 	while (ee->envp[x])
 	{
 		if (ft_strncmp(ee->envp[x], var_name, len) == 0
 			&& ee->envp[x][len] == '=')
+			{
+				free(var_name);
 			return (ft_strdup(ee->envp[x] + len + 1));
+			}
 		x++;
 	}
+	free(var_name);
 	return (NULL);
 }
 
@@ -80,6 +108,7 @@ char	*extract_text_before_dollar(char *arg)
 	return (before_equal);
 }
 
+
 char	**parse_dollars(char **args, t_ee *ee)
 {
 	t_dollar_parser	p;
@@ -88,6 +117,7 @@ char	**parse_dollars(char **args, t_ee *ee)
 	p.i = 0;
 	while (args[p.i])
 	{
+		//printf("args[p.i]= %s\n", args[p.i]);
 		p.lock = 0;
 		if (args[p.i][0] == '$')
 			p.changed_args[p.i] = handle_dollar_variable(args[p.i], ee);

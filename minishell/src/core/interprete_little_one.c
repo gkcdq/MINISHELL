@@ -24,7 +24,7 @@ void	if_exit(t_token *token, char *input, t_ee *ee)
 	if (ft_strcmp(token->trimmed_input, "exit") == 0
 		&& ft_strcmp(token->trimmed_input, input) == 0)
 	{
-		printf("🏃 exit\n");
+		ft_printf("🏃 exit\n");
 		ee->minishell_check = 1;
 	}
 	else

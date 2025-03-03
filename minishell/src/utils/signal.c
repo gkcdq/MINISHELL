@@ -16,8 +16,8 @@ void	handle_sigint(int sig)
 {
 	if (sig == SIGINT)
 	{
-		ft_printf("\n");
 		rl_replace_line("", 0);
+		ft_printf("\n");
 		rl_on_new_line();
 		rl_redisplay();
 		g_status = 130;
@@ -43,5 +43,5 @@ void	handle_herdoc_sigint(int status)
 void	handle_sigquit(int sig)
 {
 	(void)sig;
-	printf("Quit signal received (Ctrl+\\)\n");
+	ft_printf("Quit signal received (Ctrl+\\)\n");
 }

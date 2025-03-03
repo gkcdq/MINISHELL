@@ -12,6 +12,7 @@
 
 #ifndef MINISHELL_H
 # define MINISHELL_H
+#define MAX_LEN 2048
 
 # include "libft/libft.h"
 # include <curses.h>
@@ -159,6 +160,15 @@ typedef struct s_redir
 	int				command_fail;
 }					t_redir;
 
+typedef struct s_quote_normalizer
+{
+    int i;                  
+    int j;                  
+    int k;               
+    char quote_type;        
+    char result[MAX_LEN];  
+}   t_quote_normalizer;
+
 typedef struct s_redir_handler
 {
 	char			**split_in;
@@ -303,6 +313,11 @@ void				ft_echo(char *input, t_ee *ee);
 
 // ------------------------------ //
 
+void process_quotes(char *arg, t_quote_normalizer *q);
+int check_quotes(char *arg, t_quote_normalizer *q);
+void init_normalizer(t_quote_normalizer *q);
+char **parse_dollarsss(char **args, t_ee *ee) ;
+void	remoov_quote__(char **args);
 int	f_q(char *input);
 void for_quote_at_start(char ***args);
 char **ft_splittt(const char *st, char sep);
@@ -516,8 +531,10 @@ void				add_oldpwd(t_ee *ee, char **sorted_env, int *len);
 void				bilbon_saquet(t_ee *ee, char **args);
 void				norminette_backstab(t_ee *ee, char **args);
 void				process_simple_export(char *input, t_ee *ee);
+int	found_single_or_double_quote(char *input);
 int printf_expand_var(char *input, t_ee *ee);
 void set_value_dollars(char **input, t_ee *ee);
+void	copy_until_close_quote(char *l, int *i, char *copy, int *j);
 void				copy_sorted_elements(char **sorted, char **sorted_env,
 						int len);
 int					calculate_sorted_len(char **sorted, t_ee *ee);

@@ -12,36 +12,49 @@
 
 #include "../../minishell.h"
 
+void	norminette_one_kill(t_ee *ee, char **args)
+{
+	ft_printf("🍁_(`へ´*)_🍁: %s: command not found\n", args[0]);
+	ee->signal = 127;
+	if (ee->command_with_and == 1)
+		ee->check_and_validity = 1;
+	ee->command_with_or = 1;
+	ee->confirmed_command = 0;
+}
+
 void	if_path_is_incorrect(char **args, t_ee *ee)
 {
 	if (args[0][0] != '$')
-	{
-		ft_printf("🍁_(`へ´*)_🍁: %s: command not found\n", args[0]);
-		ee->signal = 127;
-		if (ee->command_with_and == 1)
-			ee->check_and_validity = 1;
-		ee->command_with_or = 1;
-		ee->confirmed_command = 0;
-	}
+		norminette_one_kill(ee, args);
 	else if (args[0][0] == '$' && args[0][1] <= 32)
-	{
-		ft_printf("🍁_(`へ´*)_🍁: %s: command not found\n", args[0]);
-		ee->signal = 127;
-		if (ee->command_with_and == 1)
-			ee->check_and_validity = 1;
-		ee->command_with_or = 1;
-		ee->confirmed_command = 0;
-	}
+		norminette_one_kill(ee, args);
 	else if (args[0][0] == '$' && args[0][1] > 32)
 	{
-		printf("ee->siganel = %d\n", ee->signal);
-		if (ee->signal == 127)
+		if (ee->signal == 127 || ee->signal == 126)
 			ee->confirmed_command = 0;
 		else
 			ee->confirmed_command = 1;
 	}
 	free_split(args);
 	return ;
+}
+
+void	error_access(char *command)
+{
+	int i;
+
+	i = 0;
+	if (command[i + 2] <= 32)
+	{
+		ft_printf("🚧_(⊙_⊙;)_🚧 : ./: Is a directory\n");
+		exit(126);
+	}
+	if (access(command, X_OK) == -1)
+	{
+		ft_printf("%s: Permission denied\n", command);
+		exit(126);
+	}
+
 }
 
 void	if_pid_is_equal_to_zero(char *path, char **args, t_ee *ee,
@@ -51,22 +64,11 @@ void	if_pid_is_equal_to_zero(char *path, char **args, t_ee *ee,
 
 	i = 0;
 	if (command[i] == '.' && command [i + 1] == '/')
-	{
-		if (command[i + 2] <= 32)
-		{
-			ft_printf("🚧_(⊙_⊙;)_🚧 : ./: Is a directory\n");
-			exit(126);
-		}
-		if (access(command, X_OK) == -1)
-		{
-			ft_printf("%s: Permission denied\n", command);
-			exit(126);
-		}
-	}
+		error_access(command);
 	if (ee->reset_sigint == 1)
 		signal(SIGINT, handle_sigint);
 	ee->reset_sigint = 0;
-	printf_expand_var(command, ee);
+	printf_expand_var(args[0], ee);
 	if (execve(path, args, ee->envp) == -1)
 	{
 		perror("execve");
@@ -74,6 +76,8 @@ void	if_pid_is_equal_to_zero(char *path, char **args, t_ee *ee,
 			exit(127);
 		if (errno == EACCES)
 			exit(126);
+		if (errno == ENOEXEC)
+			exit(0);
 		exit(EXIT_FAILURE);
 	}
 }
@@ -86,16 +90,18 @@ void	if_pid_is_sup_to_zero(t_ee *ee, pid_t pid)
 	if (WIFEXITED(status))
 	{
 		if (!g_status)
-		{
 			ee->signal = WEXITSTATUS(status);
-		}
 		else
 			ee->signal = 0;
 	}
 	else if (WIFSIGNALED(status))
         ee->signal = WTERMSIG(status) + 128;
-	if (ee->signal == 127 || ee->signal == 126)
+	if (ee->signal == 127 || ee->signal == 126 || ee->signal == 1)
+	{
+		if (ee->command_with_and)
+			ee->check_and_validity = 1;
 		ee->confirmed_command = 0;
+	}
 	if (ee->reset_sigint == 1)
 		signal(SIGINT, handle_sigint);
 	ee->reset_sigint = 0;
@@ -110,7 +116,6 @@ void	check_signal(char *command, t_ee *ee)
 		ee->reset_sigint = 1;
 	}
 }
-//
 
 int printf_expand_var(char *input, t_ee *ee)
 {
@@ -141,24 +146,24 @@ int printf_expand_var(char *input, t_ee *ee)
     return (0);
 }
 
-
-//
-
 void	remoov_quote__(char **args)
 {
 	int		i;
 	int		j;
+	int		k;
 
 	i = 0;
 	while (args[i])
 	{
 		j = 0;
-		while(args[i][j])
+		k = 0;
+		while (args[i][j])
 		{
-			if (args[i][j] == '"')
-				args[i][j] = '\0';
+			if (args[i][j] != '"')
+				args[i][k++] = args[i][j];
 			j++;
 		}
+		args[i][k] = '\0';
 		i++;
 	}
 }
@@ -166,6 +171,7 @@ void	remoov_quote__(char **args)
 void	execute_external_command(char *command, t_ee *ee)
 {
 	char	**args;
+	char	**tmp;
 	char	*path;
 	pid_t	pid;
 
@@ -174,22 +180,29 @@ void	execute_external_command(char *command, t_ee *ee)
 	check_signal(command, ee);
 	args = ft_splittt(command, ' ');
 	remoov_quote__(args);
-	//for_quote_at_start(&args);
-	path = find_command_path(args[0]);
-	if (!path)
+	tmp = parse_dollarsss(args, ee);
+	free_split(args);
+	args = tmp;
+	if (args[0])
 	{
-		if_path_is_incorrect(args, ee);
-		return ;
+		path = find_command_path(args[0]);
+		if (!path)
+		{
+			if_path_is_incorrect(args, ee);
+			return ;
+		}
+		else
+			ee->confirmed_command = 1;
+		pid = fork();
+		if (pid == 0)
+			if_pid_is_equal_to_zero(path, args, ee, command);
+		else if (pid > 0)
+			if_pid_is_sup_to_zero(ee, pid);
+		else
+			perror("fork");
+		free(path);
 	}
 	else
 		ee->confirmed_command = 1;
-	pid = fork();
-	if (pid == 0)
-		if_pid_is_equal_to_zero(path, args, ee, command);
-	else if (pid > 0)
-		if_pid_is_sup_to_zero(ee, pid);
-	else
-		perror("fork");
-	free(path);
 	free_split(args);
 }

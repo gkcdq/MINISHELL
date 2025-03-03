@@ -14,7 +14,7 @@
 
 void	home_is_cooked(t_cd *cd)
 {
-	printf("🍂_(´~`)_🍂: HOME not set\n");
+	ft_printf("🍂_(´~`)_🍂: HOME not set\n");
 	free_split(cd->args);
 	free(cd);
 }

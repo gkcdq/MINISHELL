@@ -44,7 +44,8 @@ int	verif_what_after_redirection(char *input, t_ee *ee)
 int	parse_tmp(char *tmp, t_loop *loop, t_ee *ee)
 {
 	if (check_syntax_error(tmp, ee) || check_unexpected_semicolon(tmp, ee)
-		|| check_for_no_double(tmp, ee) || verif_what_after_redirection(tmp, ee))
+		|| check_for_no_double(tmp, ee) || verif_what_after_redirection(tmp, ee)
+			|| *tmp == '\0')
 	{
 		free(tmp);
 		cleanup_loop(loop);
@@ -54,11 +55,6 @@ int	parse_tmp(char *tmp, t_loop *loop, t_ee *ee)
 	if (!loop->input)
 	{
 		free(tmp);
-		cleanup_loop(loop);
-		return (1);
-	}
-	if (check_the_end(loop->input) == 1)
-	{
 		cleanup_loop(loop);
 		return (1);
 	}
@@ -78,19 +74,19 @@ int	more_parse_and_assign(t_loop *loop, t_ee *ee)
 		cleanup_loop(loop);
 		return (1);
 	}
-	loop->cleaned_input = handle_quotes(loop->input, ee);
-	if (!loop->cleaned_input || !*loop->cleaned_input)
+	//loop->cleaned_input = handle_quotes(loop->input, ee);
+	/*if (!loop->cleaned_input || !*loop->cleaned_input)
 	{
 		cleanup_loop(loop);
 		return (1);
 	}
-	free(loop->input);
-	loop->input = loop->cleaned_input;
+	//free(loop->input);
+	//loop->input = loop->cleaned_input;
 	if (!loop->input)
 	{
 		cleanup_loop(loop);
 		return (1);
-	}
+	}*/
 	return (0);
 }
 

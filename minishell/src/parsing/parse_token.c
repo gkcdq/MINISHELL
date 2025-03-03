@@ -25,8 +25,9 @@ int	check_the_end(char *input)
 
 	count_first = count_first_or_last(input, 'f');
 	count_last = count_first_or_last(input, 'l');
-	i = ft_strlen(input);
-	while (input[i - 1] <= 32)
+	if (input)
+		i = ft_strlen(input);
+	while (input[i] && input[i - 1] <= 32)
 		i--;
 	i--;
 	if (input[i] == '(')

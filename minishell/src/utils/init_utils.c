@@ -14,16 +14,12 @@
 
 void	init_when_heredoc_at_start(t_redir_simple *hr, char *input)
 {
-	printf("j'arrive ici\n");
-
+	//ft_printf("j'arrive ici\n");
 	hr->input_execv = parse_exev_input(input);
-	printf("i_e '%s'\n", hr->input_execv);
-
+	//ft_printf("i_e '%s'\n", hr->input_execv);
 	hr->if_need_sep = unstick_to_re_stick(input);
-
 	hr->split_execv = ft_split(hr->input_execv, ' ');
-	printf("s_e '%s'\n", hr->split_execv[0]);
-
+	//ft_printf("s_e '%s'\n", hr->split_execv[0]);
 	hr->split_in = ft_split(hr->if_need_sep, ' ');
 	if (!hr->split_in || !hr->split_in[0])
 	{
@@ -32,7 +28,7 @@ void	init_when_heredoc_at_start(t_redir_simple *hr, char *input)
 	}
 	hr->last_name = ft_strlonglen(hr->split_in);
 	hr->path = find_command_path(hr->input_execv);
-	printf("path '%s'\n", hr->path);
+	//printf("path '%s'\n", hr->path);
 	hr->heredoc_tmpfile = NULL;
 	hr->heredoc_fd = -1;
 	hr->heredoc_count = 0;
@@ -93,9 +89,9 @@ int	i_want_to_sing_a_song_hiihi(t_redir_handler *hr)
 
 void	init_redir_handler(t_redir_handler *handler, char *input)
 {
-	printf("init_redit_handler input = %s\n", input);
+	//printf("init_redit_handler input = %s\n", input);
 	handler->tmp = unstick_to_re_stick(input);
-	printf("tmp = %s\n", handler->tmp);
+	//printf("tmp = %s\n", handler->tmp);
 	if (!handler->tmp)
 		return ;
 	handler->split_in = ft_split(handler->tmp, ' ');
@@ -106,7 +102,7 @@ void	init_redir_handler(t_redir_handler *handler, char *input)
 	handler->file = -1;
 	handler->pid = 0;
 	handler->input_execv = parse_exev_input(input);
-	printf("input_execv = %s\n", input);
+	//printf("input_execv = %s\n", input);
 	handler->path = find_command_path(handler->split_in[0]);
 	handler->heredoc_tmpfile = NULL;
 	handler->heredoc_fd = -1;

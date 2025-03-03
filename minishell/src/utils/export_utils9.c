@@ -15,16 +15,16 @@
 void	bilbon_saquet(t_ee *ee, char **args)
 {
 	if (!ee->copy_oldpwd && ee->if_unset__oldpwd == 0)
-		printf("🏗️ 🏡 OLDPWD\n");
+		ft_printf("🏗️ 🏡 OLDPWD\n");
 	else if (ee->copy_oldpwd && ft_strcmp(ee->copy_oldpwd, ee->copy_pwd) != 0
 		&& ee->if_unset__oldpwd == 0)
-		printf("🏗️ 🏡 OLDPWD=%s\n", ee->copy_oldpwd);
+		ft_printf("🏗️ 🏡 OLDPWD=%s\n", ee->copy_oldpwd);
 	if (!ee->copy_pwd)
 		ee->copy_pwd = getcwd(NULL, 0);
 	if (ee->if_unset__pwd == 0)
-		printf("🏗️ 🏡 PWD=%s\n", ee->copy_pwd);
+		ft_printf("🏗️ 🏡 PWD=%s\n", ee->copy_pwd);
 	if (ee->if_unset__shlvl == 0)
-		printf("🏗️ 🏡 SHLVL=1\n");
+		ft_printf("🏗️ 🏡 SHLVL=1\n");
 	free_split(args);
 }
 

@@ -55,31 +55,26 @@ static void tableautt(char **tab, const char *str, char sep, int leng)
     int j = 0;
     int k;
     int m;
-    int in_quotes = 0;  // Vérifie si on est dans des guillemets
+    int in_quotes = 0;
 
     while (str[i] != '\0' && j < leng)
     {
-        while (str[i] != '\0' && str[i] == sep && !in_quotes)  // Ne saute les séparateurs que si on est hors des guillemets
-            i++;
-
-        if (str[i] == '"')  // Si on trouve un guillemet, on entre ou sort des guillemets
+        while (str[i] != '\0' && str[i] == sep && !in_quotes)
+			i++;
+        if (str[i] == '"')  
         {
             in_quotes = !in_quotes;
             i++;
         }
-
         k = i;
         while (str[k] != '\0' && (str[k] != sep || in_quotes))  // On s'arrête à un séparateur, sauf si on est dans les guillemets
             k++;
-
         tab[j] = malloc(sizeof(char) * (k - i + 1));
         if (!tab)
             return (ft_freetableautt(tab, leng));
-        
         m = 0;
         while (i < k)
             tab[j][m++] = str[i++];
-
         tab[j++][m] = '\0';
     }
     tab[j] = NULL;
@@ -92,12 +87,10 @@ char **ft_splittt(const char *st, char sep)
 
     if (!st)
         return (NULL);
-
     leng = count_wordstt(st, sep);
     dest = malloc(sizeof(char *) * (leng + 1));
     if (!dest)
         return (NULL);
-
     tableautt(dest, st, sep, leng);
     return (dest);
 }
@@ -108,12 +101,11 @@ char **ft_splittt(const char *st, char sep)
 char *ft_stcatt(char c, const char *str)
 {
     int len = strlen(str);
-    char *new_str = malloc(len + 2);  // +1 pour le caractère, +1 pour le '\0'
+    char *new_str = malloc(len + 2);
     if (!new_str)
         return NULL;
-
-    new_str[0] = c;  // Ajoute le guillemet au début
-    strcpy(new_str + 1, str);  // Copie la chaîne existante après le guillemet
+    new_str[0] = c; 
+    strcpy(new_str + 1, str);
     return new_str;
 }
 
@@ -154,12 +146,14 @@ void for_quote_at_start(char ***args)
 char	**check_dollars(char *input, t_ee *ee)
 {
 	char	**args;
-	char	**changed_args;
+	//char	**changed_args;
 
 	args = ft_splittt(input, ' ');
 	if (!args)
 		return (NULL);
 	for_quote_at_start(&args);
+	//for (int i = 0; args[i]; i++)
+	//	printf("check_dollars args[i] %s\n", args[i]);
 	int i = 0;
 	while (args[i])
 	{
@@ -178,33 +172,41 @@ char	**check_dollars(char *input, t_ee *ee)
 		}
 		i++;
 	}
-	changed_args = parse_dollars(args, ee);
-	if (!changed_args)
-		return (NULL);
-	free_split(args);
-	return (changed_args);
+	//changed_args = args;// parse_dollars(args, ee);
+
+	//if (!changed_args)
+	//	return (NULL);
+	//free_split(args);
+	return (args);// (changed_args);
 }
 
-char	*remove_parentheses(char *input)
+char *remove_parentheses(char *input)
 {
-	t_parentheses_remover	r;
+    t_parentheses_remover r;
+    int j;
 
-	init_remover(&r, input);
-	if (!r.tmp)
-		return (NULL);
-	while (input[r.i])
-	{
-		if (input[r.i] == '(' && r.level++ > 0)
-			r.tmp[r.j++] = input[r.i];
-		else if (input[r.i] == ')' && --r.level > 0)
-			r.tmp[r.j++] = input[r.i];
-		else if (r.level > 0 || input[r.i] != ')')
-			r.tmp[r.j++] = input[r.i];
-		r.i++;
-	}
-	r.tmp[r.j] = '\0';
-	return (r.tmp);
+    init_remover(&r, input);
+    if (!r.tmp)
+        return (NULL);
+    j = ft_strlen(input);
+    while (input[r.i] && r.i < j)
+    {
+        if (r.i > 0 && input[r.i - 1] == '(' && r.level++ > 0)
+            r.tmp[r.j++] = input[r.i];
+        else if (input[r.i] == ')' && --r.level > 0)
+            r.tmp[r.j++] = input[r.i];
+        else if (r.level > 0 || input[r.i] != ')')
+        {
+            if (input[r.i] == '(')
+                r.i++;
+            r.tmp[r.j++] = input[r.i];
+        }
+        r.i++;
+    }
+    r.tmp[r.j] = '\0';
+    return (r.tmp);
 }
+
 
 int	count_extra_spaces_pipeline(char *input)
 {

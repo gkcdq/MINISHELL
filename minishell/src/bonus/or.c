@@ -60,6 +60,14 @@ char	*copy_before_or(char *src)
 			while (src[i] != ')')
 				i++;
 		}
+		if (src[i] == '"')
+		{
+			i++; 
+			while (src[i] && src[i] != '"')
+				i++;
+			if (src[i] == '"' && src[i + 1])
+				i++;
+		}
 		if (src[i] == '|' && src[i + 1] == '|')
 			break ;
 		i++;
@@ -90,8 +98,16 @@ char	*copy_after_or(char *src)
 			while (src[i] != ')')
 				i++;
 		}
-		if (src[i] == '|' && src[i + 1] == '|')
-			break ;
+		if (src[i] == '"')
+		{
+			i++; 
+			while (src[i] && src[i] != '"')
+				i++;
+			if (src[i] == '"' && src[i + 1])
+				i++;
+		}
+			if (src[i] == '|' && src[i + 1] == '|')
+				break ;
 		i++;
 	}
 	if (src[i] == '\0')

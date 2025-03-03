@@ -75,9 +75,7 @@ int	execute_pipeline(char *input, t_ee *ee)
 	input = parse_input_pipeline(input);
 	piipe->commands = ft_split(input, '|');
 	while (piipe->commands[piipe->i])
-	{
 		do_what_pipe_need(pipe_fd, piipe, ee);
-	}
 	if (piipe->prev_fd != -1)
 		close(piipe->prev_fd);
 	while (wait(NULL) > 0)

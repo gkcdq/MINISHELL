@@ -14,7 +14,7 @@
 
 void	handle_exit_syntax_error(void)
 {
-	printf("🛠️_(>_<;)_🛠️   : syntax error near unexpected token `;;'\n");
+	ft_printf("🛠️_(>_<;)_🛠️   : syntax error near unexpected token `;;'\n");
 }
 
 void	handle_exit_numeric_error(char **args, t_ee *ee, t_token *exit)

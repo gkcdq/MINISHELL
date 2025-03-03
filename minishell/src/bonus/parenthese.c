@@ -48,6 +48,7 @@ void	process_or_case(char *input, t_ee *ee)
 		return ;
 	par->command_before_or = copy_before_or(input);
 	par->command_after_or = copy_after_or(input);
+	printf("c_after =%s\n", par->command_after_or);
 	has_parentheses = (find_parenthesis(par->command_after_or) == 1);
 	cumulate_token(par->command_before_or, ee);
 	if (ee->signal != 0)
@@ -100,6 +101,7 @@ void	its_just_a_parenthese(char *input, t_ee *ee)
 		return ;
 	}
 	clean_input = remove_parentheses(input);
+	//printf("\tcleaned_input = %s\n", clean_input);
 	if (!clean_input)
 		return ;
 	execute_cleaned_input(clean_input, ee);

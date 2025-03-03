@@ -14,7 +14,7 @@
 
 void	print_invalid_identifier(const char *arg)
 {
-	printf("🔥_(╬ Ò﹏Ó)_🔥: export: %s: not a valid identifier\n", arg);
+	ft_printf("🔥_(╬ Ò﹏Ó)_🔥: export: %s: not a valid identifier\n", arg);
 }
 
 size_t	get_key_length(const char *arg)

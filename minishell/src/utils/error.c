@@ -29,7 +29,7 @@ void	gandalf_le_grand_prince(t_redir_handler *hr, char c)
 	}
 	if (c == 'o')
 	{
-		perror("🔒 Erreurrrr ouverture fichier here-doc");
+		perror("🔒 Erreur ouverture fichier here-doc");
 		unlink(hr->heredoc_tmpfile);
 		redi_pipe_free(hr);
 		return ;

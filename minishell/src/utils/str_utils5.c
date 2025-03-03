@@ -61,10 +61,29 @@ int	check_atoi_overflow(char *str)
 	return (0);
 }
 
+void copy_until_close_quote(char *l, int *i, char *copy, int *j)
+{
+    char quote_type;
+
+    quote_type = l[*i];
+    copy[(*j)++] = l[(*i)++]; 
+    while (l[*i] != '\0')
+    {
+        copy[(*j)++] = l[*i];
+        if (l[*i] == quote_type)
+        {
+            (*i)++;
+            return;
+        }
+        (*i)++;
+    }
+}
+
+
 void	copy_until_parenthesis(char *l, int *i, char *copy, int *j)
 {
-	(*i)++;
-	while (l[*i] != '\0' && l[*i] != ')')
+//	(*i)++;
+	while (l[*i] != '\0' && (*i == 0 || l[*i - 1] != ')'))
 	{
 		copy[*j] = l[*i];
 		(*j)++;

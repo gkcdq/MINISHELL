@@ -89,4 +89,5 @@ int	count_first_or_last(char *input, char c)
 		return (count_first);
 	else
 		return (count_last);
+	return (0);
 }
