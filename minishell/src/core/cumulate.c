@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cumulate.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tmilin <marvin@42.fr>                      +#+  +:+       +#+        */
+/*   By: tmilin <tmilin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 19:27:44 by tmilin            #+#    #+#             */
-/*   Updated: 2025/02/27 19:27:48 by tmilin           ###   ########.fr       */
+/*   Updated: 2025/03/03 19:39:54 by tmilin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,7 +95,7 @@ bool	process_token(char *input, int *i, t_ee *ee, bool success)
 	ee->command_with_and = 0;
 	free(copy);
 	if (ee->check_and_validity)
-		norminette_udertaker(success, ee);
+		success = norminette_udertaker(success, ee);
 	return (success);
 }
 
