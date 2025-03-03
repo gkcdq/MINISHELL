@@ -6,7 +6,7 @@
 /*   By: tmilin <tmilin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 19:29:46 by tmilin            #+#    #+#             */
-/*   Updated: 2025/03/03 18:16:07 by tmilin           ###   ########.fr       */
+/*   Updated: 2025/03/03 19:46:15 by tmilin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,13 +95,11 @@ int	process_heredoc_entries(t_redir_simple *hr, t_ee *ee)
 
 	if (hr->help == 1)
 	{
-		printf("asdf\n");
 		hr->delimiter = hr->split_in[1];
 		return (process_single_heredoc(hr, ee, buffer));
 	}
 	else
 	{
-		printf("sdf");
 		return (process_multiple_heredocs(hr, ee, buffer));
 	}
 }
