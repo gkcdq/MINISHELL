@@ -19,31 +19,7 @@ void	norminette_tricks(void)
 
 int	check_the_end(char *input)
 {
-	int	i;
-	int	count_first;
-	int	count_last;
-
-	count_first = count_first_or_last(input, 'f');
-	count_last = count_first_or_last(input, 'l');
-	if (input)
-		i = ft_strlen(input);
-	while (input[i] && input[i - 1] <= 32)
-		i--;
-	i--;
-	if (input[i] == '(')
-	{
-		norminette_tricks();
-		return (1);
-	}
-	if ((input[i] == '|' || input[i] == '&'))
-		return (1);
-	if (count_last > count_first)
-	{
-		ft_printf("🛠️_(>_<;)_🛠️   : syntax error near unexpected token `)'\n");
-		return (1);
-	}
-	if (count_last < count_first)
-		return (1);
+	(void)input;
 	return (0);
 }
 

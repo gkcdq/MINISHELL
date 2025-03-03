@@ -88,7 +88,7 @@ void	handle_append_redirection(t_redir_handler *hr, t_pipeline *p)
 char	*handle_redi_with_pipe(char *input, t_ee *ee, t_pipeline *p)
 {
 	t_redir_handler	*hr;
-	char			*final_command;
+	char			*final_command = NULL;
 
 	hr = malloc(sizeof(t_redir_handler));
 	if (!hr)
