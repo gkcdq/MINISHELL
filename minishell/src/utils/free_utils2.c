@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   free_utils2.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tmilin <marvin@42.fr>                      +#+  +:+       +#+        */
+/*   By: tmilin <tmilin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 19:34:52 by tmilin            #+#    #+#             */
-/*   Updated: 2025/02/27 19:34:55 by tmilin           ###   ########.fr       */
+/*   Updated: 2025/03/03 18:29:19 by tmilin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,22 +37,22 @@ void	redi_pipe_free(t_redir_handler *hr)
 void	redi_last_free(t_redir_handler *hr)
 {
 	if (hr->split_in)
-	free_split(hr->split_in);
+		free_split(hr->split_in);
 	if (hr->input_execv)
-	free(hr->input_execv);
+		free(hr->input_execv);
 	if (hr->path)
-	free(hr->path);
+		free(hr->path);
 	if (hr->re)
-	free(hr->re);
+		free(hr->re);
 	if (hr->heredoc_tmpfile)
 	{
 		unlink(hr->heredoc_tmpfile);
 		free(hr->heredoc_tmpfile);
 	}
 	if (hr->tmp)
-	free(hr->tmp);
+		free(hr->tmp);
 	if (hr)
-	free(hr);
+		free(hr);
 }
 
 void	free_if_pid_is_n(t_redir_simple *hr)

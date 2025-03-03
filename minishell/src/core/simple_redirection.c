@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   simple_redirection.c                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tmilin <marvin@42.fr>                      +#+  +:+       +#+        */
+/*   By: tmilin <tmilin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 19:29:46 by tmilin            #+#    #+#             */
-/*   Updated: 2025/02/27 19:29:48 by tmilin           ###   ########.fr       */
+/*   Updated: 2025/03/03 18:16:07 by tmilin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,8 +47,67 @@ int	read_and_write_heredoc(t_redir_simple *hr, char *buffer)
 	unlink(hr->tmpfilenames[hr->heredoc_count]);
 	return (EXIT_SUCCESS);
 }
+//////////////////////////////////////////////////////////////
+
+int	process_single_heredoc(t_redir_simple *hr, t_ee *ee, char *buffer)
+{
+	hr->fd = open_available(&hr->tmpfilenames[hr->heredoc_count]);
+	if (hr->fd < 0)
+		return (perror("🔒 Erreur création fichier here-doc"), EXIT_FAILURE);
+	write_to_tmpfile(hr->fd, hr->delimiter, ee);
+	close(hr->fd);
+	if (read_and_write_heredoc(hr, buffer) == EXIT_FAILURE)
+		return (EXIT_FAILURE);
+	hr->heredoc_count++;
+	return (EXIT_SUCCESS);
+}
+
+int	process_multiple_heredocs(t_redir_simple *hr, t_ee *ee, char *buffer)
+{
+	int	i;
+
+	i = 1;
+	while (i < hr->last_name)
+	{
+		if (ft_strcmp(hr->split_in[i], "<<") == 0)
+		{
+			hr->fd = open_available(&hr->tmpfilenames[hr->heredoc_count]);
+			if (hr->fd < 0)
+				return (perror("🔒 Erreur création fichier here-doc"),
+					EXIT_FAILURE);
+			hr->delimiter = hr->split_in[i + 1];
+			write_to_tmpfile(hr->fd, hr->delimiter, ee);
+			close(hr->fd);
+			if (read_and_write_heredoc(hr, buffer) == EXIT_FAILURE)
+				return (EXIT_FAILURE);
+			hr->heredoc_count++;
+			i++;
+		}
+		i++;
+	}
+	close(hr->heredoc_fd);
+	return (EXIT_SUCCESS);
+}
 
 int	process_heredoc_entries(t_redir_simple *hr, t_ee *ee)
+{
+	char	buffer[1024];
+
+	if (hr->help == 1)
+	{
+		printf("asdf\n");
+		hr->delimiter = hr->split_in[1];
+		return (process_single_heredoc(hr, ee, buffer));
+	}
+	else
+	{
+		printf("sdf");
+		return (process_multiple_heredocs(hr, ee, buffer));
+	}
+}
+
+//////////////////////////////////////////////////////////
+/*int	process_heredoc_entries(t_redir_simple *hr, t_ee *ee)
 {
 	char	buffer[1024];
 	int		i;
@@ -90,11 +149,8 @@ int	process_heredoc_entries(t_redir_simple *hr, t_ee *ee)
 		close(hr->heredoc_fd);
 	}
 	return (EXIT_SUCCESS);
-}
+}*/
 
-////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////
 /*void	handle_redirection(char *input, t_ee *ee)
 {
 	char	*tmp_in;

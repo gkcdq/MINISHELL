@@ -62,3 +62,13 @@ void	all_is__freed(t_ee *ee)
 		free(ee->copy_home);
 	free(ee);
 }
+
+void	free_after_or(char *command_before_or, char *command_after_or, t_ee *ee)
+{
+	if (command_before_or)
+		free(command_before_or);
+	if (command_after_or)
+		free(command_after_or);
+	ee->command_with_or = 0;
+	return ;
+}

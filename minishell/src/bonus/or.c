@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   or.c                                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tmilin <marvin@42.fr>                      +#+  +:+       +#+        */
+/*   By: tmilin <tmilin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 19:24:43 by tmilin            #+#    #+#             */
-/*   Updated: 2025/02/27 19:24:44 by tmilin           ###   ########.fr       */
+/*   Updated: 2025/03/03 19:04:34 by tmilin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,29 @@ int	find_or(char *input)
 	return (0);
 }
 
+void	copy_before_or_utils(char *src, int *i)
+{
+	while (src && src[*i])
+	{
+		if (src[*i] == '(')
+		{
+			while (src[*i] != ')')
+				(*i)++;
+		}
+		if (src[*i] == '"')
+		{
+			(*i)++;
+			while (src[*i] && src[*i] != '"')
+				(*i)++;
+			if (src[*i] == '"' && src[*i + 1])
+				(*i)++;
+		}
+		if (src[*i] == '|' && src[*i + 1] == '|')
+			break ;
+		(*i)++;
+	}
+}
+
 char	*copy_before_or(char *src)
 {
 	char	*tmp;
@@ -53,6 +76,26 @@ char	*copy_before_or(char *src)
 
 	i = 0;
 	j = 0;
+	copy_before_or_utils(src, &i);
+	tmp = malloc(sizeof(char) * i + 1);
+	while (j < i)
+	{
+		tmp[j] = src[j];
+		j++;
+	}
+	tmp[j] = '\0';
+	return (tmp);
+}
+
+/*char	*copy_before_or(char *src)
+{
+	char	*tmp;
+	int		i;
+	int		j;
+
+	i = 0;
+	j = 0;
+	copy_before_or_utils(src, &i);
 	while (src && src[i])
 	{
 		if (src[i] == '(')
@@ -62,7 +105,7 @@ char	*copy_before_or(char *src)
 		}
 		if (src[i] == '"')
 		{
-			i++; 
+			i++;
 			while (src[i] && src[i] != '"')
 				i++;
 			if (src[i] == '"' && src[i + 1])
@@ -80,7 +123,7 @@ char	*copy_before_or(char *src)
 	}
 	tmp[j] = '\0';
 	return (tmp);
-}
+}*/
 
 char	*copy_after_or(char *src)
 {
@@ -91,6 +134,24 @@ char	*copy_after_or(char *src)
 	tmp = NULL;
 	if (!src || src == NULL)
 		return (NULL);
+	copy_before_or_utils(src, &i);
+	if (src[i] == '\0')
+		return (NULL);
+	i += 2;
+	tmp = complete_tmp(src, i);
+	return (tmp);
+}
+
+/*char	*copy_after_or(char *src)
+{
+	int		i;
+	char	*tmp;
+
+	i = 0;
+	tmp = NULL;
+	if (!src || src == NULL)
+		return (NULL);
+	copy_before_or_utils(src, &i);
 	while (src && src[i])
 	{
 		if (src[i] == '(')
@@ -100,14 +161,14 @@ char	*copy_after_or(char *src)
 		}
 		if (src[i] == '"')
 		{
-			i++; 
+			i++;
 			while (src[i] && src[i] != '"')
 				i++;
 			if (src[i] == '"' && src[i + 1])
 				i++;
 		}
-			if (src[i] == '|' && src[i + 1] == '|')
-				break ;
+		if (src[i] == '|' && src[i + 1] == '|')
+			break ;
 		i++;
 	}
 	if (src[i] == '\0')
@@ -115,33 +176,7 @@ char	*copy_after_or(char *src)
 	i += 2;
 	tmp = complete_tmp(src, i);
 	return (tmp);
-}
-
-char	*complete_tmp(char *src, int i)
-{
-	int		k;
-	int		j;
-	char	*tmp;
-
-	k = ft_strlen(src);
-	tmp = malloc(sizeof(char) * (k - i + 1));
-	if (!tmp)
-	{
-		free(tmp);
-		return (NULL);
-	}
-	j = 0;
-	while (i < k)
-	{
-		tmp[j] = src[i];
-		i++;
-		j++;
-	}
-	tmp[j] = '\0';
-	if (tmp == NULL)
-		free(tmp);
-	return (tmp);
-}
+}*/
 
 /*char *copy_after_or(char *src)
 {

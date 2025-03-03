@@ -70,10 +70,8 @@ void	after_find_or(char *input, t_ee *ee)
 	if (check_after_or(input) == 0)
 	{
 		command_before_or = copy_before_or(input);
-		printf("command before %s\n", command_before_or);
 		command_after_or = copy_after_or(input);
 		see_what_after = copy_after_or(command_after_or);
-		printf("command after %s\n", command_after_or);
 		if (see_what_after == NULL)
 			check_valid_after(command_after_or, ee);
 		free(see_what_after);
@@ -85,79 +83,6 @@ void	after_find_or(char *input, t_ee *ee)
 	}
 }
 
-int	found_single_or_double_quote(char *input)
-{
-	int		i;
-
-	i = 0;
-	//printf("ii = %s\n", input);
-	while(input[i])
-	{
-		if (input[i] == '(')
-			return (0);
-		if (input[i] == '\'' || input[i] == '"')
-			return (1);
-		i++;
-	}
-	return (0);
-}
-
-int	found_single_or_double__(char *input)
-{
-	int		i;
-	char	quote_type;
-	int		found_operator;
-
-	i = 0;
-	quote_type = 0;
-	found_operator = 0;
-	while (input[i])
-	{
-		if (input[i] == '\'' || input[i] == '"')
-		{
-			if (quote_type == 0)
-				quote_type = input[i];
-			else if (quote_type == input[i])
-				quote_type = 0;
-		}
-		if (quote_type == 0)
-		{
-			if ((input[i] == '|' && input[i + 1] == '|'))
-				found_operator = 1;
-		}
-		i++;
-	}
-	return (found_operator);
-}
-
-int	found_single__(char *input)
-{
-	int		i;
-	char	quote_type;
-	int		found_redir;
-
-	i = 0;
-	quote_type = 0;
-	found_redir = 0;
-	while (input[i])
-	{
-		if (input[i] == '\'' || input[i] == '"')
-		{
-			if (quote_type == 0)
-				quote_type = input[i];
-			else if (quote_type == input[i])
-				quote_type = 0;
-		}
-		if (quote_type == 0)
-		{
-			if ((input[i] == '<' || input[i + 1] == '>'))
-				found_redir = 1;
-		}
-		i++;
-	}
-	return (found_redir);
-}
-
 int	handle_or_and_redirection(char *input, t_ee *ee)
 {
 	if (find_or(input) == 1 && found_single_or_double__(input) == 1)
@@ -167,7 +92,6 @@ int	handle_or_and_redirection(char *input, t_ee *ee)
 	}
 	if (find_redirection(input) == 1 && found_single__(input) == 1)
 	{
-		printf("ici\n");
 		handle_redirection(input, ee);
 		return (1);
 	}

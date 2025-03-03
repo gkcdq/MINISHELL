@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tmilin <marvin@42.fr>                      +#+  +:+       +#+        */
+/*   By: tmilin <tmilin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 19:39:37 by tmilin            #+#    #+#             */
-/*   Updated: 2025/02/27 19:39:39 by tmilin           ###   ########.fr       */
+/*   Updated: 2025/03/03 18:45:55 by tmilin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MINISHELL_H
 # define MINISHELL_H
-#define MAX_LEN 2048
+# define MAX_LEN 2048
 
 # include "libft/libft.h"
 # include <curses.h>
@@ -57,6 +57,15 @@ typedef struct s_quote
 	char			*next_line;
 }					t_quote;
 
+typedef struct s_tableautt
+{
+	int				i;
+	int				j;
+	int				k;
+	int				m;
+	int				in_quotes;
+}					t_tableautt;
+
 typedef struct s_loop
 {
 	char			**changed_args;
@@ -67,10 +76,10 @@ typedef struct s_loop
 
 typedef struct s_pipe
 {
-	char			**commands;
 	int				prev_fd;
-	pid_t			pid;
 	int				i;
+	char			**commands;
+	pid_t			pid;
 }					t_pipe;
 
 typedef struct s_pipeline
@@ -136,6 +145,14 @@ typedef struct s_open
 	int				fd;
 }					t_open;
 
+typedef struct s_varex
+{
+	char			tmp[5000];
+	int				i;
+	int				j;
+	int				k;
+}					t_varex;
+
 typedef struct s_quote_handler
 {
 	char			*result;
@@ -162,12 +179,12 @@ typedef struct s_redir
 
 typedef struct s_quote_normalizer
 {
-    int i;                  
-    int j;                  
-    int k;               
-    char quote_type;        
-    char result[MAX_LEN];  
-}   t_quote_normalizer;
+	int				i;
+	int				j;
+	int				k;
+	char			quote_type;
+	char			result[MAX_LEN];
+}					t_quote_normalizer;
 
 typedef struct s_redir_handler
 {
@@ -271,6 +288,13 @@ typedef struct s_rdp
 	int				new_len;
 }					t_rdp;
 
+typedef struct s_env_expansion
+{
+	char			*new_str;
+	char			*input;
+	int				i;
+}					t_env_expansion;
+
 typedef struct s_envp_copy
 {
 	int				error_exit;
@@ -303,24 +327,27 @@ typedef struct s_envp_copy
 void				ft_exit(char *input, t_ee *ee);
 void				ft_pwd(void);
 void				ft_cd(char *input, t_ee *ee);
-void				ft_ls(char *input, t_ee *ee);
 void				ft_clear(char *input);
 void				ft_env(t_ee *ee);
 void				ft_unset(char *input, t_ee *ee);
 void				ft_export(char *input, t_ee *ee);
 void				ft_echo(char *input, t_ee *ee);
-// void		ft_wc(char *input);
 
 // ------------------------------ //
 
-void process_quotes(char *arg, t_quote_normalizer *q);
-int check_quotes(char *arg, t_quote_normalizer *q);
-void init_normalizer(t_quote_normalizer *q);
-char **parse_dollarsss(char **args, t_ee *ee) ;
-void	remoov_quote__(char **args);
-int	f_q(char *input);
-void for_quote_at_start(char ***args);
-char **ft_splittt(const char *st, char sep);
+int					verif_what_after_redirection(char *input, t_ee *ee);
+int					parse_tmp(char *tmp, t_loop *loop, t_ee *ee);
+void				process_quotes(char *arg, t_quote_normalizer *q);
+int					check_quotes(char *arg, t_quote_normalizer *q);
+void				init_normalizer(t_quote_normalizer *q);
+char				**parse_dollarsss(char **args, t_ee *ee);
+void				remoov_quote__(char **args);
+int					f_q(char *input);
+void				verif_what_after_redirection_utils(char *input, int *i);
+int					found_single__(char *input);
+int					found_single_or_double__(char *input);
+void				for_quote_at_start(char ***args);
+char				**ft_splittt(const char *st, char sep);
 int					ft_strcmp(char *s1, char *s2);
 int					is_number(char *str);
 int					ft_strlonglen(char **s);
@@ -340,10 +367,15 @@ char				*save_initial_path(t_ee *ee);
 char				**copy_envp(char **envp);
 void				init_struct_loop(t_loop *loop);
 void				loop(char *tmp, t_ee *ee);
+char				*parse_env_value(char *value);
+int					found_only_one_redirection(char *input);
+int					i_want_to_sing_a_song_hiihi(t_redir_handler *hr);
 char				*cut_for_no_leaks_at_the_end(char *input);
 int					check_the_end(char *input);
+char				*get_env_valueee(char *key, t_ee *ee);
 int					do_you_find_or_what(char *input);
 int					find_parenthesis(char *input);
+void				open_input_file(t_redir_simple *hr, char *filename);
 char				**parse_dollars(char **args, t_ee *ee);
 char				*reconstruct_input(char **changed_args);
 char				*parse_input_pipeline(char *input);
@@ -351,6 +383,14 @@ char				**check_dollars(char *input, t_ee *ee);
 char				*remove_parentheses(char *input);
 char				*parse_exev_input(char *tmp_in);
 int					find_pipe(char *input);
+int					process_multiple_heredocs(t_redir_simple *hr, t_ee *ee,
+						char *buffer);
+int					process_single_heredoc(t_redir_simple *hr, t_ee *ee,
+						char *buffer);
+void				ft_freetableautt(char **tab, int len);
+int					count_wordstt(const char *str, char sep);
+char				*parse_final_command(char *input);
+void				tableau_picasso(t_tableautt *tt);
 int					execute_pipeline(char *input, t_ee *ee);
 int					execute_pipeline_heredoc(char *input, t_ee *ee);
 int					find_redirection(char *input);
@@ -363,7 +403,9 @@ void				handle_redirection(char *input, t_ee *ee);
 char				*foud_delimiter(char **split_in);
 int					check_after_or(char *input);
 int					find_or(char *input);
+void				if_path_is_incorrect(char **args, t_ee *ee);
 char				*copy_before_or(char *src);
+void				error_access(char *command);
 char				*copy_after_or(char *src);
 char				*copy_pasta(char *l, int *i, t_ee *ee);
 void				copy_until_parenthesis(char *l, int *i, char *copy, int *j);
@@ -421,6 +463,7 @@ int					ft_found_equal(char c);
 char				*ft_strndup(const char *s, size_t n);
 void				check_variable_oldpwd(char **envp);
 int					find_pipe(char *input);
+void				check_signal(char *command, t_ee *ee);
 void				path_checker(char *input, t_ee *ee);
 void				path_confirm(char *input);
 void				init_pipe_struct(t_pipe *pipe);
@@ -455,6 +498,7 @@ void				init_redir_handler(t_redir_handler *handler, char *input);
 void				redi_pipe_free(t_redir_handler *hr);
 void				redi_last_free(t_redir_handler *hr);
 void				init_p_fd(t_pipeline *p);
+void				init_varex(t_varex *v);
 void				gandalf_le_grand_prince(t_redir_handler *hr, char c);
 int					norminette_backflip(char *fi, t_redir_handler *hr);
 int					find_redirection_and_pipe(char *input);
@@ -487,7 +531,7 @@ int					check_simple_exit(char *input);
 void				handle_exit_no_args(char **args, t_ee *ee, t_token *exit);
 void				handle_exit_syntax_error(void);
 void				handle_exit_numeric_error(char **a, t_ee *ee, t_token *e);
-void				handle_exit_too_many_args(t_token *exit, char **args, t_ee *ee);
+void				bilbon_the_saquet(char **args, char *command, t_ee *ee);
 int					find_oldpwd_index(char **envp);
 void				remove_oldpwd_from_env(char **envp, int index);
 void				norminette_heelflip(t_ee *ee);
@@ -495,8 +539,6 @@ void				norminette_hardflip(t_unset_data *data, t_ee *ee);
 void				norminette_pop_shove_it(t_ee *ee);
 char				*save_initial_home(t_ee *ee);
 void				check_if_home_is_set(t_ee *ee, char **args);
-void				print_files(t_ls *ls);
-int					open_directory(t_ls *ls);
 void				init_ls(t_ls *ls, char *input);
 char				*parse_input_ls(char *input);
 void				clean_up_ls(t_ls *ls);
@@ -522,6 +564,10 @@ void				allocate_and_copy_envp(t_ewa *ewa, t_ee *ee);
 void				count_arguments(t_ewa *ewa, char **args);
 void				count_env_length(t_rdp *rdp, char **env);
 void				allocate_to_keep(t_rdp *rdp);
+void				do_what_dq_do(t_ee *ee);
+void				normalize_quotes(char **args);
+bool				norminette_udertaker(bool success, t_ee *ee);
+void				copy_before_or_utils(char *src, int *i);
 size_t				ft_strcspn(const char *str, const char *reject);
 void				remove_duplicates(t_rdp *rdp, char **env);
 char				**copy_filtered_env(t_rdp *rdp, char **env);
@@ -531,10 +577,10 @@ void				add_oldpwd(t_ee *ee, char **sorted_env, int *len);
 void				bilbon_saquet(t_ee *ee, char **args);
 void				norminette_backstab(t_ee *ee, char **args);
 void				process_simple_export(char *input, t_ee *ee);
-int	found_single_or_double_quote(char *input);
-int printf_expand_var(char *input, t_ee *ee);
-void set_value_dollars(char **input, t_ee *ee);
-void	copy_until_close_quote(char *l, int *i, char *copy, int *j);
+int					found_single_or_double_quote(char *input);
+int					printf_expand_var(char *input, t_ee *ee);
+void				set_value_dollars(char **input, t_ee *ee);
+void				copy_until_close_quote(char *l, int *i, char *copy, int *j);
 void				copy_sorted_elements(char **sorted, char **sorted_env,
 						int len);
 int					calculate_sorted_len(char **sorted, t_ee *ee);
@@ -554,7 +600,9 @@ void				handle_exit_with_numeric_value(char **a, t_ee *e,
 						t_token *x);
 int					handle_error_piperedi(const char *m, t_pipeline *p,
 						char *t);
+void				handle_exit_too_many_args(t_token *exit, char **args,
+						t_ee *ee);
 
-//cat "$PATH"
+// cat "$PATH"
 
 #endif

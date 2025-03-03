@@ -45,3 +45,13 @@ void	handle_sigquit(int sig)
 	(void)sig;
 	ft_printf("Quit signal received (Ctrl+\\)\n");
 }
+
+void	check_signal(char *command, t_ee *ee)
+{
+	if (ft_strcmp(command, "./minishell") == 0)
+	{
+		signal(SIGINT, SIG_IGN);
+		signal(SIGQUIT, SIG_IGN);
+		ee->reset_sigint = 1;
+	}
+}

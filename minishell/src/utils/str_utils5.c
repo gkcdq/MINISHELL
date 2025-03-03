@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   str_utils5.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tmilin <marvin@42.fr>                      +#+  +:+       +#+        */
+/*   By: tmilin <tmilin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 19:38:35 by tmilin            #+#    #+#             */
-/*   Updated: 2025/02/27 19:38:36 by tmilin           ###   ########.fr       */
+/*   Updated: 2025/03/03 18:48:28 by tmilin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,28 +61,26 @@ int	check_atoi_overflow(char *str)
 	return (0);
 }
 
-void copy_until_close_quote(char *l, int *i, char *copy, int *j)
+void	copy_until_close_quote(char *l, int *i, char *copy, int *j)
 {
-    char quote_type;
+	char	quote_type;
 
-    quote_type = l[*i];
-    copy[(*j)++] = l[(*i)++]; 
-    while (l[*i] != '\0')
-    {
-        copy[(*j)++] = l[*i];
-        if (l[*i] == quote_type)
-        {
-            (*i)++;
-            return;
-        }
-        (*i)++;
-    }
+	quote_type = l[*i];
+	copy[(*j)++] = l[(*i)++];
+	while (l[*i] != '\0')
+	{
+		copy[(*j)++] = l[*i];
+		if (l[*i] == quote_type)
+		{
+			(*i)++;
+			return ;
+		}
+		(*i)++;
+	}
 }
-
 
 void	copy_until_parenthesis(char *l, int *i, char *copy, int *j)
 {
-//	(*i)++;
 	while (l[*i] != '\0' && (*i == 0 || l[*i - 1] != ')'))
 	{
 		copy[*j] = l[*i];

@@ -3,19 +3,18 @@
 /*                                                        :::      ::::::::   */
 /*   redirection_utils.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tmilin <marvin@42.fr>                      +#+  +:+       +#+        */
+/*   By: tmilin <tmilin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 19:37:25 by tmilin            #+#    #+#             */
-/*   Updated: 2025/02/27 19:37:26 by tmilin           ###   ########.fr       */
+/*   Updated: 2025/03/03 18:37:55 by tmilin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
 
-
 int	has_no_or(char *input)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	while (input[i])
@@ -26,7 +25,6 @@ int	has_no_or(char *input)
 	}
 	return (0);
 }
-
 
 int	find_redirection_and_pipe(char *input)
 {

@@ -44,3 +44,10 @@ void	assign_rdp_name(t_rdp *rdp, char **env)
 	rdp->name_i = ft_strndup(env[rdp->i], rdp->name_i_len);
 	rdp->name_j = ft_strndup(env[rdp->j], rdp->name_j_len);
 }
+
+void	init_varex(t_varex *v)
+{
+	v->i = 0;
+	v->k = 0;
+	v->j = 0;
+}

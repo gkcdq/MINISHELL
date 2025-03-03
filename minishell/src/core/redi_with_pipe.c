@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   redi_with_pipe.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tmilin <marvin@42.fr>                      +#+  +:+       +#+        */
+/*   By: tmilin <tmilin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 19:29:09 by tmilin            #+#    #+#             */
-/*   Updated: 2025/02/27 19:29:10 by tmilin           ###   ########.fr       */
+/*   Updated: 2025/03/03 17:43:39 by tmilin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@ void	handle_input_redirection(t_redir_handler *hr, t_pipeline *p)
 void	handle_output_redirection(t_redir_handler *hr, t_pipeline *p)
 {
 	if (p->output_fd != -1)
-    	close(p->output_fd);
+		close(p->output_fd);
 	p->output_fd = open(hr->split_in[hr->i + 1], O_WRONLY | O_CREAT | O_TRUNC,
 			0644);
 	if (p->output_fd < 0)
@@ -73,7 +73,7 @@ void	handle_output_redirection(t_redir_handler *hr, t_pipeline *p)
 void	handle_append_redirection(t_redir_handler *hr, t_pipeline *p)
 {
 	if (p->output_fd != -1)
-    	close(p->output_fd);
+		close(p->output_fd);
 	p->output_fd = open(hr->split_in[hr->i + 1], O_WRONLY | O_CREAT | O_APPEND,
 			0644);
 	if (p->output_fd < 0)
@@ -88,11 +88,10 @@ void	handle_append_redirection(t_redir_handler *hr, t_pipeline *p)
 char	*handle_redi_with_pipe(char *input, t_ee *ee, t_pipeline *p)
 {
 	t_redir_handler	*hr;
-	char			*final_command = NULL;
+	char			*final_command;
 
+	final_command = NULL;
 	hr = malloc(sizeof(t_redir_handler));
-	if (!hr)
-		return (NULL);
 	init_p_fd(p);
 	init_redir_handler(hr, input);
 	while (hr->i < hr->last_name && p->breakk == 0)

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipe_redi.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tmilin <marvin@42.fr>                      +#+  +:+       +#+        */
+/*   By: tmilin <tmilin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 19:29:00 by tmilin            #+#    #+#             */
-/*   Updated: 2025/02/27 19:29:02 by tmilin           ###   ########.fr       */
+/*   Updated: 2025/03/03 17:39:53 by tmilin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,30 +51,6 @@ int	execute_child(t_pipeline *p, t_ee *ee)
 	handle_child_process(p, ee);
 	exit(EXIT_FAILURE);
 }
-
-char *parse_final_command(char *input)
-{
-    int i = 0;
-    int j = 0;
-    char *tmp;
-
-    while (input[i] && input[i] <= 32)
-        i++;
-    if (input[i] == '\0')
-    {
-		free(input);
-        return NULL;
-    }
-    tmp = malloc(sizeof(char) * (ft_strlen(input + i) + 1));
-    if (!tmp)
-        return NULL;
-    while (input[i])
-        tmp[j++] = input[i++];
-    tmp[j] = '\0';
-    free(input);
-    return tmp;
-}
-
 
 void	main_core(t_pipeline *p, char *input, t_ee *ee)
 {

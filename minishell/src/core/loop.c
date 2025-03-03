@@ -3,63 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   loop.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tmilin <marvin@42.fr>                      +#+  +:+       +#+        */
+/*   By: tmilin <tmilin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 19:28:44 by tmilin            #+#    #+#             */
-/*   Updated: 2025/02/27 19:28:45 by tmilin           ###   ########.fr       */
+/*   Updated: 2025/03/03 16:55:14 by tmilin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
-
-int	verif_what_after_redirection(char *input, t_ee *ee)
-{
-	int i;
-
-	i = 0;
-	while (input[i])
-	{
-		if ((input[i] == '<' || input[i] == '>') && (input[i + 1] == '<' || input[i + 1] == '>'))
-		{
-			i += 2;
-			break ;
-		}
-		else if (input[i] == '<' || input[i] == '>')
-		{
-			i += 1;
-			break ;
-		}
-		i++;
-	}
-	while (input [i] && input[i] <= 32)
-		i++;
-	if (input[i] == '<' || input[i] == '>' || input[i] == '|' || input[i] == ';' || input[i] == '&')
-	{
-		ee->signal = 2;
-		return (1);
-	}
-	return (0);
-}
-
-int	parse_tmp(char *tmp, t_loop *loop, t_ee *ee)
-{
-	if (check_syntax_error(tmp, ee) || check_unexpected_semicolon(tmp, ee)
-		|| check_for_no_double(tmp, ee) || verif_what_after_redirection(tmp, ee)
-			|| *tmp == '\0')
-	{
-		free(tmp);
-		cleanup_loop(loop);
-		return (1);
-	}
-	loop->input = cut_for_no_leaks_at_the_end(tmp);
-	if (!loop->input)
-	{
-		free(tmp);
-		cleanup_loop(loop);
-		return (1);
-	}
-	return (0);
-}
 
 int	more_parse_and_assign(t_loop *loop, t_ee *ee)
 {
@@ -74,19 +25,6 @@ int	more_parse_and_assign(t_loop *loop, t_ee *ee)
 		cleanup_loop(loop);
 		return (1);
 	}
-	//loop->cleaned_input = handle_quotes(loop->input, ee);
-	/*if (!loop->cleaned_input || !*loop->cleaned_input)
-	{
-		cleanup_loop(loop);
-		return (1);
-	}
-	//free(loop->input);
-	//loop->input = loop->cleaned_input;
-	if (!loop->input)
-	{
-		cleanup_loop(loop);
-		return (1);
-	}*/
 	return (0);
 }
 
