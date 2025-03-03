@@ -99,7 +99,12 @@ void	ft_echo(char *input, t_ee *ee)
 		if (ft_strcmp(args[i], "$?" ) == 0)
 			ft_printf("%d", ee->signal);
 		else
-			ft_printf("%s", args[i]);
+		{
+			if (confirme_n(args[i]) != 1)
+				ft_printf("%s", args[i]);
+			if (confirme_n(args[i]) == 1 && i > 1)
+				ft_printf("%s", args[i]);
+		}
 		if (args[i + 1])
 			ft_printf(" ");
 		i++;
