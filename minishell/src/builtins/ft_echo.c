@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_echo.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tmilin <marvin@42.fr>                      +#+  +:+       +#+        */
+/*   By: tmilin <tmilin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 19:25:36 by tmilin            #+#    #+#             */
-/*   Updated: 2025/02/27 19:25:37 by tmilin           ###   ########.fr       */
+/*   Updated: 2025/03/04 15:37:37 by tmilin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,6 +94,7 @@ void	ft_echo(char *input, t_ee *ee)
 	args = ft_splittt(input, ' ');
 	remoov_quote__(args);
 	tmp = parse_dollarsss(args, ee);
+	parse_dollars_input(&tmp, ee);
 	free_split(args);
 	args = tmp;
 	if (args[1] && confirme_n(args[1]) == 1)

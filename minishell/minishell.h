@@ -6,7 +6,7 @@
 /*   By: tmilin <tmilin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 19:39:37 by tmilin            #+#    #+#             */
-/*   Updated: 2025/03/03 18:45:55 by tmilin           ###   ########.fr       */
+/*   Updated: 2025/03/04 15:45:40 by tmilin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,6 +73,16 @@ typedef struct s_loop
 	char			*input;
 	pid_t			pid;
 }					t_loop;
+
+typedef struct s_parser
+{
+	int				i;
+	int				j;
+	char			*tmp;
+	char			*kekw;
+	char			*new_value;
+	int				new_len;
+}					t_parser;
 
 typedef struct s_pipe
 {
@@ -335,6 +345,8 @@ void				ft_echo(char *input, t_ee *ee);
 
 // ------------------------------ //
 
+void				skip_separators(const char *str, char sep, t_tableautt *tt);
+void				parse_dollars_input(char ***input, t_ee *ee);
 int					verif_what_after_redirection(char *input, t_ee *ee);
 int					parse_tmp(char *tmp, t_loop *loop, t_ee *ee);
 void				process_quotes(char *arg, t_quote_normalizer *q);
@@ -602,7 +614,5 @@ int					handle_error_piperedi(const char *m, t_pipeline *p,
 						char *t);
 void				handle_exit_too_many_args(t_token *exit, char **args,
 						t_ee *ee);
-
-// cat "$PATH"
 
 #endif
