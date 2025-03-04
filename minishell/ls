@@ -1,1 +1,0 @@
-cat << e |wc -l | ls > lol || pwd < Makefile | ./minishell

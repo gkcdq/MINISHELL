@@ -6,7 +6,7 @@
 /*   By: tmilin <tmilin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/03 18:50:03 by tmilin            #+#    #+#             */
-/*   Updated: 2025/03/03 18:50:48 by tmilin           ###   ########.fr       */
+/*   Updated: 2025/03/04 17:23:15 by tmilin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,11 @@ void	error_access(char *command)
 	{
 		ft_printf("🚧_(⊙_⊙;)_🚧 : ./: Is a directory\n");
 		exit(126);
+	}
+	if (access(command, F_OK) == -1)
+	{
+		ft_printf("🪦_(°ロ°)☝_🪦 : No such file or directory\n");
+		exit(127);
 	}
 	if (access(command, X_OK) == -1)
 	{
