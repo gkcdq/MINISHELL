@@ -6,7 +6,7 @@
 /*   By: tmilin <tmilin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 15:45:57 by tmilin            #+#    #+#             */
-/*   Updated: 2025/03/04 15:45:57 by tmilin           ###   ########.fr       */
+/*   Updated: 2025/03/04 16:43:44 by tmilin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,4 +36,13 @@ void	skip_separators(const char *str, char sep, t_tableautt *tt)
 {
 	while (str[tt->i] && str[tt->i] == sep)
 		tt->i++;
+}
+
+void	skip_quoted_part(char *tmp_in, t_pparser *p)
+{
+	p->quote = tmp_in[p->i++];
+	while (tmp_in[p->i] && tmp_in[p->i] != p->quote)
+		p->i++;
+	if (tmp_in[p->i] == p->quote)
+		p->i++;
 }

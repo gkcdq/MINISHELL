@@ -6,7 +6,7 @@
 /*   By: tmilin <tmilin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 19:39:37 by tmilin            #+#    #+#             */
-/*   Updated: 2025/03/04 15:45:40 by tmilin           ###   ########.fr       */
+/*   Updated: 2025/03/04 16:59:51 by tmilin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -180,12 +180,21 @@ typedef struct s_separator_handler
 	int				j;
 	int				count_how_many_sep;
 	char			*good_sep;
+	char			quote;
 }					t_separator_handler;
 
 typedef struct s_redir
 {
 	int				command_fail;
 }					t_redir;
+
+typedef struct s_pparser
+{
+	int				i;
+	int				j;
+	char			quote;
+	char			*return_input;
+}					t_pparser;
 
 typedef struct s_quote_normalizer
 {
@@ -345,6 +354,9 @@ void				ft_echo(char *input, t_ee *ee);
 
 // ------------------------------ //
 
+int					f_q(char *input);
+void				skip_quoted_part(char *tmp_in, t_pparser *p);
+void				init_parser(t_pparser *p);
 void				skip_separators(const char *str, char sep, t_tableautt *tt);
 void				parse_dollars_input(char ***input, t_ee *ee);
 int					verif_what_after_redirection(char *input, t_ee *ee);
@@ -354,7 +366,6 @@ int					check_quotes(char *arg, t_quote_normalizer *q);
 void				init_normalizer(t_quote_normalizer *q);
 char				**parse_dollarsss(char **args, t_ee *ee);
 void				remoov_quote__(char **args);
-int					f_q(char *input);
 void				verif_what_after_redirection_utils(char *input, int *i);
 int					found_single__(char *input);
 int					found_single_or_double__(char *input);

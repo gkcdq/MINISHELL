@@ -6,7 +6,7 @@
 /*   By: tmilin <tmilin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 19:29:23 by tmilin            #+#    #+#             */
-/*   Updated: 2025/03/04 14:35:20 by tmilin           ###   ########.fr       */
+/*   Updated: 2025/03/04 16:38:35 by tmilin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,6 @@ void	handle_child_simple_process(t_redir_simple *hr, t_ee *ee)
 		exit(EXIT_FAILURE);
 	handle_otpt_redirection(hr);
 	cumulate_token(hr->input_execv, ee);
-	//execv(hr->path, hr->split_execv);
 	exit(EXIT_SUCCESS);
 }
 
