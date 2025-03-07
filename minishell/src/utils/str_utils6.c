@@ -6,7 +6,7 @@
 /*   By: tmilin <tmilin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/03 16:54:03 by tmilin            #+#    #+#             */
-/*   Updated: 2025/03/07 21:00:53 by tmilin           ###   ########.fr       */
+/*   Updated: 2025/03/07 21:19:59 by tmilin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ void	remoov_quote__(char **args)
 
 int	found_single_or_double_quote(char *input)
 {
-	int		i;
+	int	i;
 
 	i = 0;
 	while (input[i])
@@ -85,7 +85,6 @@ int	found_single__(char *input)
 	int		found_redir;
 
 	i = 0;
-	printf("%s\n", input);
 	quote_type = 0;
 	found_redir = 0;
 	while (input[i])
@@ -97,14 +96,11 @@ int	found_single__(char *input)
 			else if (quote_type == input[i])
 				quote_type = 0;
 		}
-		// Fix: Check correctly for redirections outside of quotes
 		if (quote_type == 0 && (input[i] == '<' || input[i] == '>'))
 		{
-			printf("ici\n");
 			found_redir = 1;
 		}
 		i++;
 	}
 	return (found_redir);
 }
-

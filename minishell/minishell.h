@@ -6,7 +6,7 @@
 /*   By: tmilin <tmilin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 19:39:37 by tmilin            #+#    #+#             */
-/*   Updated: 2025/03/04 19:44:39 by tmilin           ###   ########.fr       */
+/*   Updated: 2025/03/07 21:15:55 by tmilin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -467,6 +467,7 @@ int					check_syntax_error(const char *tmp, t_ee *ee);
 int					check_unexpected_semicolon(char *tmp, t_ee *ee);
 int					find_trap(char *input);
 void				cleanup_loop(t_loop *loop);
+int					found_single_pipe__(char *input);
 int					check_tmp_not_null(char *tmp, t_ee *ee);
 void				for_norminette(t_ee *ee);
 void				its_just_a_parenthese(char *input, t_ee *ee);
