@@ -6,7 +6,7 @@
 /*   By: tmilin <tmilin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 19:25:36 by tmilin            #+#    #+#             */
-/*   Updated: 2025/03/07 20:33:39 by tmilin           ###   ########.fr       */
+/*   Updated: 2025/03/07 21:25:52 by tmilin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,7 +97,11 @@ void	ft_echo(char *input, t_ee *ee)
 	normalize_quotes(args);
 	remoov_quote__(args);
 	tmp = parse_dollarsss(args, ee);
+	for (int i = 0; tmp[i]; i++)
+		printf("%s\n", tmp[i]);
 	parse_dollars_input(&tmp, ee);
+	for (int i = 0; tmp[i]; i++)
+		printf("--%s\n", tmp[i]);
 	remoov_single__quote__(tmp);
 	free_split(args);
 	args = tmp;
