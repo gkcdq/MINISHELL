@@ -6,7 +6,7 @@
 /*   By: tmilin <tmilin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/03 19:01:57 by tmilin            #+#    #+#             */
-/*   Updated: 2025/03/04 15:44:50 by tmilin           ###   ########.fr       */
+/*   Updated: 2025/03/07 20:33:26 by tmilin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,42 +37,6 @@ int	count_wordstt(const char *str, char sep)
 	return (count);
 }
 
-/*static void	tableautt(char **tab, const char *str, char sep, int leng)
-{
-	t_tableautt	tt;
-
-	tableau_picasso(&tt);
-	while (str[tt.i] != '\0' && tt.j < leng)
-	{
-		while (str[tt.i] != '\0' && str[tt.i] == sep)
-			tt.i++;
-		tt.k = tt.i;
-		tt.in_quotes = 0;
-		while (str[tt.k] != '\0')
-		{
-			if (str[tt.k] == '"')
-				tt.in_quotes = !tt.in_quotes;
-			else if (str[tt.k] == sep && !tt.in_quotes)
-				break ;
-			tt.k++;
-		}
-		tab[tt.j] = malloc(sizeof(char) * (tt.k - tt.i + 1));
-		if (!tab[tt.j])
-			return (ft_freetableautt(tab, tt.j));
-		tt.m = 0;
-		while (tt.i < tt.k)
-		{
-			if (str[tt.i] != '"')
-				tab[tt.j][tt.m++] = str[tt.i];
-			tt.i++;
-		}
-		tab[tt.j++][tt.m] = '\0';
-		if (str[tt.i] == sep)
-			tt.i++;
-	}
-	tab[tt.j] = NULL;
-}*/
-
 void	find_token_end(const char *str, char sep, t_tableautt *tt)
 {
 	tt->k = tt->i;
@@ -95,8 +59,7 @@ int	allocate_and_copy(char **tab, const char *str, t_tableautt *tt)
 	tt->m = 0;
 	while (tt->i < tt->k)
 	{
-		if (str[tt->i] != '"')
-			tab[tt->j][tt->m++] = str[tt->i];
+		tab[tt->j][tt->m++] = str[tt->i];
 		tt->i++;
 	}
 	tab[tt->j][tt->m] = '\0';
@@ -135,37 +98,3 @@ char	**ft_splittt(const char *st, char sep)
 	tableautt(dest, st, sep, leng);
 	return (dest);
 }
-
-/*static void	tableautt(char **tab, const char *str, char sep, int leng)
-{
-	int	i;
-	int	j;
-	int	k;
-	int	m;
-	int	in_quotes;
-
-	i = 0;
-	j = 0;
-	in_quotes = 0;
-	while (str[i] != '\0' && j < leng)
-	{
-		while (str[i] != '\0' && str[i] == sep && !in_quotes)
-			i++;
-		if (str[i] == '"')
-		{
-			in_quotes = !in_quotes;
-			i++;
-		}
-		k = i;
-		while (str[k] != '\0' && (str[k] != sep || in_quotes))
-			k++;
-		tab[j] = malloc(sizeof(char) * (k - i + 1));
-		if (!tab)
-			return (ft_freetableautt(tab, leng));
-		m = 0;
-		while (i < k)
-			tab[j][m++] = str[i++];
-		tab[j++][m] = '\0';
-	}
-	tab[j] = NULL;
-}*/

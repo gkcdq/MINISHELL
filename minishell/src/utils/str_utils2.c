@@ -6,7 +6,7 @@
 /*   By: tmilin <tmilin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 19:38:03 by tmilin            #+#    #+#             */
-/*   Updated: 2025/03/04 16:36:47 by tmilin           ###   ########.fr       */
+/*   Updated: 2025/03/07 20:34:32 by tmilin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,7 @@ char	**check_dollars(char *input, t_ee *ee)
 	char	**args;
 	int		i;
 
-	args = ft_split(input, ' ');
+	args = ft_splittt(input, ' ');
 	i = 0;
 	while (args[i])
 	{

@@ -6,7 +6,7 @@
 /*   By: tmilin <tmilin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 19:39:37 by tmilin            #+#    #+#             */
-/*   Updated: 2025/03/04 16:59:51 by tmilin           ###   ########.fr       */
+/*   Updated: 2025/03/04 19:44:39 by tmilin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -202,7 +202,7 @@ typedef struct s_quote_normalizer
 	int				j;
 	int				k;
 	char			quote_type;
-	char			result[MAX_LEN];
+	char			*result;
 }					t_quote_normalizer;
 
 typedef struct s_redir_handler
@@ -316,6 +316,7 @@ typedef struct s_env_expansion
 
 typedef struct s_envp_copy
 {
+	int				single_quote;
 	int				error_exit;
 	int				reset_sigint;
 	int				code_exit;
@@ -355,6 +356,7 @@ void				ft_echo(char *input, t_ee *ee);
 // ------------------------------ //
 
 int					f_q(char *input);
+int					f_sq(char *input);
 void				skip_quoted_part(char *tmp_in, t_pparser *p);
 void				init_parser(t_pparser *p);
 void				skip_separators(const char *str, char sep, t_tableautt *tt);
@@ -388,6 +390,8 @@ int					calcul_check_path(char **check_path);
 void				check_path_in_or_with_pipe(char *input, t_ee *ee);
 char				*save_initial_path(t_ee *ee);
 char				**copy_envp(char **envp);
+int					black_hole(char *tmp, t_ee *ee);
+void				remoov_single__quote__(char **args);
 void				init_struct_loop(t_loop *loop);
 void				loop(char *tmp, t_ee *ee);
 char				*parse_env_value(char *value);

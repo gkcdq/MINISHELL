@@ -6,7 +6,7 @@
 /*   By: tmilin <tmilin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 15:37:14 by tmilin            #+#    #+#             */
-/*   Updated: 2025/03/04 15:37:14 by tmilin           ###   ########.fr       */
+/*   Updated: 2025/03/07 19:58:30 by tmilin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,13 +56,14 @@ void	replace_dollar(t_parser *p, char ***input, t_ee *ee)
 	p->tmp = find_dollar((*input)[p->i]);
 	if (!p->tmp)
 		return ;
-	p->kekw = get_env_value(p->tmp + 1, ee);
-	if (!p->kekw)
+	p->kekw = get_env_value(p->tmp, ee);
+	if (p->kekw == NULL)
 	{
 		(*input)[p->i][p->j] = '\0';
 		return ;
 	}
-	p->new_len = strlen((*input)[p->i]) - strlen(p->tmp) + strlen(p->kekw);
+	p->new_len = ft_strlen((*input)[p->i]) - ft_strlen(p->tmp)
+		+ ft_strlen(p->kekw);
 	p->new_value = malloc(sizeof(char) * (p->new_len + 1));
 	if (!p->new_value)
 		return ;
@@ -82,15 +83,18 @@ void	parse_dollars_input(char ***input, t_ee *ee)
 	p.i = 0;
 	while ((*input)[p.i])
 	{
-		p.j = 0;
-		while ((*input)[p.i][p.j])
+		if (f_sq((*input)[p.i]) == 0)
 		{
-			if ((*input)[p.i][p.j] == '$')
+			p.j = 0;
+			while ((*input)[p.i][p.j])
 			{
-				replace_dollar(&p, input, ee);
-				return ;
+				if ((*input)[p.i][p.j] == '$')
+				{
+					replace_dollar(&p, input, ee);
+					return ;
+				}
+				p.j++;
 			}
-			p.j++;
 		}
 		p.i++;
 	}
