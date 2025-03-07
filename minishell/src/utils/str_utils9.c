@@ -6,7 +6,7 @@
 /*   By: tmilin <tmilin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/03 19:01:57 by tmilin            #+#    #+#             */
-/*   Updated: 2025/03/07 20:33:26 by tmilin           ###   ########.fr       */
+/*   Updated: 2025/03/07 21:03:35 by tmilin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ void	find_token_end(const char *str, char sep, t_tableautt *tt)
 	tt->in_quotes = 0;
 	while (str[tt->k])
 	{
-		if (str[tt->k] == '"')
+		if (str[tt->k] == '"' || str[tt->k] == '\'')
 			tt->in_quotes = !tt->in_quotes;
 		else if (str[tt->k] == sep && !tt->in_quotes)
 			break ;
