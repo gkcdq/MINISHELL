@@ -6,7 +6,7 @@
 /*   By: tmilin <tmilin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 15:37:14 by tmilin            #+#    #+#             */
-/*   Updated: 2025/03/07 21:31:53 by tmilin           ###   ########.fr       */
+/*   Updated: 2025/03/07 21:50:55 by tmilin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,31 +51,31 @@ char	*find_dollar(char *str)
 	return (NULL);
 }
 
-void replace_dollar(t_parser *p, char ***input, t_ee *ee)
+void	replace_dollar(t_parser *p, char ***input, t_ee *ee)
 {
-    p->tmp = find_dollar((*input)[p->i]);
-    if (!p->tmp)
-        return ;
-    p->j = p->tmp - (*input)[p->i];
-    p->kekw = get_env_value(p->tmp + 1, ee);
-    if (!p->kekw)
-    {
-        (*input)[p->i][p->j] = '\0';
-        return ;
-    }
-    p->new_len = ft_strlen((*input)[p->i]) - ft_strlen(p->tmp) + ft_strlen(p->kekw);
-    p->new_value = malloc(sizeof(char) * (p->new_len + 1));
-    if (!p->new_value)
-        return ;
-    strncpy(p->new_value, (*input)[p->i], p->j);
-    p->new_value[p->j] = '\0';
-    strcat(p->new_value, p->kekw);
-    strcat(p->new_value, p->tmp + ft_strlen(p->tmp));
-    free((*input)[p->i]);
-    (*input)[p->i] = p->new_value;
-    free(p->kekw);
+	p->tmp = find_dollar((*input)[p->i]);
+	if (!p->tmp)
+		return ;
+	p->j = p->tmp - (*input)[p->i];
+	p->kekw = get_env_value(p->tmp + 1, ee);
+	if (!p->kekw)
+	{
+		(*input)[p->i][p->j] = '\0';
+		return ;
+	}
+	p->new_len = ft_strlen((*input)[p->i]) - ft_strlen(p->tmp)
+		+ ft_strlen(p->kekw);
+	p->new_value = malloc(sizeof(char) * (p->new_len + 1));
+	if (!p->new_value)
+		return ;
+	strncpy(p->new_value, (*input)[p->i], p->j);
+	p->new_value[p->j] = '\0';
+	strcat(p->new_value, p->kekw);
+	strcat(p->new_value, p->tmp + ft_strlen(p->tmp));
+	free((*input)[p->i]);
+	(*input)[p->i] = p->new_value;
+	free(p->kekw);
 }
-
 
 void	parse_dollars_input(char ***input, t_ee *ee)
 {
