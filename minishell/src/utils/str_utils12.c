@@ -6,7 +6,7 @@
 /*   By: tmilin <tmilin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/07 21:20:09 by tmilin            #+#    #+#             */
-/*   Updated: 2025/03/07 21:20:09 by tmilin           ###   ########.fr       */
+/*   Updated: 2025/03/08 11:54:14 by tmilin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,4 +37,13 @@ int	found_single_pipe__(char *input)
 		i++;
 	}
 	return (found_redir);
+}
+
+void	the_really_last_function(char *input, int *i)
+{
+	(*i)++;
+	while (input[*i] && (input[*i] != '"' || input[*i] != '\''))
+		(*i)++;
+	if ((input[*i] == '"' || input[*i] == '\'') && input[*i + 1])
+		(*i)++;
 }

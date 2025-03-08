@@ -6,7 +6,7 @@
 /*   By: tmilin <tmilin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 19:39:37 by tmilin            #+#    #+#             */
-/*   Updated: 2025/03/07 21:15:55 by tmilin           ###   ########.fr       */
+/*   Updated: 2025/03/08 11:46:14 by tmilin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -473,6 +473,7 @@ void				for_norminette(t_ee *ee);
 void				its_just_a_parenthese(char *input, t_ee *ee);
 char				*find_env_var(const char *var_name, t_ee *ee);
 char				*expand_variable(char *input, t_ee *ee);
+void				the_really_last_function(char *input, int *i);
 char				*handle_quotes(char *input, t_ee *ee);
 void				handle_sigint(int sig);
 void				catch_signal(t_ee *ee);

@@ -6,7 +6,7 @@
 /*   By: tmilin <tmilin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/03 16:53:17 by tmilin            #+#    #+#             */
-/*   Updated: 2025/03/04 20:22:04 by tmilin           ###   ########.fr       */
+/*   Updated: 2025/03/08 11:55:04 by tmilin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,16 @@ void	verif_what_after_redirection_utils(char *input, int *i)
 {
 	while (input[*i])
 	{
+		if (input[*i] == '"' || input[*i] == '\'')
+		{
+			(*i)++;
+			while (input[*i] && (input[*i] != '"' || input[*i] != '\''))
+				(*i)++;
+			if ((input[*i] == '"' || input[*i] == '\'') && input[*i + 1])
+				(*i)++;
+			else
+				break ;
+		}
 		if ((input[*i] == '<' || input[*i] == '>') && (input[*i + 1] == '<'
 				|| input[*i + 1] == '>'))
 		{
